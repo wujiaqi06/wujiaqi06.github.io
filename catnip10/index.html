@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catnip10 — deterministic branch-coordinate conformance benchmark</title>
+<meta name="description" content="Catnip10 is a deterministic 10-tip conformance benchmark for branch-wise workflows that use a fixed or shared reference-branch axis. It tests pruning-aware coordinate eligibility and representation-stable coordinate identity against an independent graph-contraction oracle.">
+<link rel="stylesheet" href="../splitaligner/catnip10_game.css">
+<script src="../splitaligner/catnip10_game_data.js" defer></script>
+<script src="../splitaligner/catnip10_game.js" defer></script>
+<style>
+  :root{
+    --paper:#f4f6f4; --surface:#ffffff; --surface2:#eef1ee; --line:#dde3df;
+    --ink:#16211c; --muted:#5b6b64; --faint:#8a9791;
+    --accent:#15736a;
+    --accent-2:#b06a2c;
+    --accent-soft:#e2efec;
+    --serif:"Charter","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --maxw:1080px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#0f1613; --surface:#151d19; --surface2:#1b241f; --line:#2a352f;
+      --ink:#e7efea; --muted:#a2b1aa; --faint:#75847d;
+      --accent:#4bb7a8; --accent-2:#d8974f; --accent-soft:#17302b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0f1613; --surface:#151d19; --surface2:#1b241f; --line:#2a352f;
+    --ink:#e7efea; --muted:#a2b1aa; --faint:#75847d;
+    --accent:#4bb7a8; --accent-2:#d8974f; --accent-soft:#17302b;
+  }
+  :root[data-theme="light"]{
+    --paper:#f4f6f4; --surface:#ffffff; --surface2:#eef1ee; --line:#dde3df;
+    --ink:#16211c; --muted:#5b6b64; --faint:#8a9791;
+    --accent:#15736a; --accent-2:#b06a2c; --accent-soft:#e2efec;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
+    line-height:1.6; -webkit-font-smoothing:antialiased; font-size:17px}
+  h1,h2,h3{font-family:var(--serif); font-weight:600; line-height:1.15; letter-spacing:-.01em}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+  .mono{font-family:var(--mono)}
+  code{font-family:var(--mono); font-size:.88em; background:var(--surface2); border:1px solid var(--line);
+    border-radius:5px; padding:1px 5px}
+
+  /* Nav — same idiom as the rest of the site */
+  header.nav{position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.4) blur(8px);
+    background:color-mix(in srgb,var(--paper) 86%, transparent); border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--maxw); margin:0 auto; padding:11px 24px; display:flex; align-items:center; gap:18px}
+  .nav-name{font-family:var(--serif); font-weight:600; font-size:17px; letter-spacing:-.01em; margin-right:auto}
+  .nav-name a{color:var(--ink)}
+  .nav-links{display:flex; gap:20px; align-items:center}
+  .nav-links a{color:var(--muted); font-size:14.5px}
+  .nav-links a:hover{color:var(--accent); text-decoration:none}
+  .lang-switch{display:flex; gap:1px; align-items:center; font-family:var(--mono); font-size:12px}
+  .lang-switch a{color:var(--faint); padding:3px 7px; border-radius:6px; text-decoration:none}
+  .lang-switch a:hover{color:var(--accent)}
+  .lang-switch a.cur{color:var(--accent); background:var(--surface2); font-weight:700}
+  .theme-btn{border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:8px;
+    width:34px; height:34px; cursor:pointer; font-size:15px; display:grid; place-items:center}
+  .theme-btn:hover{color:var(--accent); border-color:var(--accent)}
+  @media (max-width:820px){ .nav-links{display:none} }
+
+  /* Hero */
+  .hero{padding:64px 0 40px}
+  .hero-grid{display:grid; grid-template-columns:1.45fr .8fr; gap:44px; align-items:center}
+  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr; gap:28px} }
+  .eyebrow{font-size:13px; text-transform:uppercase; letter-spacing:.18em; color:var(--accent); font-weight:700}
+  .hero h1{font-size:clamp(40px,6.4vw,64px); margin:.22em 0 .1em}
+  .hero .tag{font-family:var(--serif); font-size:clamp(18px,2.2vw,22px); color:var(--muted); font-style:italic}
+  .lead{font-size:clamp(17px,1.7vw,19.5px); color:var(--muted); max-width:62ch; margin:20px 0 24px}
+  .lead em{color:var(--ink); font-style:normal; font-weight:600}
+  .btns{display:flex; flex-wrap:wrap; gap:10px}
+  .btn{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line); background:var(--surface);
+    color:var(--ink); padding:9px 15px; border-radius:10px; font-size:14.5px; font-weight:500}
+  .btn:hover{border-color:var(--accent); color:var(--accent); text-decoration:none}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  .btn.primary:hover{background:color-mix(in srgb,var(--accent) 88%, #000); color:#fff}
+  .badge-card{background:#fbfaf4; border:1px solid var(--line); border-radius:18px; padding:12px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .badge-card img{display:block; width:100%; height:auto; border-radius:10px}
+  .badge-cap{font-family:var(--mono); font-size:11.5px; color:var(--faint); text-align:center; margin-top:8px}
+
+  /* Sections */
+  section.block{padding:50px 0; border-top:1px solid var(--line)}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:22px}
+  .sec-head h2{font-size:clamp(23px,3.1vw,30px); margin:0}
+  .sec-head .sec-num{font-family:var(--mono); font-size:13px; color:var(--accent); font-weight:700}
+  .prose{max-width:70ch; color:var(--muted); font-size:17px}
+  .prose strong{color:var(--ink)}
+  .prose p{margin:0 0 15px}
+  .prose p:last-child{margin-bottom:0}
+
+  /* Callout */
+  .note{background:linear-gradient(180deg,var(--accent-soft),transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 32%,var(--line)); border-radius:14px;
+    padding:18px 20px; margin:22px 0 0; color:var(--muted); font-size:15.5px; max-width:70ch}
+  .note strong{color:var(--ink)}
+  .note p{margin:0 0 10px} .note p:last-child{margin:0}
+
+  /* Contraction diagram */
+  .diagram{margin:26px 0 0; background:var(--surface); border:1px solid var(--line);
+    border-radius:14px; padding:22px; overflow-x:auto}
+  .diagram svg{display:block; width:100%; min-width:560px; max-width:820px; margin:0 auto; height:auto}
+  .dg-edge{fill:none; stroke:var(--muted); stroke-width:2.2; stroke-linecap:round}
+  .dg-edge.hot{stroke:var(--accent)}
+  .dg-edge.gone{stroke:var(--accent-2); stroke-dasharray:3 4; opacity:.6}
+  .dg-edge.fused{stroke:var(--accent-2); stroke-width:4.4}
+  .dg-dot{fill:var(--ink)}
+  .dg-dot.open{fill:var(--paper); stroke:var(--muted); stroke-width:1.6}
+  .dg-dot.gone{fill:var(--accent-2); opacity:.45}
+  .dg-t{font-family:var(--mono); font-size:11.5px; fill:var(--muted)}
+  .dg-t.lbl{fill:var(--ink); font-weight:700}
+  .dg-t.hot{fill:var(--accent); font-weight:700}
+  .dg-t.warm{fill:var(--accent-2); font-weight:700}
+  .dg-cap{font-family:var(--mono); font-size:11.5px; fill:var(--faint)}
+  .dg-arrow{fill:none; stroke:var(--line); stroke-width:2}
+
+  /* Algorithm steps */
+  .algo{counter-reset:step; margin:24px 0 0; display:grid; gap:12px; max-width:76ch}
+  .algo li{list-style:none; counter-increment:step; position:relative; padding:14px 18px 14px 52px;
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    color:var(--muted); font-size:15.5px; line-height:1.55}
+  .algo li::before{content:counter(step,decimal-leading-zero); position:absolute; left:18px; top:14px;
+    font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent)}
+  .algo li strong{color:var(--ink)}
+
+  /* State table */
+  .tbl-scroll{overflow-x:auto; margin:24px 0 0}
+  table.states{border-collapse:collapse; width:100%; min-width:620px; font-size:15px}
+  table.states th,table.states td{text-align:left; padding:12px 14px; border-bottom:1px solid var(--line);
+    vertical-align:top; color:var(--muted)}
+  table.states thead th{font-family:var(--mono); font-size:11.5px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--faint); font-weight:700; border-bottom:1px solid var(--line)}
+  table.states td.st{white-space:nowrap; font-family:var(--mono); font-size:13px; font-weight:700}
+  .sw-obs{color:#0c6e5b} .sw-fus{color:#2f5cc4} .sw-str{color:#bf3625}
+  @media (prefers-color-scheme:dark){ .sw-obs{color:#3cc0a6} .sw-fus{color:#8ab4f2} .sw-str{color:#f28a8a} }
+  :root[data-theme="dark"] .sw-obs{color:#3cc0a6}
+  :root[data-theme="dark"] .sw-fus{color:#8ab4f2}
+  :root[data-theme="dark"] .sw-str{color:#f28a8a}
+  :root[data-theme="light"] .sw-obs{color:#0c6e5b}
+  :root[data-theme="light"] .sw-fus{color:#2f5cc4}
+  :root[data-theme="light"] .sw-str{color:#bf3625}
+  table.states td strong{color:var(--ink)}
+
+  /* Spec grid */
+  .spec{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:820px){ .spec{grid-template-columns:repeat(2,1fr)} }
+  .spec > div{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .spec .n{font-family:var(--serif); font-size:30px; font-weight:600; color:var(--accent); line-height:1}
+  .spec .k{font-size:13.5px; color:var(--muted); margin-top:6px; line-height:1.4}
+
+  /* Verdict cards */
+  .verdicts{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:720px){ .verdicts{grid-template-columns:1fr} }
+  .vd{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .vd h4{margin:0 0 6px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--accent); font-weight:700}
+  .vd p{margin:0; color:var(--muted); font-size:15px; line-height:1.55}
+
+  /* Code block */
+  pre{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+    overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.6; color:var(--ink); margin:20px 0 0}
+  pre code{background:none; border:none; padding:0; font-size:inherit}
+  .cm{color:var(--faint)}
+
+  /* Link rows */
+  .linkrow{display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px; margin-top:18px}
+
+  footer{border-top:1px solid var(--line); padding:26px 0 40px; color:var(--faint); font-size:13.5px}
+  footer .wrap{display:flex; flex-wrap:wrap; gap:10px 20px; justify-content:space-between}
+
+
+  /* Audit result tables */
+  .figcard{background:#ffffff; border:1px solid var(--line); border-radius:14px; padding:16px;
+    overflow-x:auto; margin:24px 0 8px}
+  .figcard img{display:block; min-width:900px; width:100%; height:auto}
+  figcaption.cap{color:var(--faint); font-size:13.5px; margin-top:10px; max-width:80ch}
+  figcaption.cap b{color:var(--muted); font-weight:600}
+  .axis-wrap{overflow-x:auto; margin:18px 0 0; border:1px solid var(--line); border-radius:12px; background:var(--surface)}
+  table.axis{border-collapse:collapse; font-family:var(--mono); font-size:11.5px; width:100%; min-width:1000px}
+  table.axis th,table.axis td{padding:5px 7px; text-align:right; white-space:nowrap;
+    border-bottom:1px solid var(--line); color:var(--muted); font-variant-numeric:tabular-nums}
+  table.axis thead th{position:sticky; top:0; background:var(--surface2); color:var(--faint);
+    font-weight:700; font-size:11px; letter-spacing:.03em}
+  table.axis th.rl,table.axis td.rl{text-align:left; position:sticky; left:0; background:var(--surface);
+    color:var(--ink); font-weight:700; border-right:1px solid var(--line)}
+  table.axis thead th.rl{background:var(--surface2)}
+  table.axis tbody tr:last-child td{border-bottom:none}
+  td.o-obs{color:var(--muted)}
+  td.o-fuse{color:#2f5cc4}
+  td.o-struct{color:#bf3625}
+  td.mk-bad{color:#bf3625; font-weight:700; background:color-mix(in srgb,#bf3625 9%,transparent)}
+  td.mk-proj{color:#2f5cc4; font-weight:700; background:color-mix(in srgb,#2f5cc4 9%,transparent)}
+  @media (prefers-color-scheme:dark){ td.mk-proj{color:#8ab4f2; background:color-mix(in srgb,#8ab4f2 12%,transparent)} }
+  :root[data-theme="dark"] td.mk-proj{color:#8ab4f2; background:color-mix(in srgb,#8ab4f2 12%,transparent)}
+  :root[data-theme="light"] td.mk-proj{color:#2f5cc4; background:color-mix(in srgb,#2f5cc4 9%,transparent)}
+  @media (prefers-color-scheme:dark){
+    td.o-fuse{color:#8ab4f2} td.o-struct{color:#f28a8a}
+    td.mk-bad{color:#f28a8a; background:color-mix(in srgb,#f28a8a 12%,transparent)}
+    .figcard{background:#f7f7f2}
+  }
+  :root[data-theme="dark"] td.o-fuse{color:#8ab4f2}
+  :root[data-theme="dark"] td.o-struct{color:#f28a8a}
+  :root[data-theme="dark"] td.mk-bad{color:#f28a8a; background:color-mix(in srgb,#f28a8a 12%,transparent)}
+  :root[data-theme="dark"] .figcard{background:#f7f7f2}
+  :root[data-theme="light"] td.o-fuse{color:#2f5cc4}
+  :root[data-theme="light"] td.o-struct{color:#bf3625}
+  :root[data-theme="light"] td.mk-bad{color:#bf3625; background:color-mix(in srgb,#bf3625 9%,transparent)}
+  :root[data-theme="light"] .figcard{background:#ffffff}
+  .tkey{display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--faint)}
+  .tkey i{font-style:normal; font-weight:700}
+  .callouts{display:grid; grid-template-columns:1.6fr 1fr; gap:14px; margin-top:16px}
+  @media (max-width:820px){ .callouts{grid-template-columns:1fr} }
+  .co{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .co h4{margin:0 0 8px; font-size:13px; font-family:var(--mono); letter-spacing:.04em; color:var(--accent-2);
+    text-transform:uppercase; font-weight:700}
+  .co p{margin:0; font-family:var(--mono); font-size:12.5px; line-height:1.75; color:var(--muted); word-break:break-word}
+  .co .big{font-family:var(--serif); font-size:26px; font-weight:600; color:var(--ink)}
+  .subh{font-family:var(--serif); font-size:19px; font-weight:600; color:var(--ink); margin:32px 0 0}
+  .subh + .prose{margin-top:8px}
+
+  .catnip-game{margin-top:24px}
+  /* Hero axis chips */
+  .axes{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:22px 0 24px; max-width:62ch}
+  @media (max-width:720px){ .axes{grid-template-columns:1fr} }
+  .ax{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:13px 15px}
+  .ax .axl{display:block; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--accent)}
+  .ax b{display:block; color:var(--ink); font-size:15px; margin:3px 0 4px; line-height:1.3}
+  .ax span:last-child{color:var(--muted); font-size:13.5px; line-height:1.5}
+
+  /* Representation controls */
+  .reps{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:860px){ .reps{grid-template-columns:1fr} }
+  .rep{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .rep .rid{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent-2); letter-spacing:.06em}
+  .rep h4{margin:4px 0 10px; font-family:var(--serif); font-size:17px; color:var(--ink); font-weight:600}
+  .rep ul{margin:0 0 10px; padding-left:16px; color:var(--muted); font-size:13.5px; line-height:1.6}
+  .rep li{margin:0}
+  .rep p{margin:0; color:var(--muted); font-size:14.5px; line-height:1.55}
+  .rep p strong{color:var(--ink)}
+  .defn{border-left:3px solid var(--accent); padding-left:14px; margin:4px 0 15px !important}
+
+  /* Dispositions */
+  .vd.d-pass h4{color:#0c6e5b} .vd.d-fail h4{color:#bf3625}
+  .vd.d-ne h4{color:#2f5cc4}   .vd.d-un h4{color:var(--faint)}
+  @media (prefers-color-scheme:dark){
+    .vd.d-pass h4{color:#3cc0a6} .vd.d-fail h4{color:#f28a8a} .vd.d-ne h4{color:#8ab4f2}
+  }
+  :root[data-theme="dark"] .vd.d-pass h4{color:#3cc0a6}
+  :root[data-theme="dark"] .vd.d-fail h4{color:#f28a8a}
+  :root[data-theme="dark"] .vd.d-ne h4{color:#8ab4f2}
+  :root[data-theme="light"] .vd.d-pass h4{color:#0c6e5b}
+  :root[data-theme="light"] .vd.d-fail h4{color:#bf3625}
+  :root[data-theme="light"] .vd.d-ne h4{color:#2f5cc4}
+
+  .axnote{border-left:3px solid var(--accent-2); padding-left:14px; font-size:15.5px}
+  .fine{display:block; margin-top:8px; font-family:var(--sans); font-size:12.5px; color:var(--faint); line-height:1.5}
+
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-name"><a href="../index.html">Jiaqi Wu</a></span>
+    <nav class="nav-links">
+      <a href="../index.html#software">Software</a>
+      <a href="#oracle">Oracle</a>
+      <a href="#axis-a">Axis A</a>
+      <a href="#axis-b">Axis B</a>
+      <a href="#dispositions">Dispositions</a>
+      <a href="#case-study">Case study</a>
+      <a href="#explore">Explore</a>
+    </nav>
+    <div class="lang-switch" aria-label="Language / 言語 / 语言"><a href="index.html" class="cur">EN</a><a href="index_ja.html">日本語</a><a href="index_zh.html">中文</a></div>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle colour theme">◐</button>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Conformance benchmark · graph oracle</div>
+      <h1>Catnip10</h1>
+      <div class="tag">We may be small, but we see all.</div>
+      <p class="lead">A deterministic conformance benchmark for branch-wise workflows that file values on a <em>fixed or shared reference-branch axis</em>. Ten tips, seventeen frozen primitive coordinates, small enough to trace completely — and structured enough to test every declared coordinate claim.</p>
+      <div class="axes">
+        <div class="ax"><span class="axl">Axis A</span><b>Pruning-aware coordinate eligibility</b><span>After pruning and contraction, is a value independently eligible on the primitive coordinate it is filed under?</span></div>
+        <div class="ax"><span class="axl">Axis B</span><b>Representation-stable coordinate identity and availability</b><span>Does the same canonical unrooted split keep its identity and declared availability across equivalent serializations?</span></div>
+      </div>
+      <div class="btns">
+        <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub repository ↗</a>
+        <a class="btn" href="#oracle">How the oracle works</a>
+        <a class="btn" href="#case-study">Case study</a>
+        <a class="btn" href="#explore">Try it interactively</a>
+      </div>
+    </div>
+    <figure class="badge-card" style="margin:0">
+      <img src="catnip10_mascot.jpg" alt="The Catnip10 badge: a cartoon toy tree holding a magnifying glass and an audit clipboard, with ten labelled tips t1 to t10, and t10 annotated as the display root.">
+      <figcaption class="badge-cap">project mascot · 10-tip conformance benchmark</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 01 THE PROBLEM -->
+<section class="block" id="problem">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2>A number can be right while its coordinate is wrong</h2></div>
+    <div class="prose">
+      <p>Comparative-genomics pipelines routinely place branch-associated values — rates, residuals, path lengths — into a matrix whose columns are branches of a reference tree. That only means something if a column label keeps denoting the same evolutionary object across every gene that contributes to it.</p>
+      <p>Genes differ in taxon coverage, so each gene tree is a <strong>contraction</strong> of the reference tree. Removing a tip can leave an internal node with only two neighbours; standard tree reduction then suppresses that node and merges its two incident edges into one. The merged edge can carry the exact sum of its members' lengths — the arithmetic is perfect — but the two original branches are no longer separately observable in that gene.</p>
+      <p>If a pipeline writes that merged value into a cell named after one of the two members, the number is numerically valid and the coordinate is not. Nothing crashes, no <code>NA</code> appears, and the error is invisible to every check that only asks whether the arithmetic is correct.</p>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 800 200" role="img" aria-label="Diagram: deleting a tip leaves a degree-two node; suppressing it fuses two primitive edges into one composite edge whose length is the sum.">
+        <text class="dg-cap" x="20" y="18">1 · reference tree</text>
+        <g>
+          <path class="dg-edge" d="M30 110 H90"/>
+          <path class="dg-edge hot" d="M90 110 H150"/>
+          <path class="dg-edge" d="M150 110 L150 60 H200"/>
+          <path class="dg-edge hot" d="M150 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/>
+          <circle class="dg-dot" cx="150" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="60" r="4"/>
+          <circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t hot" x="105" y="103">b₁</text>
+          <text class="dg-t hot" x="168" y="103">b₂</text>
+          <text class="dg-t" x="208" y="56">x</text>
+          <text class="dg-t" x="218" y="114">y</text>
+          <text class="dg-t" x="208" y="169">z</text>
+        </g>
+        <path class="dg-arrow" d="M245 110 H285"/>
+        <path class="dg-arrow" d="M277 104 L285 110 L277 116"/>
+        <text class="dg-cap" x="300" y="18">2 · tip x dropped → degree-2 node</text>
+        <g transform="translate(280,0)">
+          <path class="dg-edge" d="M30 110 H90"/>
+          <path class="dg-edge hot" d="M90 110 H150"/>
+          <path class="dg-edge gone" d="M150 110 L150 60 H200"/>
+          <path class="dg-edge hot" d="M150 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/>
+          <circle class="dg-dot open" cx="150" cy="110" r="5.5"/>
+          <circle class="dg-dot gone" cx="200" cy="60" r="4"/>
+          <circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t hot" x="105" y="103">b₁</text>
+          <text class="dg-t hot" x="168" y="103">b₂</text>
+          <text class="dg-t warm" x="208" y="56">x̶</text>
+          <text class="dg-t" x="218" y="114">y</text>
+          <text class="dg-t" x="208" y="169">z</text>
+        </g>
+        <path class="dg-arrow" d="M525 110 H565"/>
+        <path class="dg-arrow" d="M557 104 L565 110 L557 116"/>
+        <text class="dg-cap" x="580" y="18">3 · suppressed → composite edge</text>
+        <g transform="translate(560,0)">
+          <path class="dg-edge" d="M30 110 H90"/>
+          <path class="dg-edge fused" d="M90 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/>
+          <circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t warm" x="112" y="100">{b₁,b₂}</text>
+          <text class="dg-t" x="112" y="130">len = b₁+b₂</text>
+          <text class="dg-t" x="218" y="114">y</text>
+          <text class="dg-t" x="208" y="169">z</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="note">
+      <p><strong>The distinction Catnip10 enforces.</strong> The composite edge <span class="mono">{b₁,b₂}</span> is a perfectly valid estimand — as a reduced-tree edge, or as a declared composite. What it is not is an independent value for <span class="mono">b₁</span> or for <span class="mono">b₂</span>. Endpoint-defined paths and reduced-tree edges are legitimate native objects; the requirement only bites when values are aligned, compared, or interpreted on a shared full-tree branch axis.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 THE ORACLE -->
+<section class="block" id="oracle">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>The oracle: graph contraction with bookkeeping</h2></div>
+    <div class="prose">
+      <p>The oracle is deliberately not a phylogenetic method. It is a small graph algorithm that computes the answer by construction, so the benchmark's truth object is exact and inspectable rather than estimated. It never looks at the audited workflow's output.</p>
+    </div>
+
+    <ol class="algo">
+      <li>Freeze a reference tree and enumerate its edges as <strong>primitive coordinates</strong> <code>B1…B17</code>. Every edge is a discrete object; removing it induces a taxon bipartition, which is what gives the label its meaning.</li>
+      <li>For a taxon subset, <strong>delete the absent tips</strong> and repeatedly <strong>suppress every degree-2 vertex</strong>, merging its two incident edges. This is standard tree reduction — the same contraction any pipeline performs implicitly.</li>
+      <li><strong>Propagate original-edge membership</strong> through every suppression. Each surviving reduced edge carries the set of primitive edges it absorbed; a merge takes the union of the two member sets. Nothing is discarded, so provenance is never lost.</li>
+      <li><strong>Classify each primitive coordinate</strong> by the fate of its membership: sole member of a surviving edge → <code>observed</code>; member of a surviving edge with two or more members → <code>NA_fuse</code>; contained in no surviving edge → <code>NA_struct</code>.</li>
+      <li>Emit <strong>two linked ledgers</strong>: a primitive-coordinate ledger assigning every original coordinate exactly one state, and a composite-edge ledger listing each surviving composite keyed by its member set and summed length.</li>
+    </ol>
+
+    <div class="note">
+      <p>Because the procedure is deterministic and finite, the expected state of all 17 coordinates can be enumerated for every taxon subset in advance — no simulation, no sampling, no tolerance. For an exposed workflow with a validated adapter, disagreement with the frozen oracle is an auditable conformance mismatch.</p>
+      <p><strong>Scope of the three states.</strong> Within this fixed-topology toy core, <code>observed</code>, <code>NA_fuse</code> and <code>NA_struct</code> are mutually exclusive and exhaustive. That is a property of the benchmark's design, not a claim about heterogeneous-tree workflows in general: topology-driven absence is intentionally excluded from the fixed-topology core, so these three states are not offered as a complete taxonomy for workflows outside it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 THE THREE STATES -->
+<section class="block" id="states">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Three states, and what each one licenses</h2></div>
+    <div class="prose">
+      <p>The whole audit turns on separating two kinds of missingness that pipelines habitually collapse into one. A branch that vanished and a branch that merged are not the same event, and they call for different handling downstream.</p>
+    </div>
+
+    <div class="tbl-scroll">
+      <table class="states">
+        <thead>
+          <tr><th>State</th><th>What happened to the coordinate</th><th>What a value in this cell would mean</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="st sw-obs">observed</td>
+            <td>The primitive branch survives contraction as an edge of its own; no other original edge merged into it.</td>
+            <td><strong>Legitimate.</strong> The cell can hold an independent value for this named branch.</td>
+          </tr>
+          <tr>
+            <td class="st sw-fus">NA_fuse</td>
+            <td>The branch survives only inside a composite edge, together with at least one other original branch. The composite's length is the exact sum of its members.</td>
+            <td><strong>Not eligible.</strong> Any number here is the composite's, not this member's. The value may be arithmetically exact and still misattributed.</td>
+          </tr>
+          <tr>
+            <td class="st sw-str">NA_struct</td>
+            <td>The branch is structurally absent: no surviving edge contains it under this taxon subset.</td>
+            <td><strong>Undefined.</strong> There is no evolutionary object for the cell to refer to. Note that zero is not this — zero is an observed no-change state.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <p><strong>Names used in the published tables.</strong> The machine-readable truth tables write these three states as <code>OBSERVED_PRIMITIVE</code>, <code>NA_FUSE</code> and <code>NA_STRUCT</code>; the shorter forms used on this page and in the figures denote exactly the same states. A fourth state, <code>NA_TOPO</code>, is reserved in the contract for topology-driven absence and is not generated by the fixed-topology pruning core.</p>
+      <p><strong>Why the last row matters in practice.</strong> A numeric zero in a structurally unavailable cell can pass ordinary missing-value filters and be treated downstream as an observed zero, unless coordinate state is validated explicitly. Missingness codes describe coordinate state, not software failure — telling <code>NA_struct</code> apart from a genuine observed zero is a coordinate-level question that numerical validation alone cannot answer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 AXIS A -->
+<section class="block" id="axis-a">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Axis A — pruning-aware coordinate eligibility</h2></div>
+    <div class="prose">
+      <p>The first validity axis asks a single question: after pruning and contraction, is a value independently eligible on the primitive full-tree coordinate it is filed under?</p>
+      <p>The pruning experiment is built so that pruning is the only thing that can explain a discrepancy <em>within this experiment</em>. Topology and branch lengths are fixed. There is no true rate shift, no gene-tree/species-tree discordance, no branch-length estimation error, and no species-tree uncertainty. Taxon deletion and degree-2-node suppression are the only perturbations applied here — the benchmark as a whole also contains representation controls, which vary something else entirely and are described in Axis B below.</p>
+      <p>Two prespecified deletion schedules give contrasting geometries: a <strong>progressive global</strong> sequence working inward from the display-root side, and a <strong>localized</strong> sequence concentrating deletions within one clade. Each runs eight steps including its baseline. Because the tree is small, the oracle can also enumerate the expected state of every coordinate under <em>all</em> subsets of the deletable tips — which is what the interactive panel below is driving.</p>
+    </div>
+
+    <div class="spec">
+      <div><div class="n">10</div><div class="k">tips, fixed topology and branch lengths</div></div>
+      <div><div class="n">17</div><div class="k">frozen primitive coordinates <span class="mono">B1–B17</span></div></div>
+      <div><div class="n">2</div><div class="k">pruning schedules, 8 steps each with baseline</div></div>
+      <div><div class="n">3</div><div class="k">coordinate states in the fixed-topology core</div></div>
+    </div>
+
+    <div class="note">
+      <p><strong>Scope, stated plainly.</strong> This is a deterministic existence-and-mechanism design. It shows how pruning alone can separate numerical validity from coordinate eligibility, and it makes that separation testable. It is not an estimate of how often such mismatches occur in empirical datasets, and it does not by itself establish gene-level bias in any real analysis.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 AXIS B -->
+<section class="block" id="axis-b">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Axis B — representation-stable coordinate identity</h2></div>
+    <div class="prose">
+      <p>The second validity axis varies nothing biological at all. It asks whether the same canonical unrooted split keeps the same identity and the same declared availability when the <em>same tree</em> is written down a different way.</p>
+      <p class="defn"><strong>Display root.</strong> The root location used to serialize or traverse a tree representation. It is not part of the authoritative unrooted branch identity, which remains the canonical split key.</p>
+      <p>The controls are built as strict equivalents: identical tip sets, identical canonical split keys, and identical branch lengths after canonical alignment. What differs is only how the tree is written.</p>
+    </div>
+
+    <div class="reps">
+      <div class="rep">
+        <div class="rid">R0</div>
+        <h4>Native representation</h4>
+        <ul><li>baseline serialization</li><li>display root unchanged</li></ul>
+        <p>The reference point every control is compared against.</p>
+      </div>
+      <div class="rep">
+        <div class="rid">R1</div>
+        <h4>Serialization / child-order control</h4>
+        <ul><li>strict-equivalent unrooted tree</li><li>child order changed</li><li>display root unchanged</li></ul>
+        <p>An <strong>irrelevant-representation negative control</strong>. Nothing that matters has changed, so nothing should move.</p>
+      </div>
+      <div class="rep">
+        <div class="rid">R2</div>
+        <h4>Display-root displacement challenge</h4>
+        <ul><li>strict-equivalent unrooted tree</li><li>same tips, same unrooted splits</li><li>same split-specific lengths</li><li>display root genuinely moved</li></ul>
+        <p>The actual test: the serialization root sits on a different vertex while the weighted unrooted split object is untouched.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>A changed Newick string is not a changed representation variable.</strong> Rewriting a tree can alter the bytes, the child order, or both, without moving the display root at all. Catnip10 therefore defines the display-root signature as the unordered partition of tip sets incident to the serialized root vertex, and <strong>independently certifies whether that signature actually changed</strong> before any participant is scored on this axis. A request to shift the display root that produces only a reordering is retained as a no-op regression control, so a benchmark run cannot quietly credit itself with a challenge it never applied.</p>
+      <p>Child-order variation is a negative control, not a predicted failure mode. Nothing on this page should be read as a claim that reordering children generally breaks workflows.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 06 DISPOSITIONS -->
+<section class="block" id="dispositions">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Four dispositions</h2></div>
+    <div class="prose">
+      <p>Auditing a workflow is a mechanical procedure. You normalize one output layer to the adapter contract, declare that layer's exposure, and let the scorer compare it against the oracle ledgers cell by cell. The outcome is one of exactly four dispositions, and only one of them is a failure.</p>
+    </div>
+
+    <div class="verdicts">
+      <div class="vd d-pass">
+        <h4>PASS</h4>
+        <p>The workflow is exposed to the tested coordinate contract and satisfies the specified benchmark condition.</p>
+      </div>
+      <div class="vd d-fail">
+        <h4>FAIL</h4>
+        <p>The workflow is exposed to the tested coordinate contract and violates the specified benchmark condition.</p>
+      </div>
+      <div class="vd d-ne">
+        <h4>NOT-EXPOSED</h4>
+        <p>The workflow's declared native estimand does not claim the tested coordinate contract. This is a clean result, and it is not a euphemism for missing data.</p>
+      </div>
+      <div class="vd d-un">
+        <h4>UNRESOLVED</h4>
+        <p>Required evidence or a valid test precondition is unavailable, so the benchmark cannot adjudicate the contract either way.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>What a FAIL is about.</strong> A disposition applies to a declared claim at a specified interface, not to an entire software package. A native endpoint or path object is never assigned a primitive-axis FAIL when no primitive alignment was claimed in the first place. Adapter validation is separate again: a missing expected row is an input error, not NOT-EXPOSED.</p>
+      <p><strong>Diagnostic localization.</strong> Not a disposition, but a use of the benchmark: when a reproducible failure exists, Catnip10 can be used to trace the first representation boundary at which coordinate identity or availability diverges.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 07 CASE STUDY -->
+<section class="block" id="case-study">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Anonymous case study — what a conformance audit looks like</h2></div>
+    <div class="prose">
+      <p>Two branch-wise workflows were run on identical pruned inputs from the global schedule, and their outputs mapped onto the frozen coordinate axis through an explicitly declared exposure. <strong>Participant identities are withheld in the public benchmark release</strong>; exact identities, versions, adapters and execution provenance are retained in a sealed archive. The two are shown here as Method A and Method B.</p>
+      <p>One result frames everything below: <strong>the native path arithmetic was exact in both workflows</strong>. Nothing here is a claim that either computes distances incorrectly. What the audit examines is where those correct numbers are filed.</p>
+      <p class="axnote">This case study illustrates the pruning-eligibility axis. Representation stability is tested separately, using the strict-equivalence controls described in Axis B.</p>
+    </div>
+
+    <div class="subh">A · Representative pruning states</div>
+    <div class="prose"><p>Seven progressive deletions from the display-root side. Each tree shows what the contraction does to every coordinate: red dashed where the coordinate becomes structurally absent, blue where it survives only inside a composite, black where it is unaffected.</p></div>
+
+    <figure style="margin:0">
+      <div class="figcard">
+        <img src="oracle_global_deletion.png" alt="Eight cladograms showing the reference tree and seven progressive deletion steps. In each step, branches are coloured red-dashed where the coordinate is structurally absent, blue where it survives only inside a fused composite edge, and black where it is unaffected.">
+      </div>
+      <figcaption class="cap"><b>A.</b> Deletion order t10 → t1 → t8 → t7 → t4 → t9 → t5. Structural absence accumulates from the pruned side while fusion propagates inward along the path toward the display root.</figcaption>
+    </figure>
+
+    <div class="subh">B · The oracle's expected states</div>
+    <div class="prose"><p>The independent graph oracle supplies the expected state of every primitive coordinate at every step. This is the truth object the participants are scored against.</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">coordinate</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">reference tree</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+</tbody></table></div>
+    <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — survives only inside a composite</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — structurally absent</span><span>numeric — independently observable</span></div>
+
+    <div class="subh">C · Method A — exposed to the fixed-axis contract</div>
+    <div class="prose"><p>Method A declares a fixed shared primitive layer, so the eligibility contract applies to it. Highlighted cells are coordinate-state mismatches in this frozen benchmark configuration: either a coordinate the oracle records as independently observable came back as <code>NA</code>, or a complete composite-path quantity occupies a fusion-ineligible primitive cell.</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">step</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">reference tree</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-bad" title="composite-path quantity in an NA_fuse cell">0.876306</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-bad" title="composite-path quantity in an NA_fuse cell">1.822974</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="mk-bad" title="composite-path quantity in an NA_fuse cell">2.337186</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="mk-bad" title="composite-path quantity in an NA_fuse cell">2.337186</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="mk-bad" title="composite-path quantity in an NA_fuse cell">0.815003</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+<td class="mk-bad" title="oracle-observed coordinate returned NA">NA</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co">
+        <h4>Composite-path quantities in NA_fuse cells</h4>
+        <p>N_16: 0.876306 = N_12|N_16 · 1.822974 = N_13|N_12|N_16 · 2.337186 = N_14|N_13|N_12|N_16<br>
+        N_18: 0.815003 = N_17|N_18</p>
+      </div>
+      <div class="co">
+        <h4>Frozen-configuration outcome</h4>
+        <p><span class="big">13</span> oracle-observed coordinate dropouts<br><span class="big">5</span> complete composite quantities in fusion-ineligible cells<br><span class="fine">Example audit outcomes for this frozen toy configuration — not a software error rate and not a prevalence estimate.</span></p>
+      </div>
+    </div>
+
+    <div class="subh">D · Method B — endpoint/path-native audit projection</div>
+    <div class="prose"><p><strong>NOT-EXPOSED to the primitive-axis contract shown here.</strong> Method B's native object is endpoint- and path-associated; it is not equivalent to a primitive branch-length matrix and never claims one. The marked cells are not errors. They show how a legitimate native object looks when it is <em>projected</em> onto a frozen primitive axis: typically half of a composite under an endpoint split, or a whole composite attributed to a single endpoint.</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">step</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">baseline</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.438153</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.438153</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.911487</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.911487</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.168593</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.168593</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.837173</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.168593</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.586595</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.586595</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.407502</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.407502</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.750087</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.750087</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co">
+        <h4>Endpoint-split projection</h4>
+        <p>N_16 &amp; N_12: 0.438153 = (N_12|N_16)/2 · N_13 &amp; N_16: 0.911487 = (N_13|N_12|N_16)/2<br>
+        N_14 &amp; N_16: 1.168593 = (N_14|N_13|N_12|N_16)/2 · N_17 &amp; N_18: 0.407502 = (N_17|N_18)/2<br>
+        t9 &amp; N_16: 1.586595 = (t9|N_14|N_13|N_12|N_16)/2 · t2 &amp; N_18: 0.750087 = (t2|N_17|N_18)/2</p>
+      </div>
+      <div class="co">
+        <h4>Single-endpoint full projection</h4>
+        <p>t4: 0.837173 = t4|N_15<br><br><span class="fine">The baseline row also differs at t10 by construction: an endpoint split halves the display-root-incident edge.</span></p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>Reading C and D together.</strong> Identical inputs, identical arithmetic, two different filing behaviours — and two different dispositions, because the two methods claim different things. That distinction is not available to any check that only compares numbers. It needs the coordinate ledger and a declared exposure, which is the whole reason both exist.</p>
+    </div>
+
+    <div class="subh">E · The same audit on the localized schedule</div>
+    <div class="prose"><p>The global schedule deletes inward from the display-root side. The <strong>localized</strong> schedule removes the same number of taxa but concentrates them inside one clade, so fusion and structural absence fall in different places. Running the identical audit on that geometry changes the answer for one participant and not for the other.</p></div>
+
+    <div class="verdicts">
+      <div class="vd d-pass">
+        <h4>Method A · localized schedule</h4>
+        <p><b>No discrepant cells.</b> Every coordinate the oracle records as observed carries its value, and every ineligible cell is empty, across all seven steps. The same exposed workflow that showed mismatches under the global geometry satisfies the tested condition here.</p>
+      </div>
+      <div class="vd d-ne">
+        <h4>Method B · localized schedule</h4>
+        <p><b>Same estimand boundary, different signature.</b> Ten coordinate-ineligible native-distance entries, including single-endpoint full projections into fusion-ineligible cells, plus four cells where an oracle-observed coordinate is simply unavailable in the projection. Still an endpoint-native object, still not a primitive-coordinate claim.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>This is the point of having four dispositions rather than a score.</strong> A disposition describes a declared claim in a specified configuration — not a package, and not a permanent property. The same implementation and coordinate contract can yield different conformance outcomes under different prespecified pruning configurations. Reporting either result alone would misrepresent the workflow.</p>
+    </div>
+
+    <figcaption class="cap" style="margin-top:22px"><b>Anonymous global-pruning case study.</b> (A) Representative deletion states show how pruning changes primitive-coordinate eligibility on the frozen 10-tip axis. (B) The independent graph oracle supplies the expected state of every primitive coordinate. (C) Method A is exposed to the tested fixed-axis contract; highlighted cells show coordinate-state mismatches in the frozen toy configuration, including oracle-observed dropout and complete composite-path quantities occupying fusion-ineligible primitive cells. (D) Method B has an endpoint/path-native estimand and is shown only as an audit projection onto the primitive axis. Its endpoint-associated signatures illustrate an estimand boundary and are not classified as failures of a primitive-coordinate contract the method does not claim. (E) The same audit on the localized deletion schedule, where Method A shows no discrepant cells, illustrates that a disposition describes a declared claim in a specified configuration rather than a property of a software package. Participant identities are withheld in the initial public benchmark release; exact identities, versions and execution provenance are retained in a frozen sealed archive.</figcaption>
+
+  </div>
+</section>
+
+<!-- 08 EXPLORE -->
+<section class="block" id="explore">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">08</span><h2>Explore the oracle</h2></div>
+    <div class="prose">
+      <p>Delete tips and watch the ledger update. Every state shown is the oracle's exact answer for that taxon subset — select a branch to see which coordinates fuse together with it, and which vanish entirely.</p>
+    </div>
+    <div class="catnip-game" data-lang="en"><noscript>JavaScript is required for the Catnip10 interaction.</noscript></div>
+  </div>
+</section>
+
+<!-- 09 WHERE IT FITS -->
+<section class="block" id="fit">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">09</span><h2>SplitAligner builds coordinates; Catnip10 tests them</h2></div>
+    <div class="prose">
+      <p><strong>SplitAligner</strong> constructs and interprets the branch-coordinate framework: it defines branch identity through projected species-tree splits and names every kind of branch absence. <strong>Catnip10</strong> tests whether an implementation preserves a declared coordinate contract. The two answer different questions, and neither substitutes for the other.</p>
+      <p>Catnip10 was developed within the SplitAligner validation ecosystem, which is where the need for an independent truth object first became concrete. Its oracle and scoring contract are implementation-independent: the truth layer is derived by graph contraction, not by asking SplitAligner what the answer should be. SplitAligner is reference infrastructure for the framework, not the benchmark's oracle and not the identity of any participant.</p>
+      <p>If you want the coordinate system itself — how projected splits define branch identity, and how absence is decomposed — start with the explainer and the tutorial.</p>
+    </div>
+    <div class="linkrow">
+      <a href="../splitaligner/SplitAligner_explainer.html">Animated explainer — how split-based branch identity works ↗</a>
+      <a href="../splitaligner/SplitAligner_tutorial.html">Tutorial — run SplitAligner end to end ↗</a>
+      <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener">SplitAligner preprint (bioRxiv) ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- 10 RUN IT -->
+<section class="block" id="get">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">10</span><h2>Score your own workflow</h2></div>
+    <div class="prose">
+      <p>You do not have to make your implementation public to be scored. Normalize one output layer to the long-table adapter contract, declare that layer's exposure, and run the scorer. The public repository ships the normative specifications, the frozen benchmark inputs, the oracle truth tables and composite ledgers, machine-readable table schemas, a method-neutral scoring engine, a synthetic example adapter, and anonymous normalized participant outputs. Participant-specific adapters, source versions and execution commands are not public, because they would reveal participant identities.</p>
+    </div>
+
+<pre><code><span class="cm"># Axis A — score an exposed fixed/shared primitive layer</span>
+python3 tools/score_participant.py \
+  --truth oracle/primitive_truth_tables/global_truth.tsv \
+  --input tutorial/example_scoring/pass_output.tsv \
+  --exposure tutorial/example_scoring/pass_exposure.tsv \
+  --cell-output /tmp/catnip10_cells.tsv \
+  --summary-output /tmp/catnip10_summary.tsv
+
+<span class="cm"># Axis B — certify strict equivalence first, then score</span>
+python3 tools/certify_representations.py \
+  --manifest benchmark/representation_controls/representation_manifest.tsv \
+  --output /tmp/catnip10_representation_certification.tsv
+
+python3 tools/score_representation.py \
+  --namespace benchmark/reference_tree/branch_namespace.tsv \
+  --baseline-output tutorial/example_representation_scoring/rep_pass_baseline.tsv \
+  --equivalent-output tutorial/example_representation_scoring/rep_pass_equivalent.tsv \
+  --certification /tmp/catnip10_representation_certification.tsv \
+  --representation-id display_root_shift_true \
+  --exposure tutorial/example_representation_scoring/rep_pass_exposure.tsv \
+  --cell-output /tmp/catnip10_rep_cells.tsv \
+  --summary-output /tmp/catnip10_rep_summary.tsv
+
+<span class="cm"># contract and anonymity checks</span>
+python3 -m unittest discover -s tests -v
+</code></pre>
+
+    <div class="prose" style="margin-top:20px">
+      <p>Axis A requires the complete expected canonical-key set before scoring: missing, duplicate, unknown or inconsistent crosswalk rows are adapter-validation errors rather than participant results. Axis B requires an independently computed certification record before any participant is scored, then aligns outputs by canonical split identity. Synthetic PASS, FAIL, NOT-EXPOSED, true-shift and serialization-only no-op cases are all exercised by the test suite. The authoritative numerical assets are TSV files; rendered documents and figures are views, not the source of truth.</p>
+      <p><strong>Citing this work.</strong> For the coordinate-construction framework, cite SplitAligner. For Catnip10, cite the versioned Catnip10 repository. Released under the MIT licence.</p>
+    </div>
+
+    <div class="linkrow">
+      <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">Catnip10 on GitHub ↗</a>
+      <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener">SplitAligner (Perl) ↗</a>
+      <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">SplitAlignerR (R) ↗</a>
+      <a href="mailto:wujiaqi@hiroshima-u.ac.jp">Contact the author</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr"></span> Jiaqi Wu (呉佳齊) · Hiroshima University</span>
+    <span>Catnip10 · deterministic branch-coordinate conformance benchmark</span>
+  </div>
+</footer>
+
+<script>
+"use strict";
+const root = document.documentElement, tb = document.getElementById("themeBtn");
+tb.addEventListener("click", ()=>{
+  const cur = root.getAttribute("data-theme")
+    || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark":"light");
+  root.setAttribute("data-theme", cur==="dark" ? "light":"dark");
+});
+document.getElementById("yr").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

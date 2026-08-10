@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>吴佳齐 Jiaqi Wu — 比较基因组学与分子进化</title>
+<meta name="description" content="吴佳齐(呉佳齊 / Jiaqi Wu),广岛大学(应用动植物科学)助理教授。动物遗传育种、比较基因组学、分子进化、统计遗传学与生物信息学——家禽与家畜育种、野生哺乳动物基因组监测,以及面向大规模基因组分析的可复现比较基准。">
+<style>
+  :root{
+    --paper:#f4f6f4; --surface:#ffffff; --surface2:#eef1ee; --line:#dde3df;
+    --ink:#16211c; --muted:#5b6b64; --faint:#8a9791;
+    --accent:#15736a;        /* deep viridian */
+    --accent-2:#b06a2c;      /* ochre, sparing */
+    --accent-soft:#e2efec;
+    --serif:"Charter","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --maxw:1080px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#0f1613; --surface:#151d19; --surface2:#1b241f; --line:#2a352f;
+      --ink:#e7efea; --muted:#a2b1aa; --faint:#75847d;
+      --accent:#4bb7a8; --accent-2:#d8974f; --accent-soft:#17302b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0f1613; --surface:#151d19; --surface2:#1b241f; --line:#2a352f;
+    --ink:#e7efea; --muted:#a2b1aa; --faint:#75847d;
+    --accent:#4bb7a8; --accent-2:#d8974f; --accent-soft:#17302b;
+  }
+  :root[data-theme="light"]{
+    --paper:#f4f6f4; --surface:#ffffff; --surface2:#eef1ee; --line:#dde3df;
+    --ink:#16211c; --muted:#5b6b64; --faint:#8a9791;
+    --accent:#15736a; --accent-2:#b06a2c; --accent-soft:#e2efec;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
+    line-height:1.6; -webkit-font-smoothing:antialiased; font-size:17px}
+  h1,h2,h3{font-family:var(--serif); font-weight:600; line-height:1.15; letter-spacing:-.01em}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+  .mono{font-family:var(--mono)}
+
+  /* Nav */
+  header.nav{position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.4) blur(8px);
+    background:color-mix(in srgb,var(--paper) 86%, transparent); border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--maxw); margin:0 auto; padding:11px 24px; display:flex; align-items:center; gap:18px}
+  .nav-name{font-family:var(--serif); font-weight:600; font-size:17px; letter-spacing:-.01em; margin-right:auto}
+  .nav-name a{color:var(--ink)}
+  .nav-links{display:flex; gap:20px; align-items:center}
+  .nav-links a{color:var(--muted); font-size:14.5px}
+  .nav-links a:hover,.nav-links a.active{color:var(--accent); text-decoration:none}
+  .lang-switch{display:flex; gap:1px; align-items:center; font-family:var(--mono); font-size:12px}
+  .lang-switch a{color:var(--faint); padding:3px 7px; border-radius:6px; text-decoration:none}
+  .lang-switch a:hover{color:var(--accent)}
+  .lang-switch a.cur{color:var(--accent); background:var(--surface2); font-weight:700}
+  .theme-btn{border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:8px;
+    width:34px; height:34px; cursor:pointer; font-size:15px; display:grid; place-items:center}
+  .theme-btn:hover{color:var(--accent); border-color:var(--accent)}
+  @media (max-width:720px){
+    .nav-inner{padding:10px 16px; gap:8px}
+    .nav-links{display:none}
+    .nav-name,.lang-switch{white-space:nowrap}
+    .lang-switch{margin-left:auto}
+    .lang-switch a{padding:3px 5px}
+    .theme-btn{flex:0 0 34px}
+  }
+
+  /* Hero */
+  .hero{padding:72px 0 42px; position:relative; overflow:hidden}
+  .hero-grid{display:grid; grid-template-columns:1.5fr .9fr; gap:40px; align-items:center}
+  @media (max-width:820px){ .hero-grid{grid-template-columns:1fr; gap:26px} }
+  .eyebrow{font-size:13px; text-transform:uppercase; letter-spacing:.18em; color:var(--accent); font-weight:700}
+  .hero h1{font-size:clamp(38px,6vw,62px); margin:.28em 0 .12em}
+  .hero .cjk{font-family:var(--serif); font-size:.42em; color:var(--muted); font-weight:500; letter-spacing:.04em; margin-left:.5em; white-space:nowrap}
+  .hero .role{font-size:clamp(17px,2vw,20px); color:var(--ink)}
+  .hero .affil{color:var(--muted); font-size:16px; margin-top:4px}
+  .lead{font-size:clamp(17px,1.7vw,19.5px); color:var(--muted); max-width:60ch; margin:20px 0 24px}
+  .lead em{color:var(--ink); font-style:normal; font-weight:600}
+  .btns{display:flex; flex-wrap:wrap; gap:10px}
+  .btn{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line); background:var(--surface);
+    color:var(--ink); padding:9px 15px; border-radius:10px; font-size:14.5px; font-weight:500}
+  .btn:hover{border-color:var(--accent); color:var(--accent); text-decoration:none}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  .btn.primary:hover{background:color-mix(in srgb,var(--accent) 88%, #000); color:#fff}
+  .hero-art{width:100%; height:auto; max-width:340px; margin-left:auto; opacity:.95}
+  @media (max-width:820px){ .hero-art{display:none} }
+
+  /* Sections */
+  section.block{padding:52px 0; border-top:1px solid var(--line)}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:26px}
+  .sec-head h2{font-size:clamp(24px,3.2vw,32px); margin:0}
+  .sec-head .sec-num{font-family:var(--mono); font-size:13px; color:var(--accent); font-weight:700}
+  .prose{max-width:68ch; color:var(--muted); font-size:17px}
+  .prose strong{color:var(--ink)}
+
+  /* Research cards */
+  .cards{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-top:26px}
+  @media (max-width:720px){ .cards{grid-template-columns:1fr} }
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px 22px}
+  .card h3{font-size:19px; margin:0 0 8px; color:var(--ink)}
+  .card p{margin:0; color:var(--muted); font-size:15.5px; line-height:1.55}
+  .card .ktag{font-family:var(--mono); font-size:11.5px; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; font-weight:700}
+
+  .focus{margin-top:22px; background:linear-gradient(180deg,var(--accent-soft),transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line)); border-radius:14px; padding:20px 22px}
+  .focus h3{margin:0 0 6px; color:var(--ink); font-size:19px}
+  .focus p{margin:0 0 10px; color:var(--muted); font-size:15.5px}
+
+  /* Software */
+  .sw-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px}
+  @media (max-width:820px){ .sw-grid{grid-template-columns:1fr} }
+  .sw{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:20px 22px; display:flex; flex-direction:column; gap:10px}
+  .sw h3{margin:0; font-size:20px; display:flex; align-items:baseline; gap:9px}
+  .sw .meta{display:flex; flex-wrap:wrap; gap:6px}
+  .pill{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:20px; background:var(--surface2); color:var(--muted); border:1px solid var(--line)}
+  .pill.lang{color:var(--accent); border-color:color-mix(in srgb,var(--accent) 30%,var(--line))}
+  .sw p{margin:0; color:var(--muted); font-size:15px; line-height:1.55; flex:1}
+  .sw .links{display:flex; gap:14px; font-size:14px; flex-wrap:wrap}
+
+  /* Publications */
+  .pub-controls{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+  .fbtn{border:1px solid var(--line); background:var(--surface); color:var(--muted); padding:6px 13px;
+    border-radius:20px; font-size:13.5px; cursor:pointer; font-family:var(--sans)}
+  .fbtn.on{background:var(--accent); border-color:var(--accent); color:#fff}
+  .pub-note{color:var(--faint); font-size:14px; margin:2px 0 18px}
+  .year-group{margin-bottom:22px}
+  .year-label{font-family:var(--mono); font-size:13px; color:var(--accent-2); font-weight:700; letter-spacing:.04em;
+    padding-bottom:6px; border-bottom:1px solid var(--line); margin-bottom:12px}
+  ul.pubs{list-style:none; margin:0; padding:0; display:grid; gap:14px}
+  .pub{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start}
+  .pub .idx{font-family:var(--mono); font-size:12.5px; color:var(--faint); padding-top:3px; font-variant-numeric:tabular-nums}
+  .pub .body{font-size:15.5px; line-height:1.5}
+  .pub .title{color:var(--ink); font-weight:600}
+  .pub .authors{color:var(--muted)}
+  .pub .authors b{color:var(--ink); font-weight:700}
+  .pub .venue{color:var(--muted); font-style:italic}
+  .pub .venue .yr{font-style:normal; font-weight:600; color:var(--ink)}
+  .badges{display:inline-flex; gap:6px; margin-left:6px; vertical-align:middle}
+  .badge{font-family:var(--mono); font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:20px; letter-spacing:.03em; white-space:nowrap}
+  .badge.first{background:var(--accent); color:#fff}
+  .badge.corr{background:var(--accent-2); color:#fff}
+  .badge.cofirst{background:color-mix(in srgb,var(--accent) 22%,var(--surface)); color:var(--accent); border:1px solid var(--accent)}
+  .badge.pre{background:var(--surface2); color:var(--muted); border:1px solid var(--line)}
+  .pub[hidden]{display:none}
+
+  /* Contact / footer */
+  .contact-grid{display:grid; grid-template-columns:1.2fr 1fr; gap:30px}
+  @media (max-width:720px){ .contact-grid{grid-template-columns:1fr} }
+  .contact a{font-weight:500}
+  footer{border-top:1px solid var(--line); padding:26px 0 40px; color:var(--faint); font-size:13.5px}
+  footer .wrap{display:flex; flex-wrap:wrap; gap:10px 20px; justify-content:space-between}
+
+  .tree-edge{fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; opacity:.85}
+  .tree-tip{fill:var(--accent)}
+  .tree-cut{stroke:var(--accent-2); stroke-width:1.6; stroke-dasharray:3 4}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-name"><a href="#top">Jiaqi Wu</a></span>
+    <nav class="nav-links">
+      <a href="#about" data-opt>简介</a>
+      <a href="#research">研究</a>
+      <a href="#software">软件</a>
+      <a href="#publications">论文</a>
+      <a href="#contact" data-opt>联系</a>
+    </nav>
+    <div class="lang-switch" aria-label="Language / 言語 / 语言"><a href="index.html">EN</a><a href="index_ja.html">日本語</a><a href="index_zh.html" class="cur">中文</a></div>
+    <button class="theme-btn" id="themeBtn" title="切换 明/暗" aria-label="切换配色主题">◐</button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">动物遗传育种 · 比较基因组学</div>
+        <h1>吴佳齐 <span class="cjk">Jiaqi Wu · 呉佳齊</span></h1>
+        <div class="role">广岛大学 助理教授</div>
+        <div class="affil">综合生命科学研究科 与 生物生产学部(应用动植物科学) · 日本 东广岛</div>
+        <p class="lead">我研究哺乳动物、家禽与家畜、野生动物以及病毒的大规模基因组数据中,性状、育种与适应如何形成,并开发让大规模比较基因组分析<em>可比较、可复现</em>的方法——让跨基因的比较真的是在比较「同一条分支」。</p>
+        <div class="btns">
+          <a class="btn primary" href="#software">软件</a>
+          <a class="btn" href="https://scholar.google.com/citations?user=z6IPkcoAAAAJ&hl=ja" target="_blank" rel="noopener">Google&nbsp;Scholar ↗</a>
+          <a class="btn" href="https://github.com/wujiaqi06" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="btn" href="https://seeds.office.hiroshima-u.ac.jp/profile/ja.c049548abe9b045d520e17560c007669.html" target="_blank" rel="noopener">学校主页 ↗</a>
+          <a class="btn" href="mailto:wujiaqi@hiroshima-u.ac.jp">邮箱</a>
+        </div>
+      </div>
+      <svg class="hero-art" viewBox="0 0 320 260" role="img" aria-label="被虚线分裂切开的、风格化的系统发育树">
+        <!-- decorative cladogram + split line -->
+        <g class="tree-edge">
+          <path d="M20 130 H70"/>
+          <path d="M70 60 V200"/>
+          <path d="M70 60 H120"/>
+          <path d="M70 200 H110"/>
+          <path d="M120 30 V90"/>
+          <path d="M120 30 H180"/>
+          <path d="M120 90 H160"/>
+          <path d="M160 66 V114"/>
+          <path d="M160 66 H210"/>
+          <path d="M160 114 H210"/>
+          <path d="M110 160 V240"/>
+          <path d="M110 160 H175"/>
+          <path d="M110 240 H210"/>
+          <path d="M175 130 V190"/>
+          <path d="M175 130 H210"/>
+          <path d="M175 190 H210"/>
+        </g>
+        <g class="tree-tip">
+          <circle cx="180" cy="30" r="3.4"/><circle cx="210" cy="66" r="3.4"/><circle cx="210" cy="114" r="3.4"/>
+          <circle cx="210" cy="130" r="3.4"/><circle cx="210" cy="190" r="3.4"/><circle cx="210" cy="240" r="3.4"/>
+        </g>
+        <path class="tree-cut" d="M245 18 V250"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="block" id="about">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">01</span><h2>简介</h2></div>
+      <div class="prose">
+        <p>我是广岛大学生物生产学部<strong>应用动植物科学专攻</strong>的进化基因组学研究者,担任<strong>动物遗传育种</strong>教学。我的工作处在比较基因组学、分子进化、统计遗传学与生物信息学的交叉处,从哺乳动物、鸟类/家禽、家畜、昆虫与病毒的大规模基因组数据中,提炼共通的进化原理。</p>
+        <p>在我看来,动物育种基因组学与进化基因组学是同一个框架,而非两个。用来推断哺乳动物生活史进化年代的同一套统计基因组学工具,同样适用于<strong>家禽与家畜育种</strong>——在来鸡与山羊的起源、群体结构与多样性——以及为保护与种群管理服务的<strong>野生哺乳动物基因组监测</strong>(亚洲黑熊、日本狼、蝙蝠等)。我把物种分化的长期历史,与种内、品种内的多样性、适应与选择,放在共同的基准上连接起来。</p>
+        <p>我先后学习医学(学士,山东大学)、生物信息学(硕士,复旦大学)与统计遗传学(博士,东京大学,师从岸野洋久教授),此后在东京工业大学(JSPS特别研究员)、东海大学医学部(JST CREST)与广岛大学工作。我方法学工作中反复出现的主题是:<strong>大规模分析是否真的在比较「同一个进化对象」</strong>,并构建能确保这一点的方法、基准与可复现流程。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH -->
+  <section class="block" id="research">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">02</span><h2>研究</h2></div>
+      <div class="prose"><p>从动物遗传育种到方法开发——把物种分化的长期历史,与品种内的多样性、适应与选择,放在共同、可审计的基准上连接起来。</p></div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="ktag">系统发育基因组方法</div>
+          <h3>跨基因的分支可比性</h3>
+          <p>当类群缺失或基因树不一致时,种树上不同的分支可能融合或消失。我开发基于分裂(split)的坐标系,让分支身份——以及每一种缺失——都变得明确且可复现。</p>
+        </div>
+        <div class="card">
+          <div class="ktag">分子进化</div>
+          <h3>速率、生活史与约束</h3>
+          <p>以分子进化速率为窗口,考察哺乳动物的生活史进化、功能约束与种内多态——包括有胎盘类在 K–Pg 之后的夜行性瓶颈假说。</p>
+        </div>
+        <div class="card">
+          <div class="ktag">病毒基因组学</div>
+          <h3>基因组监测与变异动态</h3>
+          <p>为 Genotype-to-Phenotype Japan(G2P-Japan)联盟设计并分析病毒基因组变异数据库——SARS-CoV-2 变异株的出现与传播,以及 HCV 耐药与 KSHV 传播。</p>
+        </div>
+        <div class="card">
+          <div class="ktag">动物遗传育种</div>
+          <h3>家禽、家畜与野生哺乳动物</h3>
+          <p>服务育种与保护的群体与比较基因组学——在来鸡与山羊的起源与结构,野生哺乳动物(亚洲黑熊、日本狼、蝙蝠)的基因组监测,并延伸到家蚕、夜蛾类害虫、走禽等。</p>
+        </div>
+      </div>
+
+      <div class="focus">
+        <h3>当前重点 — SplitAligner</h3>
+        <p>一个面向「缺失类群与基因树不一致」情形的分支身份坐标系。它通过投影的种树分裂来定义分支身份,并把分支缺失分解为明确、可审计的类别;配套一个确定性的图论 oracle 基准(Catnip10),以及开发中的 R 参考实现。</p>
+        <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
+          <a href="splitaligner/SplitAligner_explainer_zh.html" target="_blank" rel="noopener">动画讲解 ↗</a>
+          <a href="splitaligner/SplitAligner_tutorial_zh.html" target="_blank" rel="noopener">教程 ↗</a>
+          <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener">预印本(bioRxiv) ↗</a>
+          <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener">SplitAligner 仓库 ↗</a>
+          <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">SplitAlignerR (R) ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOFTWARE -->
+  <section class="block" id="software">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">03</span><h2>软件</h2></div>
+      <div class="prose"><p>我开发并维护的开源工具。方法、验证数据与可复现流程一并发布。</p></div>
+      <div class="sw-grid" style="margin-top:24px">
+
+        <div class="sw">
+          <h3>SplitAligner</h3>
+          <div class="meta"><span class="pill lang">Perl</span><span class="pill">系统发育基因组学</span><span class="pill">2026</span></div>
+          <p>一个分支身份坐标系:在每个基因各自的类群覆盖下,把基因树映射到种树分裂上,并为每一种分支缺失(结构性、融合、拓扑引起)命名。内置确定性的 Catnip10 审计基准。</p>
+          <div class="links">
+            <a href="splitaligner/SplitAligner_explainer_zh.html" target="_blank" rel="noopener">动画讲解 ↗</a>
+          <a href="splitaligner/SplitAligner_tutorial_zh.html" target="_blank" rel="noopener">教程 ↗</a>
+            <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener">GitHub ↗</a>
+            <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener">预印本 ↗</a>
+          </div>
+        </div>
+
+        <div class="sw">
+          <h3>Catnip10</h3>
+          <div class="meta"><span class="pill lang">Python / R</span><span class="pill">MIT</span><span class="pill">一致性基准</span></div>
+          <p>面向「把数值填写在固定或共享参考枝坐标轴上」的枝级工作流的确定性 10 叶一致性基准。独立的图论 oracle(graph oracle)提供真值对象,工作流在两条轴上被评分:剪枝感知的坐标资格,以及表示无关的坐标身份。在 SplitAligner 的验证生态中开发。</p>
+          <div class="links">
+            <a href="catnip10/index_zh.html">概览与交互式 oracle ↗</a>
+            <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub ↗</a>
+          </div>
+        </div>
+
+        <div class="sw">
+          <h3>SplitAlignerR</h3>
+          <div class="meta"><span class="pill lang">R</span><span class="pill">GPL-3</span><span class="pill">开发中</span></div>
+          <p>SplitAligner 的 R 参考实现分支。当前种子版把 Catnip10 图论 oracle 基准作为可审计、带文档的包数据与校验函数发布;面向实证数据的分裂映射引擎正在开发中。</p>
+          <div class="links">
+            <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">GitHub ↗</a>
+          </div>
+        </div>
+
+        <div class="sw">
+          <h3>SGV-Caller</h3>
+          <div class="meta"><span class="pill lang">Perl</span><span class="pill">MIT</span><span class="pill">2025</span></div>
+          <p>一个 SARS-CoV-2 基因组变异 caller,从 GISAID 数据在核苷酸、密码子与氨基酸层面构建本地变异数据库。为 G2P-Japan 联盟开发,是日本监测病毒变异的底层数据来源之一。</p>
+          <div class="links">
+            <a href="https://github.com/wujiaqi06/SGV-caller" target="_blank" rel="noopener">GitHub ↗</a>
+            <a href="https://doi.org/10.1016/j.heliyon.2025.e42613" target="_blank" rel="noopener">Heliyon 2025 ↗</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICATIONS -->
+  <section class="block" id="publications">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">04</span><h2>论文</h2></div>
+      <div class="pub-controls">
+        <button class="fbtn on" data-filter="all">精选(全部)</button>
+        <button class="fbtn" data-filter="lead">第一/通讯作者</button>
+      </div>
+      <p class="pub-note">精选的同行评审论文;<a href="https://scholar.google.com/citations?user=z6IPkcoAAAAJ&hl=ja" target="_blank" rel="noopener">完整列表见 Google&nbsp;Scholar ↗</a>。编辑本文件中的 <span class="mono">PUBS</span> 数组即可添加。</p>
+      <div id="pubList"></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="block" id="contact">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">05</span><h2>联系</h2></div>
+      <div class="contact-grid">
+        <div class="prose">
+          <p>欢迎在比较基因组学、分子进化、统计遗传学与生物信息学方面开展合作——从方法开发与基准测试,到动物、病毒等的真实数据分析。</p>
+        </div>
+        <div class="prose contact">
+          <p>
+            <strong>邮箱</strong><br>
+            <a href="mailto:wujiaqi@hiroshima-u.ac.jp">wujiaqi@hiroshima-u.ac.jp</a><br>
+            <a href="mailto:wujiaqi06@gmail.com">wujiaqi06@gmail.com</a>
+          </p>
+          <p>
+            <strong>其他链接</strong><br>
+            <a href="https://scholar.google.com/citations?user=z6IPkcoAAAAJ&hl=ja" target="_blank" rel="noopener">Google Scholar</a> ·
+            <a href="https://github.com/wujiaqi06" target="_blank" rel="noopener">GitHub</a> ·
+            <a href="https://seeds.office.hiroshima-u.ac.jp/profile/ja.c049548abe9b045d520e17560c007669.html" target="_blank" rel="noopener">学校主页</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr"></span> 吴佳齐 Jiaqi Wu · 广岛大学</span>
+    <span>动物遗传育种 · 比较基因组学 · 分子进化 · 生物信息学</span>
+  </div>
+</footer>
+
+<script>
+"use strict";
+
+/* ---------- Publications data (edit here to add papers) ----------
+   role: "first" | "corresponding" | "cofirst" | "co"
+   Wrap your own name as <b>Wu J</b> in authors so it is highlighted.
+   Optional: url (DOI or link). Set preprint:true for preprints.        */
+const PUBS = [
+  {year:2026, role:"first", preprint:true,
+   authors:"<b>Wu J</b>",
+   title:"A unique graph-theoretic truth table for cross-gene branch identity",
+   venue:"bioRxiv (preprint)", url:"https://doi.org/10.64898/2026.07.22.740066"},
+
+  {year:2026, role:"co",
+   authors:"Masuko R, Ayin, Masaoka M, … <b>Wu J</b>, Yonezawa T, Lenstra JA, Mannen H",
+   title:"Genome-wide diversity of goats from Indonesia and the Philippines reveals local ancestry with different levels of cosmopolitan admixture",
+   venue:"Genome Biology and Evolution 18(7):evag177", url:"https://doi.org/10.1093/gbe/evag177"},
+
+  {year:2026, role:"co",
+   authors:"Li W, Abe H, Chen Y, … <b>Wu J</b>, … Marec F, Xia Q, Mita K",
+   title:"The complete sequence of the silkworm W chromosome uncovers its rapid evolution by large-scale duplications/deletions and translocation of W-linked genes",
+   venue:"G3: Genes, Genomes, Genetics jkag170 (advance access)", url:"https://doi.org/10.1093/g3journal/jkag170"},
+
+  {year:2026, role:"co",
+   authors:"Wang X, <b>Wu J</b>, Yonezawa T, Ren Z",
+   title:"Complete mitochondrial genome and phylogenetic position of the gall aphid Chaetogeoica ulmidrupa (Hemiptera: Aphididae)",
+   venue:"Mitochondrial DNA Part B 11(4):498", url:"https://doi.org/10.1080/23802359.2026.2638669"},
+
+  {year:2026, role:"first", preprint:true,
+   authors:"<b>Wu J</b>",
+   title:"SplitAligner: a gene–species tree reconciliation framework using split-based branch mapping",
+   venue:"bioRxiv (preprint)", url:"https://doi.org/10.64898/2026.02.24.707838"},
+
+  {year:2026, role:"cofirst",
+   authors:"Yonezawa T, <b>Wu J</b>, Masuko R, … Lenstra JA, Mannen H",
+   title:"Genome-wide variation reveal that goats were introduced into Asia via multiple migrations",
+   venue:"Scientific Reports 16:163", url:"https://doi.org/10.1038/s41598-025-29204-x"},
+
+  {year:2025, role:"first",
+   authors:"<b>Wu J</b>, Kryukov K, Takeuchi JS, Nakagawa S",
+   title:"SGV-caller: SARS-CoV-2 genome variation caller",
+   venue:"Heliyon 11(4):e42613", url:"https://doi.org/10.1016/j.heliyon.2025.e42613"},
+
+  {year:2025, role:["cofirst","corresponding"],
+   authors:"Wang T, <b>Wu J</b>, Nakagawa S, Yonezawa T, Liu Z, Zhang X, Wang H, Li Y, Zhang T",
+   title:"Evolutionary analysis and population dynamics in the global transmission of Kaposi's sarcoma-associated herpesvirus",
+   venue:"Archives of Virology 170(5):92", url:"https://doi.org/10.1007/s00705-025-06259-9"},
+
+  {year:2024, role:"co",
+   authors:"Li G, Li R, Yonezawa T, <b>Wu J</b>, … Geng Y",
+   title:"Conserved genetic background but geographically differentiated DNA methylation in invasive alligator weed",
+   venue:"Biological Invasions 26(7):2351"},
+
+  {year:2024, role:"co",
+   authors:"Yonezawa T, Mannen H, … <b>Wu J</b>, Nishibori M, Yamamoto Y",
+   title:"Origin and spatial population structure of Malagasy native chickens based on mitochondrial DNA",
+   venue:"Scientific Reports 14(1):569"},
+
+  {year:2023, role:"cofirst",
+   authors:"Kimura I, Yamasoba D, Nasser H, Ito H, Zahradnik J, <b>Wu J</b>, Fujita S, Uriu K, … Sato K",
+   title:"Multiple mutations of SARS-CoV-2 Omicron BA.2 orchestrate its virological characteristics",
+   venue:"Journal of Virology 97(10):e0101123"},
+
+  {year:2023, role:"co",
+   authors:"Tamura T, Ito J, Uriu K, … Genotype to Phenotype Japan Consortium (<b>Wu J</b>), … Sato K",
+   title:"Virological characteristics of the SARS-CoV-2 XBB variant derived from recombination of two Omicron subvariants",
+   venue:"Nature Communications 14(1):2800"},
+
+  {year:2023, role:"co",
+   authors:"Ito J, Suzuki R, Uriu K, … Genotype to Phenotype Japan Consortium (<b>Wu J</b>), … Sato K",
+   title:"Convergent evolution of SARS-CoV-2 Omicron subvariants leading to the emergence of BQ.1.1",
+   venue:"Nature Communications 14(1):2671"},
+
+  {year:2023, role:"co",
+   authors:"Nakagawa S, Katayama T, Jin L, <b>Wu J</b>, Kryukov K, Oyachi R, et al.",
+   title:"SARS-CoV-2 Haplograph: visualization of SARS-CoV-2 haplotype spread in Japan",
+   venue:"Genes &amp; Genetic Systems 98(5):221"},
+
+  {year:2022, role:"corresponding",
+   authors:"<b>Wu J</b>, Yonezawa T, Kishino H",
+   title:"Molecular evolutionary rate predicts intraspecific genetic polymorphism and species-specific selection",
+   venue:"Genes 13(4):708"},
+
+  {year:2022, role:"cofirst",
+   authors:"Zhao X, <b>Wu J</b>, Kishino H, Chen L",
+   title:"Massive loss of transcription factors promotes the initial diversification of placental mammals",
+   venue:"International Journal of Molecular Sciences 23(17):9720"},
+
+  {year:2022, role:"cofirst",
+   authors:"Kimura I, Kosugi Y, <b>Wu J</b>, Zahradnik J, … Sato K",
+   title:"The SARS-CoV-2 Lambda variant exhibits enhanced infectivity and immune resistance",
+   venue:"Cell Reports 38:110218"},
+
+  {year:2022, role:"co",
+   authors:"Saito A, Irie T, Suzuki R, … <b>Wu J</b>, … Kawaoka Y, Sato K",
+   title:"SARS-CoV-2 spike P681R mutation, a hallmark of the Delta variant, enhances fusogenicity and pathogenicity",
+   venue:"Nature 602:300"},
+
+  {year:2022, role:"co",
+   authors:"Suzuki R, Yamasoba D, Kimura I, … Genotype to Phenotype Japan (<b>Wu J</b>), … Sato K",
+   title:"Attenuated fusogenicity and pathogenicity of the SARS-CoV-2 Omicron variant",
+   venue:"Nature 603:700"},
+
+  {year:2022, role:"co",
+   authors:"Meng B, Abdullahi A, … Genotype to Phenotype Japan Consortium (<b>Wu J</b>), … Gupta RK",
+   title:"Altered TMPRSS2 usage by SARS-CoV-2 Omicron impacts infectivity and fusogenicity",
+   venue:"Nature 603:706"},
+
+  {year:2022, role:"co",
+   authors:"Segawa T, Yonezawa T, Mori H, … <b>Wu J</b>, … Nishihara H",
+   title:"Paleogenomics reveals independent and hybrid origins of two wolf lineages endemic to Japan",
+   venue:"Current Biology 32(11):2494"},
+
+  {year:2021, role:"corresponding",
+   authors:"<b>Wu J</b>, Yonezawa T, Kishino H",
+   title:"Evolution of reproductive life history in mammals and the associated change of functional constraints",
+   venue:"Genes 12(5):740"},
+
+  {year:2021, role:"cofirst",
+   authors:"Liu Z, Mao X, <b>Wu J</b>, Yu K, … Chen X",
+   title:"World-wide prevalence of substitutions in the HCV genome associated with resistance to direct-acting antivirals",
+   venue:"Clinical Gastroenterology and Hepatology 19:1906"},
+
+  {year:2021, role:"co",
+   authors:"Mlcochova P, Kemp SA, … Genotype to Phenotype Japan Consortium (<b>Wu J</b>), … Gupta RK",
+   title:"SARS-CoV-2 B.1.617.2 (Delta) variant replication and immune evasion",
+   venue:"Nature 599:114"},
+
+  {year:2021, role:"co",
+   authors:"Motozono C, Toyoda M, … Genotype to Phenotype Japan Consortium (<b>Wu J</b>), … Sato K",
+   title:"SARS-CoV-2 spike L452R variant evades cellular immunity and increases infectivity",
+   venue:"Cell Host &amp; Microbe 29:1124"},
+
+  {year:2020, role:"co",
+   authors:"Nikaido M, Kondo S, Zhang Z, <b>Wu J</b>, … Kai C",
+   title:"Comparative genomic analyses illuminate the distinct evolution of megabats within Chiroptera",
+   venue:"DNA Research 27:1"},
+
+  {year:2018, role:"co",
+   authors:"Suzuki H, Nishida H, … <b>Wu J</b>, … Nikaido M",
+   title:"A single pheromone receptor gene conserved across 400 My of vertebrate evolution",
+   venue:"Molecular Biology and Evolution 35:2928"},
+
+  {year:2017, role:"corresponding",
+   authors:"<b>Wu J</b>, Yonezawa T, Kishino H",
+   title:"Rates of molecular evolution suggest natural history of life-history traits and a post-K–Pg nocturnal bottleneck of placentals",
+   venue:"Current Biology 27:3025"},
+
+  {year:2017, role:"cofirst",
+   authors:"Cheng T, <b>Wu J</b>, Wu Y, … Goldsmith MR, Feng Q, Xia Q, Mita K",
+   title:"Genomic adaptation to polyphagy and insecticides in a major East Asian noctuid pest",
+   venue:"Nature Ecology &amp; Evolution 1:1747"},
+
+  {year:2017, role:"co",
+   authors:"Yonezawa T, Segawa T, … <b>Wu J</b>, … Willerslev E, Hasegawa M",
+   title:"Phylogenomics and morphology of extinct paleognaths reveal the origin and evolution of the ratites",
+   venue:"Current Biology 27:68"},
+
+  {year:2017, role:"co",
+   authors:"Guo H, Cheng T, … <b>Wu J</b>, … Xia Q, Mita K",
+   title:"Expression map of a complete set of gustatory receptor genes in chemosensory organs of Bombyx mori",
+   venue:"Insect Biochemistry and Molecular Biology 82:74"},
+
+  {year:2015, role:"first",
+   authors:"<b>Wu J</b>, Kohno N, Mano S, Fukumoto Y, Tanabe H, Hasegawa M, Yonezawa T",
+   title:"Phylogeographic and demographic analysis of the Asian black bear (Ursus thibetanus) based on mitochondrial DNA",
+   venue:"PLoS ONE 10:e0136398"},
+
+  {year:2014, role:"first",
+   authors:"<b>Wu J</b>, Hasegawa M, Zhong Y, Yonezawa T",
+   title:"Importance of synonymous substitutions under dense taxon sampling and appropriate modeling in reconstructing the mitogenomic tree of Eutheria",
+   venue:"Genes &amp; Genetic Systems 89:237"},
+
+  {year:2013, role:"co",
+   authors:"Li Y, Ren Z, Shedlock AM, <b>Wu J</b>, … Yonezawa T, Zhong Y",
+   title:"High-altitude adaptation of the schizothoracine fishes (Cyprinidae) revealed by mitochondrial genome analyses",
+   venue:"Gene 517:169"}
+];
+
+const LEAD = new Set(["first","corresponding","cofirst"]);
+const badgeText = {first:"第一作者", corresponding:"通讯作者", cofirst:"共同一作", co:""};
+const badgeClass = {first:"first", corresponding:"corr", cofirst:"cofirst"};
+const rolesOf = p => [].concat(p.role || []);
+
+function render(filter){
+  const list = document.getElementById("pubList");
+  list.innerHTML = "";
+  const items = PUBS.filter(p => filter==="all" ? true : rolesOf(p).some(r => LEAD.has(r)));
+  const years = [...new Set(items.map(p=>p.year))].sort((a,b)=>b-a);
+  let idx = 0;
+  years.forEach(y=>{
+    const grp = document.createElement("div"); grp.className="year-group";
+    const yl = document.createElement("div"); yl.className="year-label"; yl.textContent=y; grp.appendChild(yl);
+    const ul = document.createElement("ul"); ul.className="pubs";
+    items.filter(p=>p.year===y).forEach(p=>{
+      idx++;
+      const li = document.createElement("li"); li.className="pub";
+      const badges = [];
+      rolesOf(p).forEach(r => { if(badgeText[r]) badges.push(`<span class="badge ${badgeClass[r]}">${badgeText[r]}</span>`); });
+      if(p.preprint) badges.push(`<span class="badge pre">预印本</span>`);
+      const titleHtml = p.url
+        ? `<a class="title" href="${p.url}" target="_blank" rel="noopener">${p.title}</a>`
+        : `<span class="title">${p.title}</span>`;
+      li.innerHTML =
+        `<span class="idx">${String(idx).padStart(2,"0")}</span>`+
+        `<span class="body">${titleHtml}`+
+        (badges.length?`<span class="badges">${badges.join("")}</span>`:``)+
+        `<br><span class="authors">${p.authors}.</span> `+
+        `<span class="venue"><span class="yr">${p.year}</span>. ${p.venue}.</span>`+
+        (p.note?` <span class="authors">(${p.note})</span>`:``)+
+        `</span>`;
+      ul.appendChild(li);
+    });
+    grp.appendChild(ul); list.appendChild(grp);
+  });
+}
+render("all");
+
+document.querySelectorAll(".fbtn").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".fbtn").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    render(b.dataset.filter);
+  });
+});
+
+/* theme toggle */
+const root = document.documentElement, tb = document.getElementById("themeBtn");
+tb.addEventListener("click", ()=>{
+  const cur = root.getAttribute("data-theme")
+    || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark":"light");
+  root.setAttribute("data-theme", cur==="dark" ? "light":"dark");
+});
+
+/* scrollspy: highlight active nav link */
+const links = [...document.querySelectorAll(".nav-links a")];
+const map = new Map(links.map(a=>[a.getAttribute("href").slice(1), a]));
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(a=>a.classList.remove("active"));
+      const a = map.get(e.target.id); if(a) a.classList.add("active");
+    }
+  });
+}, {rootMargin:"-45% 0px -50% 0px"});
+["about","research","software","publications","contact"].forEach(id=>{
+  const el = document.getElementById(id); if(el) obs.observe(el);
+});
+
+document.getElementById("yr").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

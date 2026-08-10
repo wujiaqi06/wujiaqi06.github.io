@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catnip10 — 确定性枝坐标一致性基准</title>
+<meta name="description" content="Catnip10 是面向「使用固定或共享参考枝坐标轴」的分枝级工作流的确定性 10 叶一致性基准。它以独立的图论 oracle（graph oracle）为真值对象，检验剪枝感知的坐标资格，以及表示变化下稳定的坐标身份与可用性。">
+<link rel="stylesheet" href="../splitaligner/catnip10_game.css">
+<script src="../splitaligner/catnip10_game_data.js" defer></script>
+<script src="../splitaligner/catnip10_game.js" defer></script>
+<style>
+  :root{
+    --paper:#f4f6f4; --surface:#ffffff; --surface2:#eef1ee; --line:#dde3df;
+    --ink:#16211c; --muted:#5b6b64; --faint:#8a9791;
+    --accent:#15736a;
+    --accent-2:#b06a2c;
+    --accent-soft:#e2efec;
+    --serif:"Charter","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --maxw:1080px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#0f1613; --surface:#151d19; --surface2:#1b241f; --line:#2a352f;
+      --ink:#e7efea; --muted:#a2b1aa; --faint:#75847d;
+      --accent:#4bb7a8; --accent-2:#d8974f; --accent-soft:#17302b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0f1613; --surface:#151d19; --surface2:#1b241f; --line:#2a352f;
+    --ink:#e7efea; --muted:#a2b1aa; --faint:#75847d;
+    --accent:#4bb7a8; --accent-2:#d8974f; --accent-soft:#17302b;
+  }
+  :root[data-theme="light"]{
+    --paper:#f4f6f4; --surface:#ffffff; --surface2:#eef1ee; --line:#dde3df;
+    --ink:#16211c; --muted:#5b6b64; --faint:#8a9791;
+    --accent:#15736a; --accent-2:#b06a2c; --accent-soft:#e2efec;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
+    line-height:1.6; -webkit-font-smoothing:antialiased; font-size:17px}
+  h1,h2,h3{font-family:var(--serif); font-weight:600; line-height:1.15; letter-spacing:-.01em}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+  .mono{font-family:var(--mono)}
+  code{font-family:var(--mono); font-size:.88em; background:var(--surface2); border:1px solid var(--line);
+    border-radius:5px; padding:1px 5px}
+
+  /* Nav — same idiom as the rest of the site */
+  header.nav{position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.4) blur(8px);
+    background:color-mix(in srgb,var(--paper) 86%, transparent); border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--maxw); margin:0 auto; padding:11px 24px; display:flex; align-items:center; gap:18px}
+  .nav-name{font-family:var(--serif); font-weight:600; font-size:17px; letter-spacing:-.01em; margin-right:auto}
+  .nav-name a{color:var(--ink)}
+  .nav-links{display:flex; gap:20px; align-items:center}
+  .nav-links a{color:var(--muted); font-size:14.5px}
+  .nav-links a:hover{color:var(--accent); text-decoration:none}
+  .lang-switch{display:flex; gap:1px; align-items:center; font-family:var(--mono); font-size:12px}
+  .lang-switch a{color:var(--faint); padding:3px 7px; border-radius:6px; text-decoration:none}
+  .lang-switch a:hover{color:var(--accent)}
+  .lang-switch a.cur{color:var(--accent); background:var(--surface2); font-weight:700}
+  .theme-btn{border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:8px;
+    width:34px; height:34px; cursor:pointer; font-size:15px; display:grid; place-items:center}
+  .theme-btn:hover{color:var(--accent); border-color:var(--accent)}
+  @media (max-width:820px){ .nav-links{display:none} }
+
+  /* Hero */
+  .hero{padding:64px 0 40px}
+  .hero-grid{display:grid; grid-template-columns:1.45fr .8fr; gap:44px; align-items:center}
+  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr; gap:28px} }
+  .eyebrow{font-size:13px; text-transform:uppercase; letter-spacing:.18em; color:var(--accent); font-weight:700}
+  .hero h1{font-size:clamp(40px,6.4vw,64px); margin:.22em 0 .1em}
+  .hero .tag{font-family:var(--serif); font-size:clamp(18px,2.2vw,22px); color:var(--muted); font-style:italic}
+  .lead{font-size:clamp(17px,1.7vw,19.5px); color:var(--muted); max-width:62ch; margin:20px 0 24px}
+  .lead em{color:var(--ink); font-style:normal; font-weight:600}
+  .btns{display:flex; flex-wrap:wrap; gap:10px}
+  .btn{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line); background:var(--surface);
+    color:var(--ink); padding:9px 15px; border-radius:10px; font-size:14.5px; font-weight:500}
+  .btn:hover{border-color:var(--accent); color:var(--accent); text-decoration:none}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  .btn.primary:hover{background:color-mix(in srgb,var(--accent) 88%, #000); color:#fff}
+  .badge-card{background:#fbfaf4; border:1px solid var(--line); border-radius:18px; padding:12px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .badge-card img{display:block; width:100%; height:auto; border-radius:10px}
+  .badge-cap{font-family:var(--mono); font-size:11.5px; color:var(--faint); text-align:center; margin-top:8px}
+
+  /* Sections */
+  section.block{padding:50px 0; border-top:1px solid var(--line)}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:22px}
+  .sec-head h2{font-size:clamp(23px,3.1vw,30px); margin:0}
+  .sec-head .sec-num{font-family:var(--mono); font-size:13px; color:var(--accent); font-weight:700}
+  .prose{max-width:70ch; color:var(--muted); font-size:17px}
+  .prose strong{color:var(--ink)}
+  .prose p{margin:0 0 15px}
+  .prose p:last-child{margin-bottom:0}
+
+  /* Callout */
+  .note{background:linear-gradient(180deg,var(--accent-soft),transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 32%,var(--line)); border-radius:14px;
+    padding:18px 20px; margin:22px 0 0; color:var(--muted); font-size:15.5px; max-width:70ch}
+  .note strong{color:var(--ink)}
+  .note p{margin:0 0 10px} .note p:last-child{margin:0}
+
+  /* Contraction diagram */
+  .diagram{margin:26px 0 0; background:var(--surface); border:1px solid var(--line);
+    border-radius:14px; padding:22px; overflow-x:auto}
+  .diagram svg{display:block; width:100%; min-width:560px; max-width:820px; margin:0 auto; height:auto}
+  .dg-edge{fill:none; stroke:var(--muted); stroke-width:2.2; stroke-linecap:round}
+  .dg-edge.hot{stroke:var(--accent)}
+  .dg-edge.gone{stroke:var(--accent-2); stroke-dasharray:3 4; opacity:.6}
+  .dg-edge.fused{stroke:var(--accent-2); stroke-width:4.4}
+  .dg-dot{fill:var(--ink)}
+  .dg-dot.open{fill:var(--paper); stroke:var(--muted); stroke-width:1.6}
+  .dg-dot.gone{fill:var(--accent-2); opacity:.45}
+  .dg-t{font-family:var(--mono); font-size:11.5px; fill:var(--muted)}
+  .dg-t.lbl{fill:var(--ink); font-weight:700}
+  .dg-t.hot{fill:var(--accent); font-weight:700}
+  .dg-t.warm{fill:var(--accent-2); font-weight:700}
+  .dg-cap{font-family:var(--mono); font-size:11.5px; fill:var(--faint)}
+  .dg-arrow{fill:none; stroke:var(--line); stroke-width:2}
+
+  /* Algorithm steps */
+  .algo{counter-reset:step; margin:24px 0 0; display:grid; gap:12px; max-width:76ch}
+  .algo li{list-style:none; counter-increment:step; position:relative; padding:14px 18px 14px 52px;
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    color:var(--muted); font-size:15.5px; line-height:1.55}
+  .algo li::before{content:counter(step,decimal-leading-zero); position:absolute; left:18px; top:14px;
+    font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent)}
+  .algo li strong{color:var(--ink)}
+
+  /* State table */
+  .tbl-scroll{overflow-x:auto; margin:24px 0 0}
+  table.states{border-collapse:collapse; width:100%; min-width:620px; font-size:15px}
+  table.states th,table.states td{text-align:left; padding:12px 14px; border-bottom:1px solid var(--line);
+    vertical-align:top; color:var(--muted)}
+  table.states thead th{font-family:var(--mono); font-size:11.5px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--faint); font-weight:700; border-bottom:1px solid var(--line)}
+  table.states td.st{white-space:nowrap; font-family:var(--mono); font-size:13px; font-weight:700}
+  .sw-obs{color:#0c6e5b} .sw-fus{color:#2f5cc4} .sw-str{color:#bf3625}
+  @media (prefers-color-scheme:dark){ .sw-obs{color:#3cc0a6} .sw-fus{color:#8ab4f2} .sw-str{color:#f28a8a} }
+  :root[data-theme="dark"] .sw-obs{color:#3cc0a6}
+  :root[data-theme="dark"] .sw-fus{color:#8ab4f2}
+  :root[data-theme="dark"] .sw-str{color:#f28a8a}
+  :root[data-theme="light"] .sw-obs{color:#0c6e5b}
+  :root[data-theme="light"] .sw-fus{color:#2f5cc4}
+  :root[data-theme="light"] .sw-str{color:#bf3625}
+  table.states td strong{color:var(--ink)}
+
+  /* Spec grid */
+  .spec{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:820px){ .spec{grid-template-columns:repeat(2,1fr)} }
+  .spec > div{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .spec .n{font-family:var(--serif); font-size:30px; font-weight:600; color:var(--accent); line-height:1}
+  .spec .k{font-size:13.5px; color:var(--muted); margin-top:6px; line-height:1.4}
+
+  /* Verdict cards */
+  .verdicts{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:720px){ .verdicts{grid-template-columns:1fr} }
+  .vd{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .vd h4{margin:0 0 6px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--accent); font-weight:700}
+  .vd p{margin:0; color:var(--muted); font-size:15px; line-height:1.55}
+
+  /* Code block */
+  pre{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+    overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.6; color:var(--ink); margin:20px 0 0}
+  pre code{background:none; border:none; padding:0; font-size:inherit}
+  .cm{color:var(--faint)}
+
+  /* Link rows */
+  .linkrow{display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px; margin-top:18px}
+
+  footer{border-top:1px solid var(--line); padding:26px 0 40px; color:var(--faint); font-size:13.5px}
+  footer .wrap{display:flex; flex-wrap:wrap; gap:10px 20px; justify-content:space-between}
+
+
+  /* Audit result tables */
+  .figcard{background:#ffffff; border:1px solid var(--line); border-radius:14px; padding:16px;
+    overflow-x:auto; margin:24px 0 8px}
+  .figcard img{display:block; min-width:900px; width:100%; height:auto}
+  figcaption.cap{color:var(--faint); font-size:13.5px; margin-top:10px; max-width:80ch}
+  figcaption.cap b{color:var(--muted); font-weight:600}
+  .axis-wrap{overflow-x:auto; margin:18px 0 0; border:1px solid var(--line); border-radius:12px; background:var(--surface)}
+  table.axis{border-collapse:collapse; font-family:var(--mono); font-size:11.5px; width:100%; min-width:1000px}
+  table.axis th,table.axis td{padding:5px 7px; text-align:right; white-space:nowrap;
+    border-bottom:1px solid var(--line); color:var(--muted); font-variant-numeric:tabular-nums}
+  table.axis thead th{position:sticky; top:0; background:var(--surface2); color:var(--faint);
+    font-weight:700; font-size:11px; letter-spacing:.03em}
+  table.axis th.rl,table.axis td.rl{text-align:left; position:sticky; left:0; background:var(--surface);
+    color:var(--ink); font-weight:700; border-right:1px solid var(--line)}
+  table.axis thead th.rl{background:var(--surface2)}
+  table.axis tbody tr:last-child td{border-bottom:none}
+  td.o-obs{color:var(--muted)}
+  td.o-fuse{color:#2f5cc4}
+  td.o-struct{color:#bf3625}
+  td.mk-bad{color:#bf3625; font-weight:700; background:color-mix(in srgb,#bf3625 9%,transparent)}
+  td.mk-proj{color:#2f5cc4; font-weight:700; background:color-mix(in srgb,#2f5cc4 9%,transparent)}
+  @media (prefers-color-scheme:dark){ td.mk-proj{color:#8ab4f2; background:color-mix(in srgb,#8ab4f2 12%,transparent)} }
+  :root[data-theme="dark"] td.mk-proj{color:#8ab4f2; background:color-mix(in srgb,#8ab4f2 12%,transparent)}
+  :root[data-theme="light"] td.mk-proj{color:#2f5cc4; background:color-mix(in srgb,#2f5cc4 9%,transparent)}
+  @media (prefers-color-scheme:dark){
+    td.o-fuse{color:#8ab4f2} td.o-struct{color:#f28a8a}
+    td.mk-bad{color:#f28a8a; background:color-mix(in srgb,#f28a8a 12%,transparent)}
+    .figcard{background:#f7f7f2}
+  }
+  :root[data-theme="dark"] td.o-fuse{color:#8ab4f2}
+  :root[data-theme="dark"] td.o-struct{color:#f28a8a}
+  :root[data-theme="dark"] td.mk-bad{color:#f28a8a; background:color-mix(in srgb,#f28a8a 12%,transparent)}
+  :root[data-theme="dark"] .figcard{background:#f7f7f2}
+  :root[data-theme="light"] td.o-fuse{color:#2f5cc4}
+  :root[data-theme="light"] td.o-struct{color:#bf3625}
+  :root[data-theme="light"] td.mk-bad{color:#bf3625; background:color-mix(in srgb,#bf3625 9%,transparent)}
+  :root[data-theme="light"] .figcard{background:#ffffff}
+  .tkey{display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--faint)}
+  .tkey i{font-style:normal; font-weight:700}
+  .callouts{display:grid; grid-template-columns:1.6fr 1fr; gap:14px; margin-top:16px}
+  @media (max-width:820px){ .callouts{grid-template-columns:1fr} }
+  .co{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .co h4{margin:0 0 8px; font-size:13px; font-family:var(--mono); letter-spacing:.04em; color:var(--accent-2);
+    text-transform:uppercase; font-weight:700}
+  .co p{margin:0; font-family:var(--mono); font-size:12.5px; line-height:1.75; color:var(--muted); word-break:break-word}
+  .co .big{font-family:var(--serif); font-size:26px; font-weight:600; color:var(--ink)}
+  .subh{font-family:var(--serif); font-size:19px; font-weight:600; color:var(--ink); margin:32px 0 0}
+  .subh + .prose{margin-top:8px}
+
+  .catnip-game{margin-top:24px}
+  /* Hero axis chips */
+  .axes{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:22px 0 24px; max-width:62ch}
+  @media (max-width:720px){ .axes{grid-template-columns:1fr} }
+  .ax{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:13px 15px}
+  .ax .axl{display:block; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--accent)}
+  .ax b{display:block; color:var(--ink); font-size:15px; margin:3px 0 4px; line-height:1.3}
+  .ax span:last-child{color:var(--muted); font-size:13.5px; line-height:1.5}
+
+  /* Representation controls */
+  .reps{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:860px){ .reps{grid-template-columns:1fr} }
+  .rep{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .rep .rid{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent-2); letter-spacing:.06em}
+  .rep h4{margin:4px 0 10px; font-family:var(--serif); font-size:17px; color:var(--ink); font-weight:600}
+  .rep ul{margin:0 0 10px; padding-left:16px; color:var(--muted); font-size:13.5px; line-height:1.6}
+  .rep li{margin:0}
+  .rep p{margin:0; color:var(--muted); font-size:14.5px; line-height:1.55}
+  .rep p strong{color:var(--ink)}
+  .defn{border-left:3px solid var(--accent); padding-left:14px; margin:4px 0 15px !important}
+
+  /* Dispositions */
+  .vd.d-pass h4{color:#0c6e5b} .vd.d-fail h4{color:#bf3625}
+  .vd.d-ne h4{color:#2f5cc4}   .vd.d-un h4{color:var(--faint)}
+  @media (prefers-color-scheme:dark){
+    .vd.d-pass h4{color:#3cc0a6} .vd.d-fail h4{color:#f28a8a} .vd.d-ne h4{color:#8ab4f2}
+  }
+  :root[data-theme="dark"] .vd.d-pass h4{color:#3cc0a6}
+  :root[data-theme="dark"] .vd.d-fail h4{color:#f28a8a}
+  :root[data-theme="dark"] .vd.d-ne h4{color:#8ab4f2}
+  :root[data-theme="light"] .vd.d-pass h4{color:#0c6e5b}
+  :root[data-theme="light"] .vd.d-fail h4{color:#bf3625}
+  :root[data-theme="light"] .vd.d-ne h4{color:#2f5cc4}
+
+  .axnote{border-left:3px solid var(--accent-2); padding-left:14px; font-size:15.5px}
+  .fine{display:block; margin-top:8px; font-family:var(--sans); font-size:12.5px; color:var(--faint); line-height:1.5}
+
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-name"><a href="../index_zh.html">Jiaqi Wu</a></span>
+    <nav class="nav-links">
+      <a href="../index_zh.html#software">软件</a>
+      <a href="#oracle">Oracle</a>
+      <a href="#axis-a">轴 A</a>
+      <a href="#axis-b">轴 B</a>
+      <a href="#dispositions">判定</a>
+      <a href="#case-study">案例</a>
+      <a href="#explore">交互</a>
+    </nav>
+    <div class="lang-switch" aria-label="Language / 言語 / 语言"><a href="index.html">EN</a><a href="index_ja.html">日本語</a><a href="index_zh.html" class="cur">中文</a></div>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark" aria-label="切换明暗配色">◐</button>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">一致性基准 · 图论 oracle</div>
+      <h1>Catnip10</h1>
+      <div class="tag">我们虽小，但明察秋毫。</div>
+      <p class="lead">面向「把数值填写在固定或共享<em>参考枝坐标轴</em>上」的分枝级工作流的确定性一致性基准。10 个叶节点、17 条冻结的原始坐标——小到可以完整追踪，又足以检验每一项明确声明的坐标主张。</p>
+      <div class="axes">
+        <div class="ax"><span class="axl">Axis A</span><b>剪枝感知的坐标资格</b><span>剪枝与收缩之后，这个数值是否仍可作为其所填入原始坐标的独立取值？</span></div>
+        <div class="ax"><span class="axl">Axis B</span><b>表示变化下稳定的坐标身份与可用性</b><span>同一条规范化无根 split，在数学等价的树表示之间，是否保持相同的坐标身份和声明的可用状态？</span></div>
+      </div>
+      <div class="btns">
+        <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
+        <a class="btn" href="#oracle">oracle 如何工作</a>
+        <a class="btn" href="#case-study">案例研究</a>
+        <a class="btn" href="#explore">动手试试</a>
+      </div>
+    </div>
+    <figure class="badge-card" style="margin:0">
+      <img src="catnip10_mascot.jpg" alt="Catnip10 吉祥物：一棵手持放大镜与审计记录板的卡通玩具树，标注了 t1 到 t10 十个叶节点，其中 t10 标为 DISPLAY ROOT。">
+      <figcaption class="badge-cap">项目吉祥物 · 10 叶一致性基准</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 01 -->
+<section class="block" id="problem">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2>数值可以是对的，坐标却是错的</h2></div>
+    <div class="prose">
+      <p>比较基因组学流程常把分枝级数值——演化速率、残差、路径长度——放进一个以参考树的分枝为列的矩阵。但这只有在一种前提下才有意义：一个列标签，在所有为它贡献数据的基因中，始终指向同一个演化对象。</p>
+      <p>各基因的类群覆盖不同，因此每棵基因树都是参考树的一次<strong>收缩</strong>。删掉一个叶节点，可能使某个内部节点只剩两个邻居；标准的树简约会抑制该节点，把与之相连的两条分枝合并成一条。合并后的分枝可以精确保留成员长度之和——算术毫无问题——但那两条原始分枝在这个基因里已经无法被分别观测。</p>
+      <p>如果流程把这个合并值写进以其中一条成员命名的格子里，数值是有效的，坐标却不是。程序不会崩溃，不会出现 <code>NA</code>，而任何只检查算术是否正确的检验都看不见它。</p>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 800 200" role="img" aria-label="示意图：删除一个叶节点后产生度为 2 的节点；抑制该节点会把两条原始分枝融合为一条复合分枝，其长度为二者之和。">
+        <text class="dg-cap" x="20" y="18">1 · 参考树</text>
+        <g>
+          <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge hot" d="M90 110 H150"/>
+          <path class="dg-edge" d="M150 110 L150 60 H200"/><path class="dg-edge hot" d="M150 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/><circle class="dg-dot" cx="150" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="60" r="4"/><circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t hot" x="105" y="103">b₁</text><text class="dg-t hot" x="168" y="103">b₂</text>
+          <text class="dg-t" x="208" y="56">x</text><text class="dg-t" x="218" y="114">y</text><text class="dg-t" x="208" y="169">z</text>
+        </g>
+        <path class="dg-arrow" d="M245 110 H285"/><path class="dg-arrow" d="M277 104 L285 110 L277 116"/>
+        <text class="dg-cap" x="300" y="18">2 · 删除叶 x → 出现度为 2 的节点</text>
+        <g transform="translate(280,0)">
+          <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge hot" d="M90 110 H150"/>
+          <path class="dg-edge gone" d="M150 110 L150 60 H200"/><path class="dg-edge hot" d="M150 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/><circle class="dg-dot open" cx="150" cy="110" r="5.5"/>
+          <circle class="dg-dot gone" cx="200" cy="60" r="4"/><circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t hot" x="105" y="103">b₁</text><text class="dg-t hot" x="168" y="103">b₂</text>
+          <text class="dg-t warm" x="208" y="56">x̶</text><text class="dg-t" x="218" y="114">y</text><text class="dg-t" x="208" y="169">z</text>
+        </g>
+        <path class="dg-arrow" d="M525 110 H565"/><path class="dg-arrow" d="M557 104 L565 110 L557 116"/>
+        <text class="dg-cap" x="580" y="18">3 · 抑制后 → 复合分枝</text>
+        <g transform="translate(560,0)">
+          <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge fused" d="M90 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/><circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t warm" x="112" y="100">{b₁,b₂}</text><text class="dg-t" x="112" y="130">len = b₁+b₂</text>
+          <text class="dg-t" x="218" y="114">y</text><text class="dg-t" x="208" y="169">z</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="note">
+      <p><strong>Catnip10 要守住的区分：</strong>复合分枝 <span class="mono">{b₁,b₂}</span> 本身是完全合法的估计对象——它可以是一条简约树上的分枝，也可以是一个明确声明的复合对象。但它不能被当作 <span class="mono">b₁</span> 或 <span class="mono">b₂</span> 的独立取值。端点定义的路径与简约树分枝都是正当的原生对象；只有当数值被放到共享的全树分枝轴上进行对齐、比较或解释时，这项要求才适用。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="block" id="oracle">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>图论 oracle（graph oracle）：带成员溯源的图收缩</h2></div>
+    <div class="prose">
+      <p>图论 oracle（graph oracle）是一个通过图删除、收缩和原始分枝成员归属传播，直接构造基准真值的小型图算法。因此，Catnip10 的真值对象是确定、精确且可逐格核验的，而不是从被审计工作流的输出中估计出来的。oracle 从不读取被审计工作流的输出。</p>
+    </div>
+
+    <ol class="algo">
+      <li>冻结一棵参考树，把它的分枝枚举为<strong>原始坐标</strong> <code>B1…B17</code>。每条分枝都是一个离散对象；移除它会在类群上诱导一个二分划分，这正是标签意义的来源。</li>
+      <li>对某个类群子集，<strong>删除缺失的叶节点</strong>，并反复<strong>抑制每一个度为 2 的顶点</strong>，把与之相连的两条分枝合并。这就是标准的树简约——任何流程都在隐式执行的同一种收缩。</li>
+      <li>在每一次抑制中<strong>传播原始分枝的成员归属</strong>。每条存活的简约分枝都携带它所吸收的原始分枝集合，合并时取两个成员集合的并集。不丢弃任何信息，溯源因此永不丢失。</li>
+      <li>按成员归属的去向<strong>对每条原始坐标分类</strong>：是某条存活分枝的唯一成员 → <code>observed</code>；是含两条及以上成员的存活分枝的成员 → <code>NA_fuse</code>；不被任何存活分枝包含 → <code>NA_struct</code>。</li>
+      <li>输出<strong>两本相互关联的账本</strong>：为每条原始坐标分配恰好一个状态的原始坐标账本，以及按成员集合与长度之和登记每条存活复合分枝的复合分枝账本。</li>
+    </ol>
+
+    <div class="note">
+      <p>由于整个过程是确定且有限的，17 条坐标在任意类群子集下的期望状态都可以预先穷举——不需要模拟、不需要抽样，也不需要数值容差。对于适用该坐标契约且适配器已通过验证的工作流，与冻结 oracle 的不一致构成可审计的一致性偏差。</p>
+      <p><strong>三种状态的适用范围：</strong>在这个固定拓扑的 toy core 中，<code>observed</code>、<code>NA_fuse</code> 和 <code>NA_struct</code> 互斥且完备。这是本基准设计的性质，并不是对所有异质树工作流的一般性断言。拓扑导致的缺失被有意排除在固定拓扑 core 之外，因此这三种状态并不构成其他工作流的完整状态分类体系。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 -->
+<section class="block" id="states">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>三种状态，以及各自允许什么</h2></div>
+    <div class="prose">
+      <p>整个审计的关键，在于把流程习惯性混为一谈的两类缺失分开。一条消失的分枝和一条被融合的分枝不是同一回事，下游处理方式也不同。</p>
+    </div>
+
+    <div class="tbl-scroll">
+      <table class="states">
+        <thead><tr><th>状态</th><th>这条坐标发生了什么</th><th>该格中的数值意味着什么</th></tr></thead>
+        <tbody>
+          <tr><td class="st sw-obs">observed</td>
+            <td>原始分枝在收缩后作为独立的一条分枝存活，没有其他原始分枝并入其中。</td>
+            <td><strong>合法。</strong>该格可以承载这条具名分枝的独立取值。</td></tr>
+          <tr><td class="st sw-fus">NA_fuse</td>
+            <td>该分枝只在复合分枝内部存活，且至少与另一条原始分枝同在。复合分枝的长度是各成员长度的精确之和。</td>
+            <td><strong>不具备独立坐标资格。</strong>这里的任何数值都属于复合分枝，而非这条成员分枝。数值可以在算术上完全精确，归属却是错的。</td></tr>
+          <tr><td class="st sw-str">NA_struct</td>
+            <td>该分枝结构性缺失：在这个类群子集下，没有任何存活分枝包含它。</td>
+            <td><strong>未定义。</strong>该格没有可以指涉的演化对象。注意，零不属于这一类——零表示一个被实际观测到的零值状态。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <p><strong>公开表格中的名称：</strong>机器可读的真值表把这三种状态写作 <code>OBSERVED_PRIMITIVE</code>、<code>NA_FUSE</code>、<code>NA_STRUCT</code>；本页与图中使用的简写指的是完全相同的状态。契约中另有 <code>NA_TOPO</code>，保留给拓扑导致的缺失，固定拓扑的剪枝 core 不会产生该状态。</p>
+      <p><strong>最后一行为什么在实践中重要：</strong>写入结构性不可用格子的数值零，可以通过常规缺失值过滤；如果不显式校验坐标状态，它就可能在下游被当作一个实际观测到的零。缺失编码描述的是坐标状态，而不是软件失败。区分 <code>NA_struct</code> 与真实观测零，是一个坐标层面的问题，单靠数值校验无法回答。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 -->
+<section class="block" id="axis-a">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2>轴 A — 剪枝感知的坐标资格</h2></div>
+    <div class="prose">
+      <p>第一条有效性轴只问一件事：剪枝与收缩之后，这个数值是否仍可作为其所填入原始全树坐标的独立取值？</p>
+      <p>在这一剪枝实验中，拓扑和枝长保持固定；不引入真实速率变化、基因树与物种树不一致、枝长估计误差或物种树不确定性。唯一施加的扰动是类群删除，以及由此产生的度为 2 节点抑制。因此，在<em>这一实验内部</em>，剪枝是解释坐标状态变化的唯一实验因素。Catnip10 还包含另一套表示对照，用于检验完全不同的问题，见下方轴 B。</p>
+      <p>两条预先规定的删除序列给出对照鲜明的几何：一条是从显示根一侧向内推进的<strong>渐进全局</strong>序列，另一条是把删除集中在单个分支内的<strong>局部</strong>序列。每条各 8 步（含基线）。由于树很小，oracle 还能穷举可删叶节点的<em>所有</em>子集下每条坐标的期望状态——下方交互面板驱动的正是这一点。</p>
+    </div>
+
+    <div class="spec">
+      <div><div class="n">10</div><div class="k">叶节点，拓扑与枝长固定</div></div>
+      <div><div class="n">17</div><div class="k">冻结的原始坐标 <span class="mono">B1–B17</span></div></div>
+      <div><div class="n">2</div><div class="k">条剪枝序列，各 8 步（含基线）</div></div>
+      <div><div class="n">3</div><div class="k">固定拓扑 core 中的坐标状态</div></div>
+    </div>
+
+    <div class="note">
+      <p><strong>适用范围：</strong>这是一个确定性的存在性与机制性设计。它表明仅凭剪枝就能把数值有效性与坐标资格分离开，并使这种分离可被检验。它不是现实数据中此类不一致发生率的估计，也不能单凭这一实验推断真实分析中的基因层面偏倚。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 -->
+<section class="block" id="axis-b">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">05</span><h2>轴 B — 表示变化下稳定的坐标身份与可用性</h2></div>
+    <div class="prose">
+      <p>第二条有效性轴不改变任何生物学对象。它检验的是：当<em>同一棵树</em>采用另一种数学等价的表示方式时，同一条规范化无根 split 是否仍保持相同的坐标身份和声明的可用状态。</p>
+      <p class="defn"><strong>显示根（display root）：</strong>树在序列化或遍历时采用的根位置。它不是权威无根分枝身份的一部分；分枝身份仍由规范化 split key 确定。</p>
+      <p>这些表示被构造成严格等价：类群集合相同、规范化无根 split 集相同、对应 split 的枝长也相同。改变的只有树的表示方式。</p>
+    </div>
+
+    <div class="reps">
+      <div class="rep">
+        <div class="rid">R0</div><h4>原生表示</h4>
+        <ul><li>基线序列化</li><li>显示根不变</li></ul>
+        <p>所有对照据以比较的基准点。</p>
+      </div>
+      <div class="rep">
+        <div class="rid">R1</div><h4>序列化 / 子节点顺序对照</h4>
+        <ul><li>严格等价的无根树</li><li>子节点顺序改变</li><li>显示根不变</li></ul>
+        <p><strong>与检验目标无关的表示变化阴性对照。</strong>与坐标身份有关的数学对象没有改变，因此输出不应发生变化。</p>
+      </div>
+      <div class="rep">
+        <div class="rid">R2</div><h4>显示根位移挑战</h4>
+        <ul><li>严格等价的无根树</li><li>相同叶节点、相同无根 split</li><li>相同的 split 特异枝长</li><li>显示根确实移动了</li></ul>
+        <p>真正的挑战：带权无根树对象保持不变，但用于序列化的显示根移动到了另一个顶点。</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>Newick 字符串发生变化，并不意味着被检验的表示变量真的发生了变化。</strong>重写一棵树可能改变字节、改变子节点顺序，或两者都改，却完全没有移动显示根。因此 Catnip10 把显示根签名定义为「与序列化根顶点相邻的叶集合的无序划分」，并在对任何参与者进行本轴评分之前，<strong>独立认证该签名是否真的发生了变化</strong>。若请求移动显示根却只产生了重排，该情形会作为 no-op 回归对照保留下来，使一次基准运行无法把自己从未真正施加的挑战悄悄记为已完成。</p>
+      <p>子节点顺序的变动是阴性对照，不是被预期的失效模式。本页任何表述都不应被读作「重排子节点通常会破坏工作流」的主张。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 06 -->
+<section class="block" id="dispositions">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><h2>四种判定</h2></div>
+    <div class="prose">
+      <p>审计一个工作流是一套机械流程：把某一个输出层归一化到适配器契约，声明该输出层<strong>是否受这一坐标契约约束（exposure）</strong>，然后由评分器逐格与 oracle 账本比对。结果是四种判定之一，而其中只有一种是失败。</p>
+    </div>
+
+    <div class="verdicts">
+      <div class="vd d-pass"><h4>PASS</h4><p>该工作流适用被检验的坐标契约，并满足规定的基准条件。</p></div>
+      <div class="vd d-fail"><h4>FAIL</h4><p>该工作流适用被检验的坐标契约，但违反了规定的基准条件。</p></div>
+      <div class="vd d-ne"><h4>NOT-EXPOSED</h4><p>该工作流声明的原生估计对象并不承诺被检验的坐标契约，因此该契约不适用。这是一项明确的判定，不是「数据缺失」的委婉说法。</p></div>
+      <div class="vd d-un"><h4>UNRESOLVED</h4><p>所需证据或有效的检验前提不可得，因此基准无法在任一方向上作出裁定。</p></div>
+    </div>
+
+    <div class="note">
+      <p><strong>FAIL 是针对什么的：</strong>判定针对的是某个特定接口上被声明的主张，而不是整个软件包。当一个原生的端点或路径对象从未主张过原始轴对齐时，它不会被判为原始轴 FAIL。适配器校验又是另一回事：缺少应有的行是输入错误，而不是 NOT-EXPOSED。</p>
+      <p><strong>诊断性定位：</strong>它不是一种判定，而是基准的一种用途。当存在可复现的失败时，可以用 Catnip10 追踪坐标身份或可用性最先发生分歧的那个表示边界。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 07 -->
+<section class="block" id="case-study">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">07</span><h2>匿名案例研究 — 一次一致性审计是什么样子</h2></div>
+    <div class="prose">
+      <p>两个分枝级工作流使用全局序列中的同一批剪枝输入运行，并按照各自明确声明的 exposure，将输出映射到冻结坐标轴上进行审计。<strong>参与者身份在公开版本中不予披露</strong>；确切身份、版本、适配器与执行溯源均保存在封存档案中。此处分别记为 Method A 和 Method B。</p>
+      <p>有一点需要先说明，它是以下结果的前提：两个工作流的原生路径算术均为精确值。这里没有任何关于谁把距离算错了的主张。审计考察的是这些正确的数值<em>被填到了哪里</em>。</p>
+      <p class="axnote">本案例展示的是剪枝资格这条轴。表示变化下的稳定性由轴 B 的严格等价对照单独检验。</p>
+    </div>
+
+    <div class="subh">A · 代表性的剪枝状态</div>
+    <div class="prose"><p>从显示根一侧开始的七步渐进删除。每棵树显示收缩对各条坐标做了什么：红色虚线表示坐标结构性缺失，蓝色表示只在复合分枝内部存活，黑色表示未受影响。</p></div>
+
+    <figure style="margin:0">
+      <div class="figcard">
+        <img src="oracle_global_deletion.png" alt="八张进化树图，展示参考树与七步渐进删除。每一步中，坐标结构性缺失的分枝以红色虚线绘制，仅在融合复合分枝内部存活的分枝以蓝色绘制，未受影响的分枝以黑色绘制。">
+      </div>
+      <figcaption class="cap"><b>A.</b> 删除顺序 t10 → t1 → t8 → t7 → t4 → t9 → t5。结构性缺失从被剪的一侧累积，融合则沿着通往显示根的路径向内传播。</figcaption>
+    </figure>
+
+    <div class="subh">B · Oracle 的期望状态</div>
+    <div class="prose"><p>独立的图论 oracle（graph oracle）给出每一步中每条原始坐标的期望状态。这就是参与者被据以评分的真值对象。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">坐标</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">参考树</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+</tbody></table></div>
+    <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — 仅在复合分枝内部存活</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — 结构性缺失</span><span>数值 — 可独立观测</span></div>
+
+    <div class="subh">C · Method A — 适用固定轴契约</div>
+    <div class="prose"><p>Method A 声明了一个固定/共享的原始分枝坐标层，因此资格契约对它适用。高亮的格子是这个冻结基准配置下的坐标状态不一致：要么 oracle 记为可独立观测的坐标返回了 <code>NA</code>，要么一个完整的复合路径量占据了因融合而不具资格的格子。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">步骤</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">参考树</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-bad" title="复合路径量出现在 NA_fuse 格中">0.876306</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-bad" title="复合路径量出现在 NA_fuse 格中">1.822974</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="mk-bad" title="复合路径量出现在 NA_fuse 格中">2.337186</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="mk-bad" title="复合路径量出现在 NA_fuse 格中">2.337186</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="mk-bad" title="复合路径量出现在 NA_fuse 格中">0.815003</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+<td class="mk-bad" title="oracle 判为 observed 的坐标返回了 NA">NA</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co">
+        <h4>进入 NA_fuse 格的复合路径量</h4>
+        <p>N_16: 0.876306 = N_12|N_16 · 1.822974 = N_13|N_12|N_16 · 2.337186 = N_14|N_13|N_12|N_16<br>N_18: 0.815003 = N_17|N_18</p>
+      </div>
+      <div class="co">
+        <h4>该冻结配置下的结果</h4>
+        <p><span class="big">13</span> 处 oracle 判为 observed 的坐标脱落<br><span class="big">5</span> 处完整复合量占据融合不合格的格子<br><span class="fine">这是该冻结 toy 配置下的审计结果示例，既不是软件错误率，也不是发生率估计。</span></p>
+      </div>
+    </div>
+
+    <div class="subh">D · Method B — 端点/路径原生的审计投影</div>
+    <div class="prose"><p><strong>对此处展示的原始轴契约而言属于 NOT-EXPOSED。</strong>Method B 的原生对象与端点和路径相关联，并不等价于原始枝长矩阵，也从未主张过。被标记的格子不是错误。它们展示的是：一个正当的原生对象被<em>投影</em>到冻结原始轴上时会呈现什么样子——多数是端点分割下复合量的一半，或是被归给单个端点的整个复合量。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">步骤</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">原生基线</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.438153</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.438153</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.911487</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.911487</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.168593</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.168593</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.837173</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.168593</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.586595</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.586595</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.407502</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.407502</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.750087</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.750087</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co">
+        <h4>端点分割投影</h4>
+        <p>N_16 &amp; N_12: 0.438153 = (N_12|N_16)/2 · N_13 &amp; N_16: 0.911487 = (N_13|N_12|N_16)/2<br>N_14 &amp; N_16: 1.168593 = (N_14|N_13|N_12|N_16)/2 · N_17 &amp; N_18: 0.407502 = (N_17|N_18)/2<br>t9 &amp; N_16: 1.586595 = (t9|N_14|N_13|N_12|N_16)/2 · t2 &amp; N_18: 0.750087 = (t2|N_17|N_18)/2</p>
+      </div>
+      <div class="co">
+        <h4>单端点完整投影</h4>
+        <p>t4: 0.837173 = t4|N_15<br><br><span class="fine">基线行在 t10 处的差异同样源自构造：端点分割会把与显示根相邻的那条分枝对半分。</span></p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>把 C 和 D 放在一起读：</strong>输入相同、算术相同，填写行为不同，判定也不同——因为这两个方法主张的东西本就不同。这个区分，任何只比较数值的检验都得不到；它需要坐标账本和明确声明的 exposure，而这正是两者存在的理由。</p>
+    </div>
+
+    <div class="subh">E · 同一套审计，换到局部序列</div>
+    <div class="prose"><p>全局序列从显示根一侧向内删除。<strong>局部</strong>序列删除同样数量的类群，但集中在单个分支内部，因此融合与结构性缺失落在不同的位置。把同一套审计放到这个几何上运行，一个参与者的答案变了，另一个没变。</p></div>
+
+    <div class="verdicts">
+      <div class="vd d-pass">
+        <h4>Method A · 局部序列</h4>
+        <p><b>无不一致格。</b>凡 oracle 记为 observed 的坐标都带着数值，凡不具资格的格子都是空的——七步全程如此。在全局几何下出现不一致的同一个工作流，在这里满足了被检验的条件。</p>
+      </div>
+      <div class="vd d-ne">
+        <h4>Method B · 局部序列</h4>
+        <p><b>同一估计对象边界，不同的投影特征。</b>10 个在原始分枝轴上不具独立资格的原生距离值，其中包括进入融合不合格格子的单端点完整投影；另有 4 个 oracle 判为 observed 的坐标在审计投影中不可用。它依然是一个端点原生对象，依然不是原始坐标主张。</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>这正是要用四种判定而不是一个分数的原因。</strong>判定描述的是特定配置下被声明的主张——不是一个软件包，也不是一项永久属性。同一个实现和同一份坐标契约，在不同的预设剪枝配置下可以产生不同的一致性结果。只报告其中一类结果，都会造成误导。</p>
+    </div>
+
+    <figcaption class="cap" style="margin-top:22px"><b>匿名全局剪枝案例研究。</b>（A）代表性删除状态展示剪枝如何改变冻结 10 叶轴上的原始坐标资格。（B）独立的图论 oracle 给出每条原始坐标的期望状态。（C）Method A 适用被检验的固定轴契约；高亮格子显示该冻结 toy 配置下的坐标状态不一致，包括 oracle 判为 observed 的坐标脱落，以及完整复合路径量占据融合不合格的原始格。（D）Method B 具有端点/路径原生的估计对象，此处仅作为向原始轴的审计投影展示；其端点相关的投影特征说明的是估计对象的边界，不被归类为对该方法并未主张的原始坐标契约的失败。（E）在局部删除序列上的同一套审计中 Method A 无不一致格，说明判定描述的是特定配置下被声明的主张，而非某个软件包的属性。本案例反映的是封存档案中冻结的参与者构建；参与者身份在首次公开版本中不予披露，确切身份、版本与执行溯源保存于该档案，此后实现发生的变化不反映在本页结果中。</figcaption>
+  </div>
+</section>
+
+<!-- 08 -->
+<section class="block" id="explore">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">08</span><h2>动手探索 oracle</h2></div>
+    <div class="prose"><p>删除叶节点，看账本如何变化。显示的每个状态都是 oracle 对该类群子集给出的精确答案——选中一条分枝，可以看到哪些坐标与它融合在一起，哪些彻底消失。</p></div>
+    <div class="catnip-game" data-lang="zh"><noscript>Catnip10 的交互功能需要 JavaScript。</noscript></div>
+  </div>
+</section>
+
+<!-- 09 -->
+<section class="block" id="fit">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">09</span><h2>SplitAligner 构建坐标，Catnip10 检验坐标</h2></div>
+    <div class="prose">
+      <p><strong>SplitAligner</strong> 构建并解释这套分枝坐标框架：它利用投影后的物种树 split 定义分枝身份，并区分不同的分枝缺失状态。<strong>Catnip10</strong> 检验一个实现是否保持了被声明的坐标契约。两者回答不同的问题，互不替代。</p>
+      <p>Catnip10 是在 SplitAligner 的验证生态中开发出来的——独立真值对象的需求正是在那里变得具体。它的 oracle 与评分契约与实现无关：真值层由图收缩推导得出，而不是去问 SplitAligner 答案应该是什么。SplitAligner 是该框架的参考基础设施，既不是基准的 oracle，也不是任何参与者的身份。</p>
+      <p>如果你想了解坐标系本身——投影 split 如何定义分枝身份、缺失如何被分解——请从图解和教程开始。</p>
+    </div>
+    <div class="linkrow">
+      <a href="../splitaligner/SplitAligner_explainer_zh.html">动画图解 — 基于 split 的分枝身份如何工作 ↗</a>
+      <a href="../splitaligner/SplitAligner_tutorial_zh.html">教程 — 从头到尾跑一遍 SplitAligner ↗</a>
+      <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener">SplitAligner 预印本（bioRxiv） ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="block" id="get">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">10</span><h2>给你自己的工作流打分</h2></div>
+    <div class="prose">
+      <p>要接受评分，你不需要公开自己的实现。把某一个输出层归一化到长表适配器契约，声明该层的 exposure，然后运行评分器即可。公开仓库提供规范文档、冻结的基准输入、oracle 真值表与复合账本、机器可读的表格 schema、方法无关的评分引擎、一个合成适配器示例，以及匿名化的归一化参与者输出。参与者专属的适配器、源码版本与执行命令不公开，因为它们会暴露参与者身份。</p>
+    </div>
+
+<pre><code><span class="cm"># 轴 A —— 为适用固定/共享原始层的工作流打分</span>
+python3 tools/score_participant.py \
+  --truth oracle/primitive_truth_tables/global_truth.tsv \
+  --input tutorial/example_scoring/pass_output.tsv \
+  --exposure tutorial/example_scoring/pass_exposure.tsv \
+  --cell-output /tmp/catnip10_cells.tsv \
+  --summary-output /tmp/catnip10_summary.tsv
+
+<span class="cm"># 轴 B —— 先认证严格等价，再评分</span>
+python3 tools/certify_representations.py \
+  --manifest benchmark/representation_controls/representation_manifest.tsv \
+  --output /tmp/catnip10_representation_certification.tsv
+
+python3 tools/score_representation.py \
+  --namespace benchmark/reference_tree/branch_namespace.tsv \
+  --baseline-output tutorial/example_representation_scoring/rep_pass_baseline.tsv \
+  --equivalent-output tutorial/example_representation_scoring/rep_pass_equivalent.tsv \
+  --certification /tmp/catnip10_representation_certification.tsv \
+  --representation-id display_root_shift_true \
+  --exposure tutorial/example_representation_scoring/rep_pass_exposure.tsv \
+  --cell-output /tmp/catnip10_rep_cells.tsv \
+  --summary-output /tmp/catnip10_rep_summary.tsv
+
+<span class="cm"># 契约与匿名性检查</span>
+python3 -m unittest discover -s tests -v
+</code></pre>
+
+    <div class="prose" style="margin-top:20px">
+      <p>轴 A 在评分前要求提供完整的规范化 key 集合：缺失、重复、未知或不一致的 crosswalk 行属于适配器校验错误，而不是参与者结果。轴 B 在为参与者评分前要求一份独立计算的认证记录，然后按规范化 split identity 对齐输出。合成的 PASS、FAIL、NOT-EXPOSED、真实位移与仅序列化 no-op 各种情形，都由测试套件覆盖。权威的数值资产是 TSV 文件；渲染出的文档与图是视图，不是真值来源。</p>
+      <p><strong>关于引用：</strong>坐标构建框架请引用 SplitAligner；Catnip10 请引用当前 GitHub 仓库。正式版本发布后，请优先引用相应 release。以 MIT 许可发布。</p>
+    </div>
+
+    <div class="linkrow">
+      <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub 上的 Catnip10 ↗</a>
+      <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener">SplitAligner（Perl） ↗</a>
+      <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">SplitAlignerR（R） ↗</a>
+      <a href="mailto:wujiaqi@hiroshima-u.ac.jp">联系作者</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr"></span> Jiaqi Wu（呉佳齊）· 广岛大学</span>
+    <span>Catnip10 · 确定性枝坐标一致性基准</span>
+  </div>
+</footer>
+
+<script>
+"use strict";
+const root = document.documentElement, tb = document.getElementById("themeBtn");
+tb.addEventListener("click", ()=>{
+  const cur = root.getAttribute("data-theme")
+    || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark":"light");
+  root.setAttribute("data-theme", cur==="dark" ? "light":"dark");
+});
+document.getElementById("yr").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

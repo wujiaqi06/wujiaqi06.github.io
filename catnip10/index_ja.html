@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catnip10 — 決定論的な枝座標適合性ベンチマーク</title>
+<meta name="description" content="Catnip10 は、固定・共有された参照枝座標軸を用いる枝ベースのワークフローのための決定論的な 10 葉適合性ベンチマークです。独立したグラフオラクル(graph oracle)を真値対象として、剪定を考慮した座標適格性と表示上の根に依存しない座標同一性を検証します。">
+<link rel="stylesheet" href="../splitaligner/catnip10_game.css">
+<script src="../splitaligner/catnip10_game_data.js" defer></script>
+<script src="../splitaligner/catnip10_game.js" defer></script>
+<style>
+  :root{
+    --paper:#f4f6f4; --surface:#ffffff; --surface2:#eef1ee; --line:#dde3df;
+    --ink:#16211c; --muted:#5b6b64; --faint:#8a9791;
+    --accent:#15736a;
+    --accent-2:#b06a2c;
+    --accent-soft:#e2efec;
+    --serif:"Charter","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --maxw:1080px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#0f1613; --surface:#151d19; --surface2:#1b241f; --line:#2a352f;
+      --ink:#e7efea; --muted:#a2b1aa; --faint:#75847d;
+      --accent:#4bb7a8; --accent-2:#d8974f; --accent-soft:#17302b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0f1613; --surface:#151d19; --surface2:#1b241f; --line:#2a352f;
+    --ink:#e7efea; --muted:#a2b1aa; --faint:#75847d;
+    --accent:#4bb7a8; --accent-2:#d8974f; --accent-soft:#17302b;
+  }
+  :root[data-theme="light"]{
+    --paper:#f4f6f4; --surface:#ffffff; --surface2:#eef1ee; --line:#dde3df;
+    --ink:#16211c; --muted:#5b6b64; --faint:#8a9791;
+    --accent:#15736a; --accent-2:#b06a2c; --accent-soft:#e2efec;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
+    line-height:1.6; -webkit-font-smoothing:antialiased; font-size:17px}
+  h1,h2,h3{font-family:var(--serif); font-weight:600; line-height:1.15; letter-spacing:-.01em}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+  .mono{font-family:var(--mono)}
+  code{font-family:var(--mono); font-size:.88em; background:var(--surface2); border:1px solid var(--line);
+    border-radius:5px; padding:1px 5px}
+
+  /* Nav — same idiom as the rest of the site */
+  header.nav{position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.4) blur(8px);
+    background:color-mix(in srgb,var(--paper) 86%, transparent); border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--maxw); margin:0 auto; padding:11px 24px; display:flex; align-items:center; gap:18px}
+  .nav-name{font-family:var(--serif); font-weight:600; font-size:17px; letter-spacing:-.01em; margin-right:auto}
+  .nav-name a{color:var(--ink)}
+  .nav-links{display:flex; gap:20px; align-items:center}
+  .nav-links a{color:var(--muted); font-size:14.5px}
+  .nav-links a:hover{color:var(--accent); text-decoration:none}
+  .theme-btn{border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:8px;
+    width:34px; height:34px; cursor:pointer; font-size:15px; display:grid; place-items:center}
+  .theme-btn:hover{color:var(--accent); border-color:var(--accent)}
+  @media (max-width:820px){ .nav-links{display:none} }
+
+  /* Hero */
+  .hero{padding:64px 0 40px}
+  .hero-grid{display:grid; grid-template-columns:1.45fr .8fr; gap:44px; align-items:center}
+  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr; gap:28px} }
+  .eyebrow{font-size:13px; text-transform:uppercase; letter-spacing:.18em; color:var(--accent); font-weight:700}
+  .hero h1{font-size:clamp(40px,6.4vw,64px); margin:.22em 0 .1em}
+  .hero .tag{font-family:var(--serif); font-size:clamp(18px,2.2vw,22px); color:var(--muted); font-style:italic}
+  .lead{font-size:clamp(17px,1.7vw,19.5px); color:var(--muted); max-width:62ch; margin:20px 0 24px}
+  .lead em{color:var(--ink); font-style:normal; font-weight:600}
+  .btns{display:flex; flex-wrap:wrap; gap:10px}
+  .btn{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line); background:var(--surface);
+    color:var(--ink); padding:9px 15px; border-radius:10px; font-size:14.5px; font-weight:500}
+  .btn:hover{border-color:var(--accent); color:var(--accent); text-decoration:none}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  .btn.primary:hover{background:color-mix(in srgb,var(--accent) 88%, #000); color:#fff}
+  .badge-card{background:#fbfaf4; border:1px solid var(--line); border-radius:18px; padding:12px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .badge-card img{display:block; width:100%; height:auto; border-radius:10px}
+  .badge-cap{font-family:var(--mono); font-size:11.5px; color:var(--faint); text-align:center; margin-top:8px}
+
+  /* Sections */
+  section.block{padding:50px 0; border-top:1px solid var(--line)}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:22px}
+  .sec-head h2{font-size:clamp(23px,3.1vw,30px); margin:0}
+  .sec-head .sec-num{font-family:var(--mono); font-size:13px; color:var(--accent); font-weight:700}
+  .prose{max-width:70ch; color:var(--muted); font-size:17px}
+  .prose strong{color:var(--ink)}
+  .prose p{margin:0 0 15px}
+  .prose p:last-child{margin-bottom:0}
+
+  /* Callout */
+  .note{background:linear-gradient(180deg,var(--accent-soft),transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 32%,var(--line)); border-radius:14px;
+    padding:18px 20px; margin:22px 0 0; color:var(--muted); font-size:15.5px; max-width:70ch}
+  .note strong{color:var(--ink)}
+  .note p{margin:0 0 10px} .note p:last-child{margin:0}
+
+  /* Contraction diagram */
+  .diagram{margin:26px 0 0; background:var(--surface); border:1px solid var(--line);
+    border-radius:14px; padding:22px; overflow-x:auto}
+  .diagram svg{display:block; width:100%; min-width:560px; max-width:820px; margin:0 auto; height:auto}
+  .dg-edge{fill:none; stroke:var(--muted); stroke-width:2.2; stroke-linecap:round}
+  .dg-edge.hot{stroke:var(--accent)}
+  .dg-edge.gone{stroke:var(--accent-2); stroke-dasharray:3 4; opacity:.6}
+  .dg-edge.fused{stroke:var(--accent-2); stroke-width:4.4}
+  .dg-dot{fill:var(--ink)}
+  .dg-dot.open{fill:var(--paper); stroke:var(--muted); stroke-width:1.6}
+  .dg-dot.gone{fill:var(--accent-2); opacity:.45}
+  .dg-t{font-family:var(--mono); font-size:11.5px; fill:var(--muted)}
+  .dg-t.lbl{fill:var(--ink); font-weight:700}
+  .dg-t.hot{fill:var(--accent); font-weight:700}
+  .dg-t.warm{fill:var(--accent-2); font-weight:700}
+  .dg-cap{font-family:var(--mono); font-size:11.5px; fill:var(--faint)}
+  .dg-arrow{fill:none; stroke:var(--line); stroke-width:2}
+
+  /* Algorithm steps */
+  .algo{counter-reset:step; margin:24px 0 0; display:grid; gap:12px; max-width:76ch}
+  .algo li{list-style:none; counter-increment:step; position:relative; padding:14px 18px 14px 52px;
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    color:var(--muted); font-size:15.5px; line-height:1.55}
+  .algo li::before{content:counter(step,decimal-leading-zero); position:absolute; left:18px; top:14px;
+    font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent)}
+  .algo li strong{color:var(--ink)}
+
+  /* State table */
+  .tbl-scroll{overflow-x:auto; margin:24px 0 0}
+  table.states{border-collapse:collapse; width:100%; min-width:620px; font-size:15px}
+  table.states th,table.states td{text-align:left; padding:12px 14px; border-bottom:1px solid var(--line);
+    vertical-align:top; color:var(--muted)}
+  table.states thead th{font-family:var(--mono); font-size:11.5px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--faint); font-weight:700; border-bottom:1px solid var(--line)}
+  table.states td.st{white-space:nowrap; font-family:var(--mono); font-size:13px; font-weight:700}
+  .sw-obs{color:#0c6e5b} .sw-fus{color:#2f5cc4} .sw-str{color:#bf3625}
+  @media (prefers-color-scheme:dark){ .sw-obs{color:#3cc0a6} .sw-fus{color:#8ab4f2} .sw-str{color:#f28a8a} }
+  :root[data-theme="dark"] .sw-obs{color:#3cc0a6}
+  :root[data-theme="dark"] .sw-fus{color:#8ab4f2}
+  :root[data-theme="dark"] .sw-str{color:#f28a8a}
+  :root[data-theme="light"] .sw-obs{color:#0c6e5b}
+  :root[data-theme="light"] .sw-fus{color:#2f5cc4}
+  :root[data-theme="light"] .sw-str{color:#bf3625}
+  table.states td strong{color:var(--ink)}
+
+  /* Spec grid */
+  .spec{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:820px){ .spec{grid-template-columns:repeat(2,1fr)} }
+  .spec > div{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .spec .n{font-family:var(--serif); font-size:30px; font-weight:600; color:var(--accent); line-height:1}
+  .spec .k{font-size:13.5px; color:var(--muted); margin-top:6px; line-height:1.4}
+
+  /* Verdict cards */
+  .verdicts{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:720px){ .verdicts{grid-template-columns:1fr} }
+  .vd{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .vd h4{margin:0 0 6px; font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--accent); font-weight:700}
+  .vd p{margin:0; color:var(--muted); font-size:15px; line-height:1.55}
+
+  /* Code block */
+  pre{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+    overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.6; color:var(--ink); margin:20px 0 0}
+  pre code{background:none; border:none; padding:0; font-size:inherit}
+  .cm{color:var(--faint)}
+
+  /* Link rows */
+  .linkrow{display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px; margin-top:18px}
+
+  footer{border-top:1px solid var(--line); padding:26px 0 40px; color:var(--faint); font-size:13.5px}
+  footer .wrap{display:flex; flex-wrap:wrap; gap:10px 20px; justify-content:space-between}
+
+
+  /* Audit result tables */
+  .figcard{background:#ffffff; border:1px solid var(--line); border-radius:14px; padding:16px;
+    overflow-x:auto; margin:24px 0 8px}
+  .figcard img{display:block; min-width:900px; width:100%; height:auto}
+  figcaption.cap{color:var(--faint); font-size:13.5px; margin-top:10px; max-width:80ch}
+  figcaption.cap b{color:var(--muted); font-weight:600}
+  .axis-wrap{overflow-x:auto; margin:18px 0 0; border:1px solid var(--line); border-radius:12px; background:var(--surface)}
+  table.axis{border-collapse:collapse; font-family:var(--mono); font-size:11.5px; width:100%; min-width:1000px}
+  table.axis th,table.axis td{padding:5px 7px; text-align:right; white-space:nowrap;
+    border-bottom:1px solid var(--line); color:var(--muted); font-variant-numeric:tabular-nums}
+  table.axis thead th{position:sticky; top:0; background:var(--surface2); color:var(--faint);
+    font-weight:700; font-size:11px; letter-spacing:.03em}
+  table.axis th.rl,table.axis td.rl{text-align:left; position:sticky; left:0; background:var(--surface);
+    color:var(--ink); font-weight:700; border-right:1px solid var(--line)}
+  table.axis thead th.rl{background:var(--surface2)}
+  table.axis tbody tr:last-child td{border-bottom:none}
+  td.o-obs{color:var(--muted)}
+  td.o-fuse{color:#2f5cc4}
+  td.o-struct{color:#bf3625}
+  td.mk-bad{color:#bf3625; font-weight:700; background:color-mix(in srgb,#bf3625 9%,transparent)}
+  td.mk-proj{color:#2f5cc4; font-weight:700; background:color-mix(in srgb,#2f5cc4 9%,transparent)}
+  @media (prefers-color-scheme:dark){ td.mk-proj{color:#8ab4f2; background:color-mix(in srgb,#8ab4f2 12%,transparent)} }
+  :root[data-theme="dark"] td.mk-proj{color:#8ab4f2; background:color-mix(in srgb,#8ab4f2 12%,transparent)}
+  :root[data-theme="light"] td.mk-proj{color:#2f5cc4; background:color-mix(in srgb,#2f5cc4 9%,transparent)}
+  @media (prefers-color-scheme:dark){
+    td.o-fuse{color:#8ab4f2} td.o-struct{color:#f28a8a}
+    td.mk-bad{color:#f28a8a; background:color-mix(in srgb,#f28a8a 12%,transparent)}
+    .figcard{background:#f7f7f2}
+  }
+  :root[data-theme="dark"] td.o-fuse{color:#8ab4f2}
+  :root[data-theme="dark"] td.o-struct{color:#f28a8a}
+  :root[data-theme="dark"] td.mk-bad{color:#f28a8a; background:color-mix(in srgb,#f28a8a 12%,transparent)}
+  :root[data-theme="dark"] .figcard{background:#f7f7f2}
+  :root[data-theme="light"] td.o-fuse{color:#2f5cc4}
+  :root[data-theme="light"] td.o-struct{color:#bf3625}
+  :root[data-theme="light"] td.mk-bad{color:#bf3625; background:color-mix(in srgb,#bf3625 9%,transparent)}
+  :root[data-theme="light"] .figcard{background:#ffffff}
+  .tkey{display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--faint)}
+  .tkey i{font-style:normal; font-weight:700}
+  .callouts{display:grid; grid-template-columns:1.6fr 1fr; gap:14px; margin-top:16px}
+  @media (max-width:820px){ .callouts{grid-template-columns:1fr} }
+  .co{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .co h4{margin:0 0 8px; font-size:13px; font-family:var(--mono); letter-spacing:.04em; color:var(--accent-2);
+    text-transform:uppercase; font-weight:700}
+  .co p{margin:0; font-family:var(--mono); font-size:12.5px; line-height:1.75; color:var(--muted); word-break:break-word}
+  .co .big{font-family:var(--serif); font-size:26px; font-weight:600; color:var(--ink)}
+  .subh{font-family:var(--serif); font-size:19px; font-weight:600; color:var(--ink); margin:32px 0 0}
+  .subh + .prose{margin-top:8px}
+
+  .catnip-game{margin-top:24px}
+  /* Hero axis chips */
+  .axes{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:22px 0 24px; max-width:62ch}
+  @media (max-width:720px){ .axes{grid-template-columns:1fr} }
+  .ax{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:13px 15px}
+  .ax .axl{display:block; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--accent)}
+  .ax b{display:block; color:var(--ink); font-size:15px; margin:3px 0 4px; line-height:1.3}
+  .ax span:last-child{color:var(--muted); font-size:13.5px; line-height:1.5}
+
+  /* Representation controls */
+  .reps{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:24px 0 0}
+  @media (max-width:860px){ .reps{grid-template-columns:1fr} }
+  .rep{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .rep .rid{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent-2); letter-spacing:.06em}
+  .rep h4{margin:4px 0 10px; font-family:var(--serif); font-size:17px; color:var(--ink); font-weight:600}
+  .rep ul{margin:0 0 10px; padding-left:16px; color:var(--muted); font-size:13.5px; line-height:1.6}
+  .rep li{margin:0}
+  .rep p{margin:0; color:var(--muted); font-size:14.5px; line-height:1.55}
+  .rep p strong{color:var(--ink)}
+  .defn{border-left:3px solid var(--accent); padding-left:14px; margin:4px 0 15px !important}
+
+  /* Dispositions */
+  .vd.d-pass h4{color:#0c6e5b} .vd.d-fail h4{color:#bf3625}
+  .vd.d-ne h4{color:#2f5cc4}   .vd.d-un h4{color:var(--faint)}
+  @media (prefers-color-scheme:dark){
+    .vd.d-pass h4{color:#3cc0a6} .vd.d-fail h4{color:#f28a8a} .vd.d-ne h4{color:#8ab4f2}
+  }
+  :root[data-theme="dark"] .vd.d-pass h4{color:#3cc0a6}
+  :root[data-theme="dark"] .vd.d-fail h4{color:#f28a8a}
+  :root[data-theme="dark"] .vd.d-ne h4{color:#8ab4f2}
+  :root[data-theme="light"] .vd.d-pass h4{color:#0c6e5b}
+  :root[data-theme="light"] .vd.d-fail h4{color:#bf3625}
+  :root[data-theme="light"] .vd.d-ne h4{color:#2f5cc4}
+
+  .axnote{border-left:3px solid var(--accent-2); padding-left:14px; font-size:15.5px}
+  .fine{display:block; margin-top:8px; font-family:var(--sans); font-size:12.5px; color:var(--faint); line-height:1.5}
+
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <span class="nav-name"><a href="../index_ja.html">Jiaqi Wu</a></span>
+    <nav class="nav-links">
+      <a href="../index_ja.html#software">ソフトウェア</a>
+      <a href="#oracle">オラクル</a>
+      <a href="#axis-a">軸 A</a>
+      <a href="#axis-b">軸 B</a>
+      <a href="#dispositions">判定</a>
+      <a href="#case-study">ケーススタディ</a>
+      <a href="#explore">操作する</a>
+    </nav>
+    <div class="lang-switch" aria-label="Language / 言語 / 语言"><a href="index.html">EN</a><a href="index_ja.html" class="cur">日本語</a><a href="index_zh.html">中文</a></div>
+    <button class="theme-btn" id="themeBtn" title="Toggle light / dark" aria-label="配色を切り替える">◐</button>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">適合性ベンチマーク · グラフオラクル</div>
+      <h1>Catnip10</h1>
+      <div class="tag">小さくても、すべてを見ています。</div>
+      <p class="lead">固定・共有された<em>参照枝座標軸</em>の上に値を書き込む枝ベースのワークフローのための、決定論的な適合性ベンチマークです。10 個の葉と 17 本の凍結された原始座標——完全に追跡できるほど小さく、宣言されたすべての座標主張を検証できるだけの構造を備えています。</p>
+      <div class="axes">
+        <div class="ax"><span class="axl">Axis A</span><b>剪定を考慮した座標適格性</b><span>剪定と収縮のあとで、その値は書き込まれている原始座標の値として独立に成立しているか。</span></div>
+        <div class="ax"><span class="axl">Axis B</span><b>表現に依存しない座標の同一性と可用性</b><span>同じ正準無根スプリットは、等価な直列化をまたいでも同じ同一性と宣言された可用性を保つか。</span></div>
+      </div>
+      <div class="btns">
+        <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub リポジトリ ↗</a>
+        <a class="btn" href="#oracle">オラクルの仕組み</a>
+        <a class="btn" href="#case-study">ケーススタディ</a>
+        <a class="btn" href="#explore">操作してみる</a>
+      </div>
+    </div>
+    <figure class="badge-card" style="margin:0">
+      <img src="catnip10_mascot.jpg" alt="Catnip10 のマスコット:虫めがねと監査用クリップボードを持つトイツリーのイラスト。t1 から t10 までの葉が並び、t10 には DISPLAY ROOT と注記されている。">
+      <figcaption class="badge-cap">プロジェクトマスコット · 10 葉の適合性ベンチマーク</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 01 -->
+<section class="block" id="problem">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2>数値が正しくても、座標が誤っていることがある</h2></div>
+    <div class="prose">
+      <p>比較ゲノミクスのパイプラインは、枝に紐づく値——進化速度、残差、経路長——を、参照樹の枝を列とする行列に日常的に格納します。しかしそれが意味をもつのは、列のラベルが、寄与するすべての遺伝子にわたって同じ進化的対象を指し続けている場合だけです。</p>
+      <p>遺伝子ごとに分類群のカバレッジは異なるため、各遺伝子樹は参照樹の<strong>収縮</strong>になります。葉を 1 つ取り除くと、内部節点の次数が 2 になることがあります。標準的な樹の簡約はその節点を抑制し、接続する 2 本の枝を 1 本に併合します。併合された枝は構成メンバーの長さの総和を正確に保持できます——算術は完全です——が、元の 2 本の枝はその遺伝子ではもはや別々に観測できません。</p>
+      <p>パイプラインがその併合値を、メンバーの一方の名前がついたセルに書き込むと、数値としては妥当でも座標としては妥当ではありません。異常終了も起きず、<code>NA</code> も現れず、算術の正しさだけを確認する検査からは完全に見えません。</p>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 800 200" role="img" aria-label="図:葉を削除すると次数 2 の節点が生じ、それを抑制すると 2 本の原始枝が 1 本の複合枝に融合し、その長さは和になる。">
+        <text class="dg-cap" x="20" y="18">1 · 参照樹</text>
+        <g>
+          <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge hot" d="M90 110 H150"/>
+          <path class="dg-edge" d="M150 110 L150 60 H200"/><path class="dg-edge hot" d="M150 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/><circle class="dg-dot" cx="150" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="60" r="4"/><circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t hot" x="105" y="103">b₁</text><text class="dg-t hot" x="168" y="103">b₂</text>
+          <text class="dg-t" x="208" y="56">x</text><text class="dg-t" x="218" y="114">y</text><text class="dg-t" x="208" y="169">z</text>
+        </g>
+        <path class="dg-arrow" d="M245 110 H285"/><path class="dg-arrow" d="M277 104 L285 110 L277 116"/>
+        <text class="dg-cap" x="300" y="18">2 · 葉 x を削除 → 次数 2 の節点</text>
+        <g transform="translate(280,0)">
+          <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge hot" d="M90 110 H150"/>
+          <path class="dg-edge gone" d="M150 110 L150 60 H200"/><path class="dg-edge hot" d="M150 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/><circle class="dg-dot open" cx="150" cy="110" r="5.5"/>
+          <circle class="dg-dot gone" cx="200" cy="60" r="4"/><circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t hot" x="105" y="103">b₁</text><text class="dg-t hot" x="168" y="103">b₂</text>
+          <text class="dg-t warm" x="208" y="56">x̶</text><text class="dg-t" x="218" y="114">y</text><text class="dg-t" x="208" y="169">z</text>
+        </g>
+        <path class="dg-arrow" d="M525 110 H565"/><path class="dg-arrow" d="M557 104 L565 110 L557 116"/>
+        <text class="dg-cap" x="580" y="18">3 · 抑制 → 複合枝</text>
+        <g transform="translate(560,0)">
+          <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge fused" d="M90 110 H210"/>
+          <path class="dg-edge" d="M90 110 L90 165 H200"/>
+          <circle class="dg-dot" cx="90" cy="110" r="4"/><circle class="dg-dot" cx="210" cy="110" r="4"/>
+          <circle class="dg-dot" cx="200" cy="165" r="4"/>
+          <text class="dg-t warm" x="112" y="100">{b₁,b₂}</text><text class="dg-t" x="112" y="130">len = b₁+b₂</text>
+          <text class="dg-t" x="218" y="114">y</text><text class="dg-t" x="208" y="169">z</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="note">
+      <p><strong>Catnip10 が守らせる区別。</strong>複合枝 <span class="mono">{b₁,b₂}</span> は、簡約樹の枝として、あるいは宣言された複合として、まったく妥当な推定対象です。そうではないのは、それが <span class="mono">b₁</span> や <span class="mono">b₂</span> の独立な値であるということです。端点で定義された経路や簡約樹の枝は正当なネイティブ対象であり、この要件が効いてくるのは、値が共有された全樹枝軸の上で整列・比較・解釈されるときだけです。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="block" id="oracle">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>グラフオラクル(graph oracle):来歴を持ち越すグラフ収縮</h2></div>
+    <div class="prose">
+      <p>グラフオラクル(graph oracle)は意図的に系統学的手法ではありません。構成によって答えを算出する小さなグラフアルゴリズムであり、そのためベンチマークの真値対象は推定ではなく厳密かつ検査可能です。監査対象のワークフローの出力を参照することは一切ありません。</p>
+    </div>
+
+    <ol class="algo">
+      <li>参照樹を凍結し、その枝を<strong>原始座標</strong> <code>B1…B17</code> として列挙します。各枝は離散的な対象であり、取り除けば分類群の二分割が誘導されます。それがラベルの意味を与えます。</li>
+      <li>ある分類群部分集合について、<strong>存在しない葉を削除</strong>し、<strong>次数 2 の頂点をすべて繰り返し抑制</strong>して、接続する 2 本の枝を併合します。これは標準的な樹の簡約——どのパイプラインも暗黙に行っている収縮と同じものです。</li>
+      <li>抑制のたびに<strong>元の枝のメンバーシップを伝播</strong>します。生き残った各簡約枝は、自身が吸収した原始枝の集合を保持し、併合では 2 つのメンバー集合の和をとります。何も捨てないので、来歴が失われることはありません。</li>
+      <li>メンバーシップの帰結によって<strong>各原始座標を分類</strong>します。生き残った枝の唯一のメンバーなら <code>observed</code>、2 本以上を含む枝のメンバーなら <code>NA_fuse</code>、どの生存枝にも含まれなければ <code>NA_struct</code> です。</li>
+      <li><strong>連動する 2 つの台帳</strong>を出力します。すべての原始座標にちょうど 1 つの状態を割り当てる原始座標台帳と、生き残った各複合をそのメンバー集合と合計長で記録する複合枝台帳です。</li>
+    </ol>
+
+    <div class="note">
+      <p>手続きが決定論的かつ有限であるため、17 座標すべての期待状態を、任意の分類群部分集合についてあらかじめ列挙できます——シミュレーションも標本抽出も許容誤差もありません。露出したワークフローが検証済みアダプタを備えている場合、凍結オラクルとの不一致は監査可能な適合性ミスマッチです。</p>
+      <p><strong>3 状態の適用範囲。</strong>この固定トポロジーのトイコアの内部では、<code>observed</code>・<code>NA_fuse</code>・<code>NA_struct</code> は排反かつ網羅的です。これはベンチマークの設計上の性質であって、異質な樹を扱うワークフロー一般についての主張ではありません。トポロジー由来の欠測は固定トポロジーコアから意図的に除外されているため、この 3 状態はコア外のワークフローに対する完全な分類として提示するものではありません。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 -->
+<section class="block" id="states">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>3 つの状態と、それぞれが許すこと</h2></div>
+    <div class="prose">
+      <p>監査全体は、パイプラインが 1 つにまとめてしまいがちな 2 種類の欠測を分けることにかかっています。消えた枝と、融合した枝は同じ出来事ではなく、下流での扱いも異なります。</p>
+    </div>
+
+    <div class="tbl-scroll">
+      <table class="states">
+        <thead><tr><th>状態</th><th>座標に何が起きたか</th><th>そのセルの値が意味すること</th></tr></thead>
+        <tbody>
+          <tr><td class="st sw-obs">observed</td>
+            <td>原始枝は収縮後も単独の枝として生き残り、他の元の枝は併合されていない。</td>
+            <td><strong>正当。</strong>このセルは、その名前の枝の独立した値を保持できる。</td></tr>
+          <tr><td class="st sw-fus">NA_fuse</td>
+            <td>枝は、少なくとも 1 本の他の元の枝とともに、複合枝の内部でのみ生き残っている。複合の長さはメンバーの長さの正確な和。</td>
+            <td><strong>適格ではない。</strong>ここにある数値は複合のものであって、このメンバーのものではない。算術的に厳密であっても帰属が誤りうる。</td></tr>
+          <tr><td class="st sw-str">NA_struct</td>
+            <td>枝は構造的に不在:この分類群部分集合では、それを含む生存枝が存在しない。</td>
+            <td><strong>未定義。</strong>セルが指すべき進化的対象が存在しない。ゼロはこれとは異なり、ゼロは観測された「変化なし」の状態である。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <p><strong>公開表での名称。</strong>機械可読な真値表では、これら 3 状態は <code>OBSERVED_PRIMITIVE</code>・<code>NA_FUSE</code>・<code>NA_STRUCT</code> と表記されます。本ページと図で用いる短い表記はまったく同じ状態を指します。契約にはさらに <code>NA_TOPO</code> がトポロジー由来の欠測用に予約されていますが、固定トポロジーの剪定コアはこの状態を生成しません。</p>
+      <p><strong>最後の行が実務で効く理由。</strong>構造的に利用できないセルに入った数値のゼロは、通常の欠測値フィルタを通過し、座標状態が明示的に検証されない限り、下流では観測されたゼロとして扱われうる。欠測コードはソフトウェアの失敗ではなく座標の状態を記述するものであり、<code>NA_struct</code> と本物の観測ゼロを見分けることは、数値的な検証だけでは答えられない座標レベルの問いです。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 -->
+<section class="block" id="axis-a">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2>軸 A — 剪定を考慮した座標適格性</h2></div>
+    <div class="prose">
+      <p>第 1 の妥当性軸が問うのはただ 1 点です。剪定と収縮のあとで、その値は書き込まれている原始全樹座標の値として独立に成立しているか。</p>
+      <p>この剪定実験は、食い違いを説明しうるものが剪定だけになるように——<em>この実験の内部では</em>——構成されています。トポロジーと枝長は固定です。真の速度変化も、遺伝子樹と種樹の不一致も、枝長推定誤差も、種樹の不確実性もありません。ここで加えられる摂動は分類群の削除と次数 2 節点の抑制だけです。ベンチマーク全体にはさらに表現統制が含まれており、そちらはまったく別のものを変化させます(下の軸 B)。</p>
+      <p>あらかじめ規定された 2 つの削除スケジュールが対照的な幾何を与えます。表示上の根の側から内側へ進む<strong>漸進的グローバル</strong>系列と、削除を 1 つのクレード内に集中させる<strong>局所</strong>系列です。各系列はベースラインを含めて 8 ステップ。樹が小さいため、オラクルは削除可能な葉の<em>すべて</em>の部分集合について各座標の期待状態を列挙することもできます——下の対話パネルが動かしているのがそれです。</p>
+    </div>
+
+    <div class="spec">
+      <div><div class="n">10</div><div class="k">葉、トポロジーと枝長は固定</div></div>
+      <div><div class="n">17</div><div class="k">凍結された原始座標 <span class="mono">B1–B17</span></div></div>
+      <div><div class="n">2</div><div class="k">剪定スケジュール、各 8 ステップ(ベースライン含む)</div></div>
+      <div><div class="n">3</div><div class="k">固定トポロジーコアにおける座標状態</div></div>
+    </div>
+
+    <div class="note">
+      <p><strong>適用範囲について。</strong>これは決定論的な「存在と機構」の設計です。剪定だけで数値的妥当性と座標適格性が分離しうることを示し、その分離を検証可能にします。実データでそうした不一致がどれほど頻繁に生じるかの推定ではなく、これ自体で実際の解析における遺伝子レベルのバイアスを立証するものでもありません。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 -->
+<section class="block" id="axis-b">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">05</span><h2>軸 B — 表現に依存しない座標同一性</h2></div>
+    <div class="prose">
+      <p>第 2 の妥当性軸は、生物学的なものを一切変化させません。<em>同じ樹</em>を別のやり方で書き下したときに、同じ正準無根スプリットが同じ同一性と同じ宣言された可用性を保つかどうかを問います。</p>
+      <p class="defn"><strong>表示上の根(display root)。</strong>樹の表現を直列化・走査するために用いる根の位置。権威ある無根の枝同一性の一部ではなく、枝の同一性はあくまで正準スプリットキーです。</p>
+      <p>統制は厳密な等価物として構成されています。分類群集合が同一、正準スプリットキーが同一、正準整列後の枝長も同一。異なるのは樹の書き方だけです。</p>
+    </div>
+
+    <div class="reps">
+      <div class="rep">
+        <div class="rid">R0</div><h4>ネイティブ表現</h4>
+        <ul><li>基準となる直列化</li><li>表示上の根は不変</li></ul>
+        <p>すべての統制が比較される基準点。</p>
+      </div>
+      <div class="rep">
+        <div class="rid">R1</div><h4>直列化・子順序の統制</h4>
+        <ul><li>厳密等価な無根樹</li><li>子の順序を変更</li><li>表示上の根は不変</li></ul>
+        <p><strong>無関係表現の陰性対照</strong>。重要なものは何も変わっていないので、何も動いてはならない。</p>
+      </div>
+      <div class="rep">
+        <div class="rid">R2</div><h4>表示上の根の変位チャレンジ</h4>
+        <ul><li>厳密等価な無根樹</li><li>同じ葉、同じ無根スプリット</li><li>同じスプリット固有の長さ</li><li>表示上の根が実際に移動</li></ul>
+        <p>本来の試験:重み付き無根スプリット対象はそのままに、直列化の根だけが別の頂点に移る。</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>Newick 文字列が変わったことは、表現変数が変わった証拠にはならない。</strong>樹を書き直すと、バイト列や子の順序、あるいはその両方が変わりうる一方で、表示上の根はまったく動かないことがあります。そこで Catnip10 は表示上の根シグネチャを「直列化された根頂点に接続する葉集合の非順序分割」として定義し、この軸で参加者を採点する前に<strong>そのシグネチャが実際に変化したかどうかを独立に認証</strong>します。表示上の根の移動を要求したのに並べ替えしか生じなかったケースは no-op 回帰対照として保持され、適用していないチャレンジをベンチマーク実行が自分に加点してしまうことがないようにしています。</p>
+      <p>子順序の変動は陰性対照であり、予測される失敗様式ではありません。本ページのいかなる記述も、子の並べ替えが一般にワークフローを壊すという主張として読まれるべきではありません。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 06 -->
+<section class="block" id="dispositions">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><h2>4 つの判定</h2></div>
+    <div class="prose">
+      <p>ワークフローの監査は機械的な手続きです。1 つの出力層をアダプタ契約に正規化し、その層の露出(exposure)を宣言すれば、採点器がオラクル台帳とセル単位で突き合わせます。結果はちょうど 4 つの判定のいずれかであり、失敗はそのうち 1 つだけです。</p>
+    </div>
+
+    <div class="verdicts">
+      <div class="vd d-pass"><h4>PASS</h4><p>ワークフローは試験対象の座標契約に露出しており、規定されたベンチマーク条件を満たしている。</p></div>
+      <div class="vd d-fail"><h4>FAIL</h4><p>ワークフローは試験対象の座標契約に露出しており、規定されたベンチマーク条件に違反している。</p></div>
+      <div class="vd d-ne"><h4>NOT-EXPOSED</h4><p>ワークフローが宣言したネイティブ推定対象は、試験対象の座標契約を主張していない。これは明確な結果であり、データ欠如の婉曲表現ではない。</p></div>
+      <div class="vd d-un"><h4>UNRESOLVED</h4><p>必要な証拠または有効な試験前提が得られないため、ベンチマークはいずれの側にも裁定できない。</p></div>
+    </div>
+
+    <div class="note">
+      <p><strong>FAIL が何についてのものか。</strong>判定は、特定のインタフェースにおける宣言された主張に適用されるものであり、ソフトウェアパッケージ全体に対するものではありません。ネイティブな端点・経路対象に対して、原始軸への整列がそもそも主張されていない場合に原始軸 FAIL が与えられることはありません。アダプタ検証はさらに別で、期待行の欠落は入力エラーであって NOT-EXPOSED ではありません。</p>
+      <p><strong>診断的な局在化。</strong>判定ではありませんが、ベンチマークの用途の 1 つです。再現する失敗が存在するとき、座標の同一性または可用性が最初に分岐する表現境界を Catnip10 で追跡できます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 07 -->
+<section class="block" id="case-study">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">07</span><h2>匿名ケーススタディ — 適合性監査とはどのようなものか</h2></div>
+    <div class="prose">
+      <p>2 つの枝ベースのワークフローを、グローバル系列の同一の剪定入力で実行し、明示的に宣言された露出を通じて凍結座標軸へ写像しました。<strong>参加者の識別情報は公開リリースでは伏せられています</strong>。正確な識別情報、バージョン、アダプタ、実行来歴は封緘アーカイブに保持されています。ここでは Method A・Method B として示します。</p>
+      <p>以下すべての前提となる結果を先に述べます。<strong>ネイティブな経路の算術は両ワークフローとも厳密でした</strong>。いずれかが距離を誤って計算しているという主張はここには一切ありません。監査が調べるのは、その正しい数値が<em>どこに書き込まれているか</em>です。</p>
+      <p class="axnote">このケーススタディが示すのは剪定適格性の軸です。表現安定性は、軸 B の厳密等価統制によって別途試験されます。</p>
+    </div>
+
+    <div class="subh">A · 代表的な剪定状態</div>
+    <div class="prose"><p>表示上の根の側からの 7 段階の漸進的削除。各樹は、収縮が各座標に何をするかを示しています。赤い破線は座標が構造的に不在になったもの、青は複合の内部でのみ生き残るもの、黒は影響を受けないものです。</p></div>
+
+    <figure style="margin:0">
+      <div class="figcard">
+        <img src="oracle_global_deletion.png" alt="参照樹と 7 段階の漸進的削除を示す 8 つの分岐図。各段階で、座標が構造的に不在になった枝は赤い破線、融合した複合枝の内部でのみ生き残る枝は青、影響を受けない枝は黒で描かれている。">
+      </div>
+      <figcaption class="cap"><b>A.</b> 削除順序 t10 → t1 → t8 → t7 → t4 → t9 → t5。構造的不在は剪定された側から蓄積し、融合は表示上の根へ向かう経路に沿って内側へ伝播します。</figcaption>
+    </figure>
+
+    <div class="subh">B · オラクルの期待状態</div>
+    <div class="prose"><p>独立したグラフオラクル(graph oracle)が、各ステップにおけるすべての原始座標の期待状態を与えます。これが参加者を採点する真値対象です。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">座標</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">参照樹</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.836004</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+</tbody></table></div>
+    <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — 複合の内部でのみ生存</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — 構造的に不在</span><span>数値 — 独立に観測可能</span></div>
+
+    <div class="subh">C · Method A — 固定軸契約に露出</div>
+    <div class="prose"><p>Method A は固定された共有原始層を宣言しているため、適格性契約が適用されます。強調されたセルは、この凍結ベンチマーク構成における座標状態の不一致です。オラクルが独立に観測可能と記録している座標が <code>NA</code> で返ったか、融合により適格でないセルを完全な複合経路量が占めているかのいずれかです。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">ステップ</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">参照樹</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-bad" title="NA_fuse セルに複合経路量が入っている">0.876306</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-bad" title="NA_fuse セルに複合経路量が入っている">1.822974</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="mk-bad" title="NA_fuse セルに複合経路量が入っている">2.337186</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="mk-bad" title="NA_fuse セルに複合経路量が入っている">2.337186</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="mk-bad" title="NA_fuse セルに複合経路量が入っている">0.815003</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+<td class="mk-bad" title="オラクルが observed とする座標が NA を返した">NA</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co">
+        <h4>NA_fuse セルに入った複合経路量</h4>
+        <p>N_16: 0.876306 = N_12|N_16 · 1.822974 = N_13|N_12|N_16 · 2.337186 = N_14|N_13|N_12|N_16<br>N_18: 0.815003 = N_17|N_18</p>
+      </div>
+      <div class="co">
+        <h4>凍結構成での結果</h4>
+        <p><span class="big">13</span> オラクルが observed とする座標の脱落<br><span class="big">5</span> 融合により適格でないセルを占める完全な複合量<br><span class="fine">この凍結トイ構成における監査結果の例であり、ソフトウェアのエラー率でも、頻度の推定でもありません。</span></p>
+      </div>
+    </div>
+
+    <div class="subh">D · Method B — 端点・経路ネイティブの監査射影</div>
+    <div class="prose"><p><strong>ここで示す原始軸契約に対しては NOT-EXPOSED です。</strong>Method B のネイティブ対象は端点および経路に紐づくものであり、原始枝長行列と等価ではなく、そもそもそれを主張していません。印のついたセルは誤りではありません。正当なネイティブ対象を凍結原始軸へ<em>射影</em>したときにどう見えるかを示しています——多くは端点分割による複合の半分、あるいは単一端点に帰属させた複合全体です。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">ステップ</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">ネイティブ基準</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step1</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.438153</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.438153</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step2</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.911487</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.911487</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step3</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.168593</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.168593</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step4</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.837173</td>
+<td class="">0.836004</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.168593</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step5</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.586595</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.586595</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step6</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.407502</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.407502</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">main_step7</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.750087</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.750087</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co">
+        <h4>端点分割による射影</h4>
+        <p>N_16 &amp; N_12: 0.438153 = (N_12|N_16)/2 · N_13 &amp; N_16: 0.911487 = (N_13|N_12|N_16)/2<br>N_14 &amp; N_16: 1.168593 = (N_14|N_13|N_12|N_16)/2 · N_17 &amp; N_18: 0.407502 = (N_17|N_18)/2<br>t9 &amp; N_16: 1.586595 = (t9|N_14|N_13|N_12|N_16)/2 · t2 &amp; N_18: 0.750087 = (t2|N_17|N_18)/2</p>
+      </div>
+      <div class="co">
+        <h4>単一端点への完全射影</h4>
+        <p>t4: 0.837173 = t4|N_15<br><br><span class="fine">ベースライン行が t10 で異なるのも構成上のものです。端点分割は表示上の根に接する枝を 2 分します。</span></p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>C と D を並べて読む。</strong>入力も算術も同一、書き込みの振る舞いだけが異なり、判定も異なります。2 つの手法が主張しているものが違うからです。この区別は、数値だけを比較する検査からは得られません。座標台帳と宣言された露出が必要であり、両者が存在する理由がまさにそこにあります。</p>
+    </div>
+
+    <div class="subh">E · 同じ監査を局所系列で</div>
+    <div class="prose"><p>グローバル系列は表示上の根の側から内側へ削除します。<strong>局所</strong>系列は同数の分類群を、1 つのクレード内に集中して取り除くため、融合と構造的不在が別の場所に生じます。同じ監査をその幾何で走らせると、一方の参加者では答えが変わり、もう一方では変わりません。</p></div>
+
+    <div class="verdicts">
+      <div class="vd d-pass">
+        <h4>Method A · 局所系列</h4>
+        <p><b>不一致セルなし。</b>オラクルが observed と記録する座標はすべて値を保持し、適格でないセルはすべて空です——7 ステップ全体にわたって。グローバル幾何で不一致を示したのと同じ露出ワークフローが、ここでは試験条件を満たしています。</p>
+      </div>
+      <div class="vd d-ne">
+        <h4>Method B · 局所系列</h4>
+        <p><b>同じ推定対象の境界、異なるシグネチャ。</b>座標として適格でないネイティブ距離が 10 件——単一端点への完全射影が融合適格でないセルに入るものを含む——に加えて、オラクルが observed とする座標が監査射影では利用できないセルが 4 件。依然として端点ネイティブな対象であり、原始座標の主張ではありません。</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>点数ではなく 4 つの判定を持つ理由がここにあります。</strong>判定は、特定の構成における宣言された主張を記述するものであり、パッケージでも恒久的な性質でもありません。同一の実装と座標契約であっても、あらかじめ規定された剪定構成が異なれば、適合性の結果は異なりうるのです。どちらか一方の結果だけを報告すれば、そのワークフローを誤って伝えることになります。</p>
+    </div>
+
+    <figcaption class="cap" style="margin-top:22px"><b>匿名グローバル剪定ケーススタディ。</b>(A) 代表的な削除状態は、剪定が凍結 10 葉軸上の原始座標適格性をどのように変えるかを示す。(B) 独立したグラフオラクルがすべての原始座標の期待状態を与える。(C) Method A は試験対象の固定軸契約に露出しており、強調セルはこの凍結トイ構成における座標状態の不一致——オラクルが observed とする座標の脱落と、融合適格でない原始セルを占める完全な複合経路量——を示す。(D) Method B は端点・経路ネイティブな推定対象をもち、原始軸への監査射影としてのみ示される。その端点に紐づくシグネチャは推定対象の境界を示すものであり、当該手法が主張していない原始座標契約の失敗として分類されるものではない。(E) 局所削除系列での同じ監査では Method A に不一致セルがなく、判定がソフトウェアパッケージの性質ではなく特定構成における宣言された主張を記述するものであることを示す。参加者の識別情報は初回公開リリースでは伏せられ、正確な識別情報・バージョン・実行来歴は凍結された封緘アーカイブに保持される。</figcaption>
+  </div>
+</section>
+
+<!-- 08 -->
+<section class="block" id="explore">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">08</span><h2>オラクルを操作する</h2></div>
+    <div class="prose"><p>葉を削除して台帳の変化を見てください。表示される状態はすべて、その分類群部分集合に対するオラクルの厳密な答えです。枝を選ぶと、どの座標がそれと融合し、どれが完全に消えるかが分かります。</p></div>
+    <div class="catnip-game" data-lang="ja"><noscript>Catnip10 の操作には JavaScript が必要です。</noscript></div>
+  </div>
+</section>
+
+<!-- 09 -->
+<section class="block" id="fit">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">09</span><h2>SplitAligner が座標を作り、Catnip10 がそれを試験する</h2></div>
+    <div class="prose">
+      <p><strong>SplitAligner</strong> は枝座標の枠組みを構築し解釈します。射影された種樹スプリットによって枝の同一性を定義し、あらゆる種類の枝の欠測に名前を与えます。<strong>Catnip10</strong> は、実装が宣言された座標契約を保存しているかどうかを試験します。両者は異なる問いに答えるものであり、どちらか一方が他方の代わりになることはありません。</p>
+      <p>Catnip10 は SplitAligner の検証エコシステムの中で開発されました。独立した真値対象の必要性が具体的な形をとったのがそこだったからです。そのオラクルと採点契約は実装非依存です。真値層はグラフ収縮によって導かれるものであって、答えを SplitAligner に尋ねて得るものではありません。SplitAligner は枠組みの参照インフラであり、ベンチマークのオラクルではなく、いずれの参加者の正体でもありません。</p>
+      <p>座標系そのもの——射影スプリットがどのように枝の同一性を定義し、欠測がどう分解されるか——を知りたい場合は、解説とチュートリアルから始めてください。</p>
+    </div>
+    <div class="linkrow">
+      <a href="../splitaligner/SplitAligner_explainer_ja.html">アニメーション解説 — スプリットに基づく枝の同一性 ↗</a>
+      <a href="../splitaligner/SplitAligner_tutorial_ja.html">チュートリアル — SplitAligner を最初から最後まで ↗</a>
+      <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener">SplitAligner プレプリント(bioRxiv) ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="block" id="get">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">10</span><h2>自分のワークフローを採点する</h2></div>
+    <div class="prose">
+      <p>採点を受けるために実装を公開する必要はありません。1 つの出力層をロングテーブルのアダプタ契約に正規化し、その層の露出を宣言して採点器を実行するだけです。公開リポジトリには、規範的な仕様、凍結されたベンチマーク入力、オラクルの真値表と複合台帳、機械可読なテーブルスキーマ、手法非依存の採点エンジン、合成アダプタの例、そして匿名化された正規化済み参加者出力が含まれます。参加者固有のアダプタ、ソースバージョン、実行コマンドは、参加者の識別につながるため公開されません。</p>
+    </div>
+
+<pre><code><span class="cm"># 軸 A — 露出した固定・共有の原始層を採点する</span>
+python3 tools/score_participant.py \
+  --truth oracle/primitive_truth_tables/global_truth.tsv \
+  --input tutorial/example_scoring/pass_output.tsv \
+  --exposure tutorial/example_scoring/pass_exposure.tsv \
+  --cell-output /tmp/catnip10_cells.tsv \
+  --summary-output /tmp/catnip10_summary.tsv
+
+<span class="cm"># 軸 B — まず厳密等価を認証し、それから採点する</span>
+python3 tools/certify_representations.py \
+  --manifest benchmark/representation_controls/representation_manifest.tsv \
+  --output /tmp/catnip10_representation_certification.tsv
+
+python3 tools/score_representation.py \
+  --namespace benchmark/reference_tree/branch_namespace.tsv \
+  --baseline-output tutorial/example_representation_scoring/rep_pass_baseline.tsv \
+  --equivalent-output tutorial/example_representation_scoring/rep_pass_equivalent.tsv \
+  --certification /tmp/catnip10_representation_certification.tsv \
+  --representation-id display_root_shift_true \
+  --exposure tutorial/example_representation_scoring/rep_pass_exposure.tsv \
+  --cell-output /tmp/catnip10_rep_cells.tsv \
+  --summary-output /tmp/catnip10_rep_summary.tsv
+
+<span class="cm"># 契約と匿名性のチェック</span>
+python3 -m unittest discover -s tests -v
+</code></pre>
+
+    <div class="prose" style="margin-top:20px">
+      <p>軸 A は採点前に、期待される正準キーの完全な集合を要求します。欠落・重複・未知・不整合なクロスウォーク行は、参加者の結果ではなくアダプタ検証のエラーです。軸 B は参加者を採点する前に独立に計算された認証記録を要求し、その後、正準スプリット同一性によって出力を整列します。合成された PASS・FAIL・NOT-EXPOSED・真の変位・直列化のみの no-op の各ケースは、いずれもテストスイートで検証されています。権威ある数値資産は TSV ファイルであり、レンダリングされた文書や図はビューであって真値の源ではありません。</p>
+      <p><strong>引用について。</strong>座標構築の枠組みについては SplitAligner を、Catnip10 についてはバージョン管理された Catnip10 リポジトリを引用してください。MIT ライセンスで公開されています。</p>
+    </div>
+
+    <div class="linkrow">
+      <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub 上の Catnip10 ↗</a>
+      <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener">SplitAligner(Perl) ↗</a>
+      <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">SplitAlignerR(R) ↗</a>
+      <a href="mailto:wujiaqi@hiroshima-u.ac.jp">著者に連絡する</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr"></span> Jiaqi Wu(呉佳齊)· 広島大学</span>
+    <span>Catnip10 · 決定論的な枝座標適合性ベンチマーク</span>
+  </div>
+</footer>
+
+<script>
+"use strict";
+const root = document.documentElement, tb = document.getElementById("themeBtn");
+tb.addEventListener("click", ()=>{
+  const cur = root.getAttribute("data-theme")
+    || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark":"light");
+  root.setAttribute("data-theme", cur==="dark" ? "light":"dark");
+});
+document.getElementById("yr").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

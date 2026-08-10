@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SplitAligner — 动画讲解</title>
+<style>
+  :root{
+    --ink:#0c1116; --ink2:#121a22; --ink3:#1b2632; --line:#283743;
+    --edge:#b7c2c9; --paper:#eef3f5; --muted:#98a9b5; --faint:#61737f;
+    --obs:#c3ccd2;                     /* observed / numeric branch */
+    --mapped:#3fb488;                  /* mapped (real data) */
+    --struct:#e0555f;                  /* NA_struct — red, matches Fig S1 */
+    --fuse:#5b8dd6;                    /* NA_fuse  — blue, matches Fig S1 */
+    --topo:#e6a93a;                    /* NA_topo  — amber (also brand accent) */
+    --residual:#596a75;                /* residual_NA */
+    --accent:#e6a93a;
+    --sideA:#3fb488; --sideB:#c79a3f;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:radial-gradient(120% 120% at 72% 8%, #14202b 0%, var(--ink) 55%, #070b0e 100%);
+    color:var(--paper); font-family:var(--sans); overflow:hidden;
+  }
+  .app{position:fixed; inset:0; display:flex; flex-direction:column}
+
+  .brand{position:absolute; top:20px; left:28px; z-index:40; display:flex; align-items:baseline; gap:10px}
+  .brand .logo{font-family:var(--serif); font-size:20px; letter-spacing:.3px}
+  .brand .logo b{color:var(--accent); font-weight:600}
+  .brand .tag{font-size:11px; text-transform:uppercase; letter-spacing:.22em; color:var(--faint)}
+  .lang-switch{position:absolute; top:22px; right:26px; z-index:40; display:flex; gap:1px; align-items:center; font-family:var(--mono); font-size:12px}
+  .lang-switch a{color:var(--faint); padding:3px 7px; border-radius:6px; text-decoration:none}
+  .lang-switch a:hover{color:var(--accent)}
+  .lang-switch a.cur{color:var(--accent); background:var(--ink2); font-weight:700}
+
+  .stage{position:relative; flex:1; overflow:hidden}
+  .scene{position:absolute; inset:0; display:grid; place-items:center;
+    padding:72px 5vw 104px; opacity:0; visibility:hidden;
+    transition:opacity .7s ease; pointer-events:none;}
+  .scene.is-active{opacity:1; visibility:visible; pointer-events:auto}
+  .wrap{width:min(1160px,100%); display:grid; gap:30px}
+
+  .eyebrow{font-size:12px; text-transform:uppercase; letter-spacing:.26em; color:var(--accent); font-weight:600}
+  h1.title{font-family:var(--serif); font-weight:500; font-size:clamp(36px,5.6vw,70px); line-height:1.02; margin:0; text-wrap:balance; letter-spacing:-.01em}
+  h2.headline{font-family:var(--serif); font-weight:500; font-size:clamp(25px,3.4vw,44px); line-height:1.08; margin:0; text-wrap:balance; letter-spacing:-.01em}
+  .lede{font-size:clamp(15px,1.45vw,19px); line-height:1.55; color:var(--muted); max-width:62ch; text-wrap:pretty}
+  .lede em{color:var(--paper); font-style:normal}
+  code,.mono{font-family:var(--mono)}
+  .tok{font-family:var(--mono); font-size:.82em; padding:.1em .45em; border-radius:5px; white-space:nowrap; font-weight:700}
+  .tok.mapped{color:#07130e; background:var(--mapped)}
+  .tok.struct{color:#1a0709; background:var(--struct)}
+  .tok.fuse{color:#06101d; background:var(--fuse)}
+  .tok.topo{color:#1a1204; background:var(--topo)}
+  .tok.res{color:#e6edf0; background:var(--residual)}
+
+  .rv{opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
+  .scene.is-active .rv{opacity:1; transform:none; transition-delay:var(--d,0s)}
+
+  #s0 .wrap{justify-items:start; gap:22px}
+  #s0 .tagline{font-family:var(--serif); font-style:italic; font-size:clamp(18px,2vw,26px); color:var(--muted); border-left:2px solid var(--accent); padding-left:18px}
+  .bg-tree{position:absolute; inset:0; z-index:0; opacity:.14; pointer-events:none}
+
+  .split-cols{display:grid; grid-template-columns:1.02fr .98fr; gap:44px; align-items:center}
+  @media (max-width:880px){ .split-cols{grid-template-columns:1fr; gap:24px} }
+  .panel{background:linear-gradient(180deg,var(--ink2),#0e151c); border:1px solid var(--line); border-radius:16px; padding:18px 20px; box-shadow:0 24px 60px -30px #000}
+  svg{display:block; width:100%; height:auto; overflow:visible}
+  .formula{font-family:var(--mono); font-size:clamp(13px,1.5vw,17px); background:var(--ink2); border:1px solid var(--line); border-radius:12px; padding:15px 17px; line-height:1.75}
+  .formula .dim{color:var(--faint); font-size:.82em}
+
+  /* Tree engine styling */
+  .edge{fill:none; stroke:var(--edge); stroke-width:2.4; stroke-linecap:round;
+        stroke-dasharray:1; stroke-dashoffset:1;}
+  .scene.is-active .edge{stroke-dashoffset:0; transition:stroke-dashoffset .55s ease}
+  .no-draw .edge{stroke-dasharray:none; stroke-dashoffset:0;
+        transition:stroke .55s ease, stroke-width .45s ease, opacity .55s ease !important}
+  .tip-label{fill:var(--muted); font-family:var(--mono); font-size:17.5px; font-weight:700; dominant-baseline:middle; opacity:0}
+  .scene.is-active .tip-label{opacity:1; transition:opacity .5s ease .45s}
+  .no-draw .tip-label{opacity:1; transition:opacity .5s ease, fill .5s ease, text-decoration-color .5s}
+  .tip-dot{fill:var(--edge)}
+  .br-label{font-family:var(--mono); font-size:14.5px; font-weight:700; fill:var(--muted); dominant-baseline:middle}
+
+  .edge.sideA{stroke:var(--sideA)} .tip-label.sideA{fill:var(--sideA)}
+  .edge.sideB{stroke:var(--sideB)} .tip-label.sideB{fill:var(--sideB)}
+  .edge.bhi{stroke:var(--accent); stroke-width:4.6}
+  .br-label.hi{fill:var(--accent); font-weight:700}
+
+  .edge.state-obs{stroke:var(--obs); stroke-width:2.6; opacity:1}
+  .edge.state-fuse{stroke:var(--fuse); stroke-width:4.8; opacity:1}
+  .edge.state-struct{stroke:var(--struct); stroke-width:2.6; stroke-dasharray:2.5 3.5; opacity:.85}
+  .edge.state-mapped{stroke:var(--mapped); stroke-width:4.6}
+  .edge.state-topo{stroke:var(--topo); stroke-width:2.6; stroke-dasharray:2.5 3.5}
+  .br-label.st-fuse{fill:var(--fuse); font-weight:700}
+  .br-label.st-struct{fill:var(--struct); opacity:.8}
+  .tip-label.deleted{fill:var(--struct); text-decoration:line-through; text-decoration-color:var(--struct); opacity:.5 !important}
+
+  .scissors{font-size:24px; opacity:0}
+  .scene.is-active .scissors{opacity:1; transition:opacity .5s ease 1s}
+  .cutline{stroke:var(--accent); stroke-width:2; stroke-dasharray:3 4; opacity:0}
+  .scene.is-active .cutline{opacity:.9; transition:opacity .5s ease 1s}
+
+  /* Deletion scene */
+  .del-grid{display:grid; grid-template-columns:1.35fr 1fr; gap:34px; align-items:start}
+  @media (max-width:940px){ .del-grid{grid-template-columns:1fr; gap:18px} }
+  .del-head{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:6px}
+  .regime-badge{display:inline-block; background:var(--accent); color:#161006; font-weight:600; font-size:12.5px; padding:7px 15px; border-radius:999px}
+  .regime-badge.alt{background:transparent; color:var(--accent); border:1px solid var(--accent)}
+
+  /* poem */
+  .poem{display:grid; gap:3px; justify-items:center; text-align:center; font-family:var(--serif)}
+  .poem .line{font-style:italic; font-size:clamp(17px,2.15vw,28px); line-height:1.62; color:var(--paper); text-wrap:balance}
+  .poem .spacer{height:16px}
+  .poem .final{margin-top:16px; font-size:clamp(18px,2.35vw,31px); color:var(--paper)}
+  .poem .final::before,.poem .final::after{content:"\201C"; color:var(--accent)}
+  .poem .final::after{content:"\201D"}
+  .step-cap{font-family:var(--mono); font-size:13px; color:var(--paper); min-height:1.4em}
+  .step-cap b{color:var(--struct)}
+  .chips{display:grid; grid-template-columns:repeat(auto-fill,minmax(52px,1fr)); gap:7px}
+  .chip{border:1px solid var(--line); border-radius:7px; padding:6px 4px; text-align:center;
+    font-family:var(--mono); font-size:11.5px; background:var(--ink2); transition:background .5s ease,color .5s ease,border-color .5s}
+  .chip.obs{color:var(--paper); border-color:color-mix(in srgb,var(--obs) 30%,var(--line))}
+  .chip.fuse{background:var(--fuse); color:#06101d; border-color:var(--fuse); font-weight:700}
+  .chip.struct{background:transparent; color:var(--struct); border-color:var(--struct); border-style:dashed}
+  .counts{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+  .count{flex:1; min-width:96px; background:var(--ink2); border:1px solid var(--line); border-radius:12px; padding:11px 13px}
+  .count .v{font-family:var(--mono); font-size:24px; font-variant-numeric:tabular-nums; line-height:1}
+  .count .k{font-size:11px; color:var(--muted); margin-top:5px; text-transform:uppercase; letter-spacing:.08em}
+  .count.obs .v{color:var(--obs)} .count.fuse .v{color:var(--fuse)} .count.struct .v{color:var(--struct)}
+  .legend-inline{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted)}
+  .legend-inline span{display:inline-flex; align-items:center; gap:7px}
+  .sw{width:14px; height:5px; border-radius:2px; display:inline-block}
+  .sw.obs{background:var(--obs)} .sw.fuse{background:var(--fuse)}
+  .sw.struct{background:transparent; border-bottom:2px dashed var(--struct); height:0; align-self:center}
+
+  /* theorem / proof */
+  #sT{place-items:start center; overflow-y:auto}
+  #s3 .panel svg{max-width:390px; margin:0 auto}
+  .proof{display:grid; gap:11px; counter-reset:pf; align-content:start}
+  .proof .step{position:relative; padding-left:38px; font-size:13.5px; line-height:1.42; color:var(--muted)}
+  .proof .step b{color:var(--paper); font-weight:600}
+  .proof .step .mono{color:var(--paper)}
+  .proof .step::before{counter-increment:pf; content:counter(pf); position:absolute; left:0; top:-2px;
+    width:25px; height:25px; border-radius:50%; border:1px solid var(--line); color:var(--accent);
+    font-family:var(--mono); font-size:12px; display:grid; place-items:center; background:var(--ink2)}
+  .qed{color:var(--accent); font-family:var(--mono); font-size:1.15em}
+  .cor-chip{background:var(--ink2); border:1px solid var(--line); border-radius:12px; padding:10px 13px; font-size:11.5px; color:var(--muted); line-height:1.42}
+  .cor-chip b{color:var(--paper); font-weight:600}
+  .cor-chip .lbl{font-family:var(--mono); color:var(--accent); font-weight:700; font-size:10.5px; letter-spacing:.05em}
+  .thm-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:16px 40px; align-items:start}
+  @media (max-width:880px){ .thm-grid{grid-template-columns:1fr} }
+
+  /* fates */
+  .fates{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+  @media (max-width:940px){ .fates{grid-template-columns:repeat(2,1fr)} }
+  .fate{background:var(--ink2); border:1px solid var(--line); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:9px}
+  .fate .cap{display:flex; align-items:center; gap:8px; justify-content:space-between}
+  .fate .name{font-family:var(--mono); font-weight:700; font-size:13px}
+  .fate.mapped{border-color:color-mix(in srgb,var(--mapped) 45%,var(--line))}
+  .fate.struct{border-color:color-mix(in srgb,var(--struct) 50%,var(--line))}
+  .fate.fuse{border-color:color-mix(in srgb,var(--fuse) 50%,var(--line))}
+  .fate.topo{border-color:color-mix(in srgb,var(--topo) 60%,var(--line))}
+  .fate .why{font-size:12.5px; color:var(--muted); line-height:1.42}
+  .fate .why b{color:var(--paper); font-weight:600}
+  .mini-cap{font-family:var(--mono); font-size:12.5px; font-weight:700; letter-spacing:.02em}
+  .mini-note{font-family:var(--mono); font-size:11.5px; color:var(--muted); text-align:center}
+  .topo-call{border:1px solid var(--topo); border-radius:12px; padding:12px 15px; background:color-mix(in srgb, var(--topo) 12%, var(--ink2))}
+  .topo-call .h{font-family:var(--mono); color:var(--topo); font-weight:700; font-size:13.5px; margin-bottom:5px}
+  .topo-call .b{font-size:12.5px; color:var(--muted); line-height:1.45}
+  .fuse-eq{font-family:var(--mono); text-align:center; font-size:clamp(15px,1.9vw,23px); font-weight:700; color:var(--fuse); letter-spacing:.01em; padding:12px 16px; border:1px solid color-mix(in srgb,var(--fuse) 50%,var(--line)); border-radius:14px; background:color-mix(in srgb,var(--fuse) 12%,var(--ink2))}
+  .fuse-eq b{color:var(--paper)}
+  .swatch{width:11px; height:11px; border-radius:3px; flex:none}
+
+  .ledger{display:grid; grid-template-columns:1fr auto; gap:40px; align-items:center}
+  @media (max-width:940px){ .ledger{grid-template-columns:1fr; gap:22px} }
+  .matrix{display:grid; grid-template-columns:repeat(18,1fr); gap:3px; width:min(420px,100%)}
+  .cell{aspect-ratio:1; border-radius:2px; background:var(--ink3); opacity:0; transform:scale(.4)}
+  .scene.is-active .matrix .cell{opacity:1; transform:none; transition:opacity .5s ease, transform .5s ease}
+  .cell.mapped{background:var(--mapped)} .cell.struct{background:var(--struct)}
+  .cell.fuse{background:var(--fuse)} .cell.topo{background:var(--topo)} .cell.res{background:var(--residual)}
+  .equation{font-family:var(--mono); font-size:clamp(13px,1.4vw,17px); line-height:2; letter-spacing:.01em}
+  .equation .op{color:var(--faint)}
+  .legend{display:grid; gap:9px; margin-top:4px}
+  .legend .row{display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted)}
+  .legend .row .n{margin-left:auto; font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--paper)}
+
+  .stat-row{display:flex; flex-wrap:wrap; gap:26px 44px; align-items:flex-end}
+  .stat .big{font-family:var(--serif); font-size:clamp(42px,5.6vw,74px); line-height:.9; color:var(--topo)}
+  .stat .lab{font-size:13px; color:var(--muted); margin-top:8px; max-width:24ch}
+  .bar{height:26px; border-radius:6px; overflow:hidden; display:flex; width:100%; background:var(--ink3); border:1px solid var(--line)}
+  .bar span{height:100%; display:block; width:0; transition:width 1s cubic-bezier(.2,.7,.2,1) .2s}
+  .scene.is-active .bar span{width:var(--w)}
+  .barkey{display:flex; flex-wrap:wrap; gap:8px 20px; font-size:12.5px; color:var(--muted)}
+  .barkey span{display:inline-flex; align-items:center; gap:7px}
+
+  .controls{position:absolute; left:0; right:0; bottom:0; z-index:40; display:flex; align-items:center; gap:15px;
+    padding:15px 28px 18px; background:linear-gradient(0deg, rgba(6,9,12,.94), rgba(6,9,12,0));}
+  .progress{position:absolute; top:0; left:0; right:0; height:2px; background:var(--line)}
+  .progress .fill{height:100%; width:0; background:var(--accent)}
+  .btn{appearance:none; border:1px solid var(--line); background:var(--ink2); color:var(--paper);
+    width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:15px; display:grid; place-items:center;
+    transition:border-color .2s, transform .1s}
+  .btn:hover{border-color:var(--accent)} .btn:active{transform:scale(.94)}
+  .btn.play{width:46px; height:46px; font-size:16px}
+  .btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .dots{display:flex; gap:9px; margin-left:6px}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--line); border:none; padding:0; cursor:pointer; transition:background .25s, transform .2s}
+  .dot:hover{transform:scale(1.25)} .dot.on{background:var(--accent)}
+  .scene-count{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums}
+  .hint{font-size:11.5px; color:var(--faint)}
+
+  @media (prefers-reduced-motion:reduce){
+    .rv,.edge,.cell,.bar span{transition:none !important}
+    .rv{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brand">
+    <span class="logo">Split<b>Aligner</b></span>
+    <span class="tag">定义分支身份的坐标系</span>
+  </div>
+
+  <div class="lang-switch" aria-label="Language / 言語 / 语言"><a href="SplitAligner_explainer.html">EN</a><a href="SplitAligner_explainer_ja.html">日本語</a><a href="SplitAligner_explainer_zh.html" class="cur">中文</a></div>
+
+  <div class="stage" id="stage">
+
+    <!-- 0 TITLE -->
+    <section class="scene" id="s0">
+      <svg class="bg-tree no-draw" id="bgTree" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+      <div class="wrap">
+        <div class="eyebrow rv">系统发育基因组学 · 分支可比性</div>
+        <h1 class="title rv" style="--d:.08s">同一条分支,<br>贯穿每一个基因。</h1>
+        <p class="lede rv" style="--d:.18s">当类群缺失、或基因树彼此不一致时,一条分支可能消失、与邻枝融合、或掉头离开——而这些统统被压成一个无从区分的 <span class="tok res">NA</span>。SplitAligner 为每一种缺失赋予名字。</p>
+        <p class="tagline rv" style="--d:.3s">一本安静的账本,每一次缺失都有名字。</p>
+      </div>
+    </section>
+
+    <!-- 1 PREMISE + TOY TREE -->
+    <section class="scene" id="s1">
+      <div class="wrap split-cols">
+        <div class="panel rv"><svg id="treePremise" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="带 17 个分支坐标标签的 10 类群基准物种树"></svg></div>
+        <div style="display:grid; gap:20px">
+          <div class="eyebrow rv">基准</div>
+          <h2 class="headline rv" style="--d:.08s">固定一棵树,给每条分支命名。</h2>
+          <p class="lede rv" style="--d:.18s">一棵刻意做到最简的 10 类群树——由 R/APE 生成的随机拓扑(<span class="mono">seed 42</span>),枝长固定,<em>没有</em>任何速率变化、不一致或估计误差。它的无根轴定义了 <em>17 个原始分支坐标</em>:10 条末端分支 <span class="mono">t1–t10</span> 与 7 条内部分支 <span class="mono">N_12–N_18</span>。</p>
+          <p class="lede rv" style="--d:.26s">这就是被冻结的坐标系。我们唯一改变的,是某个基因恰好采样了哪些类群。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 BRANCH = SPLIT -->
+    <section class="scene" id="s2">
+      <div class="wrap split-cols">
+        <div class="panel rv"><svg id="treeSplit" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="一条内部分支把树切成两个类群集合"></svg></div>
+        <div style="display:grid; gap:18px">
+          <div class="eyebrow rv">核心思想</div>
+          <h2 class="headline rv" style="--d:.08s">一条分支,<em>就是</em>它所形成的分裂。</h2>
+          <p class="lede rv" style="--d:.18s">剪断分支 <span class="mono" style="color:var(--accent)">N_13</span>,树就分成两组。这个二分(分裂)——而非它画出来的位置或生根方式——<em>才是</em>分支的身份。</p>
+          <div class="formula rv" style="--d:.26s">
+            &sigma;(N_13) = ( <span style="color:var(--sideA)">t8, t7, t4, t9</span> &nbsp;|&nbsp; <span style="color:var(--sideB)">t1, t10, t5, t2, t3, t6</span> )<br>
+            <span class="dim">两条分支「相同」,当且仅当它们的分裂一致</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 MECHANISM: FUSION -->
+    <section class="scene" id="s3">
+      <div class="wrap" style="gap:14px">
+        <div style="display:grid; gap:8px; margin-bottom:6px">
+          <div class="eyebrow rv">机制</div>
+          <h2 class="headline rv" style="--d:.06s">去掉一个类群,两条分支就融合为一。</h2>
+        </div>
+        <div class="split-cols">
+          <div class="panel rv" style="--d:.12s">
+            <div style="font-family:var(--mono); font-size:12px; color:var(--muted); margin-bottom:6px">删除前 &mdash; t8 在场</div>
+            <svg id="treeFuseBefore" class="no-draw" viewBox="0 0 360 250" role="img" aria-label="删除 t8 之前的子树"></svg>
+          </div>
+          <div class="panel rv" style="--d:.2s">
+            <div style="font-family:var(--mono); font-size:12px; color:var(--muted); margin-bottom:6px">删除后 &mdash; t8 移除,N_13 与 N_14 合并</div>
+            <svg id="treeFuseAfter" class="no-draw" viewBox="0 0 360 250" role="img" aria-label="删除 t8 之后的子树,显示融合的分支"></svg>
+          </div>
+        </div>
+        <div class="fuse-eq rv" style="--d:.24s">
+          L(N_13&#124;N_14) = L(N_13) + L(N_14) = 0.946668 + 0.514212 = <b>1.460880</b>
+        </div>
+        <div class="formula rv" style="--d:.34s; max-width:none; font-size:13.5px">
+          移除 <span class="tok struct">t8</span> 会消除一个二度节点:相邻的两条边合并,<span style="color:var(--fuse)">N_13</span>、<span style="color:var(--fuse)">N_14</span> 变成融合坐标 <span style="color:var(--fuse)">N_13&#124;N_14</span> &mdash; 但上面那条枝长并<em>未</em>丢失。所以 <span class="tok fuse">NA_fuse</span> 意味着<em>失去独立身份</em>,而非缺少长度;<span class="tok struct">NA_struct</span> 则是被删除、根本没有投影的分支。
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 GLOBAL DELETION -->
+    <section class="scene" id="s4">
+      <div class="wrap" style="gap:12px">
+        <div class="del-head">
+          <div class="eyebrow" style="margin-right:auto">审计 · 每一处缺失都被归类</div>
+          <span class="regime-badge">全局删除 · 从外类群开始</span>
+        </div>
+        <div class="del-grid">
+          <div class="panel"><svg id="delTree" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="全局(从外类群开始)删除类群下的基准树"></svg></div>
+          <div>
+            <div class="step-cap" id="stepCap">完整的树 —— 17 个冻结坐标全部被观测</div>
+            <div class="chips" id="chips" style="margin-top:12px"></div>
+            <div class="counts">
+              <div class="count obs"><div class="v" id="cObs">17</div><div class="k">观测</div></div>
+              <div class="count fuse"><div class="v" id="cFuse">0</div><div class="k">NA_fuse</div></div>
+              <div class="count struct"><div class="v" id="cStruct">0</div><div class="k">NA_struct</div></div>
+            </div>
+            <div class="legend-inline" style="margin-top:16px">
+              <span><span class="sw obs"></span>观测(数值)</span>
+              <span><span class="sw fuse"></span>NA_fuse(融合)</span>
+              <span><span class="sw struct"></span>NA_struct(缺失)</span>
+            </div>
+            <p class="lede" style="font-size:13.5px; margin-top:16px">删除顺序 <span class="mono">t10, t1, t8, t7, t4, t9, t5</span> 从根部向内层层剥离。整个演化支坍塌,于是 <span class="tok struct">NA_struct</span> 迅速攀升。每个坐标都与一个独立的图论判定器核对——不凭空捏造,也不悄悄丢弃。这里没有不一致,所以 <span class="tok topo">NA_topo</span> = 0。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4b LOCAL DELETION -->
+    <section class="scene" id="s4L">
+      <div class="wrap" style="gap:12px">
+        <div class="del-head">
+          <div class="eyebrow" style="margin-right:auto">审计 · 同一轴,不同的印记</div>
+          <span class="regime-badge alt">局部删除 · 集中于一处</span>
+        </div>
+        <div class="del-grid">
+          <div class="panel"><svg id="delTreeL" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="局部(集中于一处)删除类群下的基准树"></svg></div>
+          <div>
+            <div class="step-cap" id="stepCapL">完整的树 —— 17 个冻结坐标全部被观测</div>
+            <div class="chips" id="chipsL" style="margin-top:12px"></div>
+            <div class="counts">
+              <div class="count obs"><div class="v" id="cObsL">17</div><div class="k">观测</div></div>
+              <div class="count fuse"><div class="v" id="cFuseL">0</div><div class="k">NA_fuse</div></div>
+              <div class="count struct"><div class="v" id="cStructL">0</div><div class="k">NA_struct</div></div>
+            </div>
+            <div class="legend-inline" style="margin-top:16px">
+              <span><span class="sw obs"></span>观测(数值)</span>
+              <span><span class="sw fuse"></span>NA_fuse(融合)</span>
+              <span><span class="sw struct"></span>NA_struct(缺失)</span>
+            </div>
+            <p class="lede" style="font-size:13.5px; margin-top:16px">删除顺序 <span class="mono">t8, t7, t4, t9, t5, t2, t3</span> 只攻击一个演化支,因此融合集中在一处,而另一侧能长久保留其数值坐标。同一个被冻结的轴,却呈现不同的缺失印记——而 <span class="tok topo">NA_topo</span> 依旧 = 0。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4b THEOREM: EXISTENCE & UNIQUENESS -->
+    <section class="scene" id="sT">
+      <div class="wrap" style="gap:20px">
+        <div style="display:grid; gap:8px">
+          <div class="eyebrow rv">存在性与唯一性</div>
+          <h2 class="headline rv" style="--d:.06s">这本账本不是约定俗成——而是唯一确定的真值。</h2>
+        </div>
+        <div class="thm-grid">
+          <div class="formula rv" style="--d:.12s; max-width:none">
+            固定物种树 <b style="color:var(--paper)">S</b> 与每个基因所保留的类群 <b style="color:var(--paper)">T<sub>g</sub></b>。剪枝诱导出一个<em style="color:var(--paper); font-style:normal">唯一</em>的映射<br>
+            <span style="color:var(--accent)">&pi;<sub>g</sub> : B(S) &rarr; E(&rho;<sub>Tg</sub>(S)) &#8852; {&perp;}</span><br>
+            <span class="dim">每条原始分支 &rarr; 吸收它的简约边;若被剪掉则映到 &perp;。</span><br><br>
+            status(g,b) = <span style="color:var(--obs)">observed</span> &nbsp;&nbsp;|fiber| = 1<br>
+            <span style="display:inline-block; width:7.2em"></span>= <span style="color:var(--fuse)">NA_fuse</span> &nbsp;&nbsp;&nbsp;|fiber| &ge; 2<br>
+            <span style="display:inline-block; width:7.2em"></span>= <span style="color:var(--struct)">NA_struct</span> &nbsp;&pi;<sub>g</sub>(b) = &perp;
+          </div>
+          <div class="proof">
+            <div class="step rv" style="--d:.16s">剪枝后的树 <b>&rho;<sub>Tg</sub>(S)</b> 是唯一的——标准的树限制操作(<span class="mono">ape::drop.tip</span>),不依赖任何标签或分裂。</div>
+            <div class="step rv" style="--d:.24s">二度节点消除是一种<b>边商</b>:每条分支恰好落入一条简约边,或被删除。因此 <b>&pi;<sub>g</sub></b> 是良定义的。</div>
+            <div class="step rv" style="--d:.32s">|fiber| = 1、|fiber| &ge; 2、以及「被删除」<b>互斥且穷尽</b>——构成一个划分;status 是 |fiber| 的函数。</div>
+            <div class="step rv" style="--d:.4s">当 |fiber| = 1 时,简约边的长度等于 <b>&ell;(b)</b>:观测<em>值</em>同样唯一。</div>
+            <div class="step rv" style="--d:.48s">每条纤维都是一段<b>连通的路径</b>——融合坐标是一条路径,而非零散的集合。<span class="qed">&#8718;</span></div>
+          </div>
+          <div class="formula rv" style="--d:.2s; max-width:none; text-align:center">
+            |B(S)| = <span style="color:var(--obs)">|observed|</span> + <span style="color:var(--fuse)">|NA_fuse|</span> + <span style="color:var(--struct)">|NA_struct|</span>
+          </div>
+          <div class="cor-chip rv" style="--d:.56s"><span class="lbl">引理1 · 分裂 = 纤维</span><br>&sigma;<sub>g</sub>(b) = &sigma;<sub>g</sub>(b&prime;) &nbsp;&hArr;&nbsp; &pi;<sub>g</sub>(b) = &pi;<sub>g</sub>(b&prime;)。SplitAligner 的分裂投影<b>忠实地计算出</b>由图确定的账本——分裂键是纤维的精确编码,而非另一套定义。</div>
+          <p class="lede rv" style="--d:.28s; font-size:14px">每个 status 都是<em>单值</em>的——它是那个唯一映射 &pi;<sub>g</sub> 的函数。一旦确定采样了谁,每个格子就只有一个正确答案。<em>「每一次缺失都有名字」——这是一条定理。</em></p>
+          <div class="cor-chip rv" style="--d:.6s"><span class="lbl">推论2.5 · 真值层 vs 复原层</span><br>真值层只依赖 <b>(S, T<sub>g</sub>)</b>——绝不依赖基因树的拓扑。不一致无法扰乱 <span class="tok struct">NA_struct</span>&thinsp;/&thinsp;<span class="tok fuse">NA_fuse</span>;它只会开启另一个独立的复原层 <span class="tok topo">NA_topo</span>。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 DISCORDANCE ADDS NA_topo -->
+    <section class="scene" id="s5">
+      <div class="wrap" style="gap:22px">
+        <div style="display:grid; gap:8px">
+          <div class="eyebrow rv">从基准到真实数据</div>
+          <h2 class="headline rv" style="--d:.06s">真实的基因树还会<em>彼此不一致</em>。这是第三种缺失。</h2>
+        </div>
+        <div class="fates">
+          <div class="fate mapped rv" style="--d:.10s">
+            <div class="cap"><span class="name" style="color:var(--mapped)">Mapped</span><span class="swatch" style="background:var(--mapped)"></span></div>
+            <div class="why">投影分裂唯一可辨,<em>且</em>确实出现在基因树中。<b>分支被回收。</b></div>
+          </div>
+          <div class="fate struct rv" style="--d:.18s">
+            <div class="cap"><span class="name" style="color:var(--struct)">NA_struct</span><span class="swatch" style="background:var(--struct)"></span></div>
+            <div class="why">剪枝后分裂的一侧为空。<b>没有投影身份</b>——由类群覆盖度决定。</div>
+          </div>
+          <div class="fate fuse rv" style="--d:.26s">
+            <div class="cap"><span class="name" style="color:var(--fuse)">NA_fuse</span><span class="swatch" style="background:var(--fuse)"></span></div>
+            <div class="why">节点坍塌后,分裂与邻枝共享。<b>信号落在复合分支上。</b></div>
+          </div>
+          <div class="fate topo rv" style="--d:.34s">
+            <div class="cap"><span class="name" style="color:var(--topo)">NA_topo</span><span class="swatch" style="background:var(--topo)"></span></div>
+            <div class="why">覆盖度没问题,但基因树拓扑<b>不一致</b>——分裂根本不存在。<b>拓扑冲突。</b></div>
+          </div>
+        </div>
+        <div class="split-cols rv" style="--d:.42s; gap:28px; align-items:stretch">
+          <div class="panel" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start">
+            <div style="display:grid; gap:7px; justify-items:center">
+              <div class="mini-cap" style="color:var(--mapped)">物种树</div>
+              <svg id="treeSp" class="no-draw" viewBox="0 0 210 165" role="img" aria-label="t5 与 t2 构成演化支的物种树"></svg>
+              <div class="mini-note">分支 <em style="color:var(--accent); font-style:normal">b</em> = 分裂 {t5,t2} → <span class="tok mapped">Mapped</span></div>
+            </div>
+            <div style="display:grid; gap:7px; justify-items:center; border-left:1px solid var(--line); padding-left:14px">
+              <div class="mini-cap" style="color:var(--topo)">基因树(不一致)</div>
+              <svg id="treeGe" class="no-draw" viewBox="0 0 210 165" role="img" aria-label="t5 与 t2 不构成演化支的不一致基因树"></svg>
+              <div class="mini-note" style="color:var(--topo)">{t5,t2} 缺失 → <span class="tok topo">NA_topo</span></div>
+            </div>
+          </div>
+          <div style="display:grid; gap:14px; align-content:center">
+            <div class="topo-call">
+              <div class="h">NA_topo —— 头号主角</div>
+              <div class="b">同样的类群、同样的覆盖度——但基因树把它们分到了不同组,于是这个分裂根本不存在。在 302 种哺乳动物的数据里,它占了全部非映射项的 <b style="color:var(--paper)">76.7%</b>。</div>
+            </div>
+            <p class="lede" style="font-size:13px">10 类群基准在设计上排除了不一致,因此能干净地分离 <span class="tok struct">NA_struct</span> 与 <span class="tok fuse">NA_fuse</span>。真实的基因树则打开了第四列 <span class="tok topo">NA_topo</span>;而第五列 <span class="tok res">residual_NA</span>,在固定侧没有可供提升的数值证据时,作为诚实的保留项存在。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 LEDGER + PAYOFF -->
+    <section class="scene" id="s6">
+      <div class="wrap" style="gap:26px">
+        <div style="display:grid; gap:8px">
+          <div class="eyebrow rv">不丢失,不捏造</div>
+          <h2 class="headline rv" style="--d:.06s">每个 基因×分支 格子,都恰好落入一列。</h2>
+        </div>
+        <div class="ledger">
+          <div style="display:grid; gap:20px">
+            <div class="equation rv" style="--d:.12s">
+              |&#x1D48A;| = <span style="color:var(--mapped)">Mapped</span>
+              <span class="op">+</span> <span style="color:var(--struct)">NA_struct</span>
+              <span class="op">+</span> <span style="color:var(--fuse)">NA_fuse</span><br>
+              <span class="op" style="margin-left:2.6em">+</span> <span style="color:var(--topo)">NA_topo</span>
+              <span class="op">+</span> <span style="color:var(--residual)">residual_NA</span>
+            </div>
+            <div class="legend rv" style="--d:.2s">
+              <div class="row"><span class="swatch" style="background:var(--mapped)"></span> Mapped <span class="n">1,219,182</span></div>
+              <div class="row"><span class="swatch" style="background:var(--topo)"></span> NA_topo <span class="n">113,656</span></div>
+              <div class="row"><span class="swatch" style="background:var(--fuse)"></span> NA_fuse <span class="n">21,913</span></div>
+              <div class="row"><span class="swatch" style="background:var(--struct)"></span> NA_struct <span class="n">12,117</span></div>
+              <div class="row"><span class="swatch" style="background:var(--residual)"></span> residual_NA <span class="n">407</span></div>
+              <div class="row" style="border-top:1px solid var(--line); padding-top:8px; color:var(--paper)">总格子数 |&#x1D48A;| <span class="n">1,367,275</span></div>
+            </div>
+            <div class="rv" style="--d:.3s; font-size:13px; color:var(--faint); font-family:var(--mono)">2,275 个单拷贝基因 &times; 302 种有胎盘哺乳动物 · 自由拓扑</div>
+          </div>
+          <div class="rv" style="--d:.16s; justify-self:center; display:grid; gap:16px; justify-items:center">
+            <div class="matrix" id="matrix" aria-label="按格子状态着色的 基因×分支 矩阵"></div>
+            <div class="stat" style="text-align:center"><div class="big">76.7%</div><div class="lab" style="margin:6px auto 0">的非映射项由拓扑引起——而非覆盖度缺失</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- POEM — the soul of the method -->
+    <section class="scene" id="sP">
+      <div class="wrap" style="gap:12px; justify-items:center">
+        <div class="eyebrow rv">方法之魂 —— 摘自 README</div>
+        <div class="poem">
+          <div class="line rv" style="--d:.1s">在固定的物种树脊梁之上,</div>
+          <div class="line rv" style="--d:.5s">我们只问一件事:分支 <em style="font-style:normal; color:var(--accent)">b</em> 是否依然成立?</div>
+          <div class="spacer"></div>
+          <div class="line rv" style="--d:1.0s">投影这个分裂:</div>
+          <div class="line rv" style="--d:1.4s">若投影的一侧消失 —— <span style="color:var(--struct)">NA_struct</span>。</div>
+          <div class="line rv" style="--d:1.8s">若分支融合 —— <span style="color:var(--fuse)">NA_fuse</span>。</div>
+          <div class="line rv" style="--d:2.2s">若拓扑背离 —— <span style="color:var(--topo)">NA_topo</span>。</div>
+          <div class="spacer"></div>
+          <div class="line rv" style="--d:2.7s">没有鬼魅,没有遗漏:</div>
+          <div class="line rv" style="--d:3.1s">总数 = <span style="color:var(--mapped)">Mapped</span> + <span style="color:var(--struct)">NA_struct</span> + <span style="color:var(--fuse)">NA_fuse</span> + <span style="color:var(--topo)">NA_topo</span> + <span style="color:var(--residual)">residual_NA</span>。</div>
+          <div class="final rv" style="--d:3.8s">一本安静的账本,每一次缺失都有名字。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 CLOSE -->
+    <section class="scene" id="s7">
+      <div class="wrap" style="justify-items:center; text-align:center; gap:22px">
+        <svg class="bg-tree no-draw" id="bgTree2" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+        <div class="eyebrow rv">SplitAligner</div>
+        <h1 class="title rv" style="--d:.08s; text-align:center; max-width:24ch">让分支身份变得可审计。</h1>
+        <p class="lede rv" style="--d:.2s; text-align:center; margin:0 auto; max-width:66ch">Wu J. (2026). <em>SplitAligner: a branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance.</em> 配套的坐标审计基准:确定性的 10 类群玩具树。</p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="controls">
+    <div class="progress"><div class="fill" id="pfill"></div></div>
+    <button class="btn" id="prev" title="上一页 (←)" aria-label="上一个场景">‹</button>
+    <button class="btn play" id="play" title="播放 / 暂停 (space)" aria-label="播放 / 暂停">❚❚</button>
+    <button class="btn" id="next" title="下一页 (→)" aria-label="下一个场景">›</button>
+    <div class="dots" id="dots" role="tablist" aria-label="场景"></div>
+    <span class="hint">space · ← → · R 重新开始</span>
+    <span class="scene-count" id="count">01 / 11</span>
+  </div>
+</div>
+
+<script>
+"use strict";
+const SVGNS="http://www.w3.org/2000/svg";
+const el=(n,a={})=>{const e=document.createElementNS(SVGNS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+
+/* ---------- tree engine ---------- */
+function layout(node,depth,ctx){
+  node.depth=depth;
+  if(node.children){
+    node.children.forEach(c=>{c.parent=node; layout(c,depth+1,ctx);});
+    node.y=(node.children[0].y+node.children[node.children.length-1].y)/2;
+  }else{ node.y=ctx.i++; }
+  ctx.maxLeafDepth=Math.max(ctx.maxLeafDepth, node.children?ctx.maxLeafDepth:depth);
+  return node;
+}
+function flat(node,out=[]){ out.push(node); if(node.children)node.children.forEach(c=>flat(c,out)); return out; }
+function findById(node,id){ if(node.id===id)return node; if(node.children)for(const c of node.children){const r=findById(c,id);if(r)return r;} return null; }
+function markSub(node,cls){ node._cls=(node._cls||"")+" "+cls; if(node.children)node.children.forEach(c=>markSub(c,cls)); }
+
+function drawTree(svg, spec, opts={}){
+  svg.textContent="";
+  const vb=svg.viewBox.baseVal, W=vb.width||540, H=vb.height||430;
+  const padL=opts.padL??30, padR=opts.padR??76, padT=opts.padT??22, padB=opts.padB??22;
+  const ctx={i:0,maxLeafDepth:0};
+  layout(spec,0,ctx);
+  const nodes=flat(spec);
+  const nLeaves=ctx.i, maxD=ctx.maxLeafDepth;
+  const dx=(W-padL-padR)/Math.max(1,maxD);
+  const dy=(H-padT-padB)/Math.max(1,nLeaves-1);
+  const X=n=>padL+(n.children?n.depth:maxD)*dx;
+  const Y=n=>padT+n.y*dy;
+  const gE=el("g"), gD=el("g"), gL=el("g");
+  nodes.forEach(n=>{
+    if(n.parent){
+      const px=X(n.parent), y=Y(n);
+      const cls="edge"+(n._cls||"")+(opts.highlight&&n.id===opts.highlight?" bhi":"")+(opts.state&&n.id===opts.highlight?" state-"+opts.state:"");
+      const p=el("path",{d:`M${px} ${y} L${X(n)} ${y}`, class:cls});
+      p.style.transitionDelay=(0.12+n.depth*0.11)+"s";
+      p.setAttribute("data-id", n.id||n.name||"");
+      gE.appendChild(p);
+      if(!opts.noLabels && opts.internalLabels && n.id && n.id[0]==="N"){
+        const t=el("text",{x:(px+X(n))/2, y:y-6, class:"br-label"+(opts.highlight===n.id?" hi":""), "text-anchor":"middle","data-id":n.id});
+        t.textContent=n.id; gD.appendChild(t);
+      }
+    }
+    if(n.children){
+      const ys=n.children.map(Y);
+      const v=el("path",{d:`M${X(n)} ${Math.min(...ys)} L${X(n)} ${Math.max(...ys)}`, class:"edge vert"+(n._cls||"")});
+      v.style.transitionDelay=(0.12+n.depth*0.11)+"s";
+      v.setAttribute("data-id", n.id||"");
+      gE.appendChild(v);
+    }
+  });
+  nodes.filter(n=>!n.children).forEach(n=>{
+    const x=X(n),y=Y(n);
+    gL.appendChild(el("circle",{cx:x,cy:y,r:3,class:"tip-dot"+(n._cls||""),"data-id":n.name}));
+    if(!opts.noLabels){
+      const t=el("text",{x:x+9,y:y,class:"tip-label"+(n._cls||""),"data-id":n.name}); t.textContent=n.name;
+      gL.appendChild(t);
+    }
+  });
+  svg.appendChild(gE); svg.appendChild(gD); svg.appendChild(gL);
+  return {X,Y,spec,gDeco:gD,find:id=>findById(spec,id)};
+}
+
+/* ---------- benchmark toy tree (APE seed 42), tip order matches Fig S1 ---------- */
+function toyTree(){ return {id:"N_11",children:[
+  {id:"N_16",children:[
+    {id:"N_18",children:[{name:"t6"},{name:"t3"}]},
+    {id:"N_17",children:[{name:"t2"},{name:"t5"}]}
+  ]},
+  {id:"N_12",children:[
+    {id:"N_13",children:[
+      {id:"N_14",children:[
+        {name:"t9"},
+        {id:"N_15",children:[{name:"t4"},{name:"t7"}]}
+      ]},
+      {name:"t8"}
+    ]},
+    {name:"t1"}
+  ]},
+  {name:"t10"}
+]};}
+
+/* Scene 1: full labeled tree */
+drawTree(document.getElementById("treePremise"), toyTree(), {internalLabels:true});
+
+/* Scene 2: split on N_13 */
+(function(){
+  const s=toyTree();
+  markSub(findById(s,"N_13"),"sideA");
+  flat(s).forEach(n=>{ if(n!==s && !(n._cls&&n._cls.includes("sideA"))) n._cls=(n._cls||"")+" sideB"; });
+  const api=drawTree(document.getElementById("treeSplit"), s, {highlight:"N_13", internalLabels:true});
+  const b=api.find("N_13");
+  const bx=(api.X(b.parent)+api.X(b))/2, by=api.Y(b);
+  api.gDeco.appendChild(el("path",{d:`M${bx} ${by-22} L${bx} ${by+22}`, class:"cutline"}));
+  const sc=el("text",{x:bx, y:by-26, class:"scissors","text-anchor":"middle"}); sc.textContent="✂";
+  api.gDeco.appendChild(sc);
+})();
+
+/* Scene 3: fusion before/after (N_12 clade) */
+(function(){
+  const before={id:"N_12",children:[
+    {id:"N_13",children:[
+      {id:"N_14",children:[{name:"t9"},{id:"N_15",children:[{name:"t4"},{name:"t7"}]}]},
+      {name:"t8"}
+    ]},
+    {name:"t1"}
+  ]};
+  markSub(findById(before,"N_13"),"");
+  const bApi=drawTree(document.getElementById("treeFuseBefore"), before, {internalLabels:true, padR:60, padT:16, padB:16});
+  document.querySelectorAll('#treeFuseBefore [data-id="N_13"],#treeFuseBefore [data-id="N_14"]').forEach(e=>e.classList.add(e.tagName==="text"?"st-fuse":"state-fuse"));
+  document.querySelectorAll('#treeFuseBefore .tip-label[data-id="t8"]').forEach(e=>e.classList.add("deleted"));
+  document.querySelectorAll('#treeFuseBefore .edge[data-id="t8"]').forEach(e=>e.classList.add("state-struct"));
+
+  const after={id:"N_12",children:[
+    {id:"NF",children:[{name:"t9"},{id:"N_15",children:[{name:"t4"},{name:"t7"}]}]},
+    {name:"t1"}
+  ]};
+  const aApi=drawTree(document.getElementById("treeFuseAfter"), after, {internalLabels:false, padR:60, padT:16, padB:16});
+  const nf=findById(after,"NF");
+  document.querySelectorAll('#treeFuseAfter [data-id="NF"]').forEach(e=>e.classList.add("state-fuse"));
+  const midx=(aApi.X(nf.parent)+aApi.X(nf))/2, midy=aApi.Y(nf);
+  const lab=el("text",{x:midx, y:midy-7, class:"br-label st-fuse","text-anchor":"middle"}); lab.textContent="N_13|N_14";
+  aApi.gDeco.appendChild(lab);
+})();
+
+/* Scene 5: NA_topo — species tree (split present) vs discordant gene tree (split absent) */
+(function(){
+  const sp={id:"r",children:[{id:"N",children:[{name:"t5"},{name:"t2"}]},{id:"M",children:[{name:"t3"},{name:"t6"}]}]};
+  const ge={id:"r",children:[{id:"N",children:[{name:"t5"},{name:"t3"}]},{id:"M",children:[{name:"t2"},{name:"t6"}]}]};
+  // species tree: the {t5,t2} branch is present -> Mapped (teal)
+  const a=drawTree(document.getElementById("treeSp"), sp, {highlight:"N", state:"mapped", padR:46, padT:16, padB:16});
+  document.querySelectorAll('#treeSp .tip-label[data-id="t5"],#treeSp .tip-label[data-id="t2"]').forEach(e=>e.style.fill="var(--mapped)");
+  const bn=a.find("N"), bx=(a.X(bn.parent)+a.X(bn))/2, by=a.Y(bn);
+  const blab=el("text",{x:bx,y:by-8,fill:"var(--mapped)","font-family":"var(--mono)","font-weight":"700","font-size":"12","text-anchor":"middle"}); blab.textContent="b"; a.gDeco.appendChild(blab);
+  // gene tree: {t5,t2} is not a clade -> NA_topo (amber)
+  drawTree(document.getElementById("treeGe"), ge, {padR:46, padT:16, padB:16});
+  document.querySelectorAll('#treeGe .tip-label[data-id="t5"],#treeGe .tip-label[data-id="t2"]').forEach(e=>e.style.fill="var(--topo)");
+  const gsvg=document.getElementById("treeGe");
+  const tag=el("text",{x:8,y:14,fill:"var(--topo)","font-family":"var(--mono)","font-weight":"700","font-size":"12.5"}); tag.textContent="✗ {t5,t2}"; gsvg.appendChild(tag);
+})();
+
+/* Scene 6: matrix fill (real free-topology proportions) */
+(function(){
+  const cols=18, rows=12, total=cols*rows;
+  const frac={mapped:0.892, topo:0.083, fuse:0.016, struct:0.0089, res:0.0003};
+  const bag=[];
+  Object.entries(frac).forEach(([k,v])=>{const n=Math.round(v*total); for(let i=0;i<n;i++)bag.push(k);});
+  while(bag.length<total)bag.push("mapped"); bag.length=total;
+  for(let i=bag.length-1;i>0;i--){const j=(i*7+3)%(i+1);[bag[i],bag[j]]=[bag[j],bag[i]];}
+  const m=document.getElementById("matrix");
+  bag.forEach((k,i)=>{const c=document.createElement("div");c.className="cell "+k;c.style.transitionDelay=(i*0.006)+"s";m.appendChild(c);});
+})();
+
+/* ambient */
+function ambient(svg){ const s=toyTree(); drawTree(svg,s,{noLabels:true, padL:70, padR:130, padT:60, padB:60}); }
+ambient(document.getElementById("bgTree"));
+ambient(document.getElementById("bgTree2"));
+
+/* ---------- deletion data (from oracle wide matrices, unrooted axis) ---------- */
+const COORDS=["t10","N_12","t1","N_13","t8","N_14","N_15","t7","t4","t9","N_16","N_17","t5","t2","N_18","t3","t6"];
+const TIPS=["t1","t2","t3","t4","t5","t6","t7","t8","t9","t10"];
+const REG={
+  global:{ order:["t10","t1","t8","t7","t4","t9","t5"], steps:[
+    {struct:[],fuse:[]},
+    {struct:["t10"],fuse:["N_12","N_16"]},
+    {struct:["t10","t1"],fuse:["N_12","N_16","N_13"]},
+    {struct:["t10","t1","t8"],fuse:["N_12","N_16","N_13","N_14"]},
+    {struct:["t10","t1","t8","t7"],fuse:["N_12","N_16","N_13","N_14","N_15","t4"]},
+    {struct:["t10","t1","t8","N_15","t7","t4"],fuse:["N_12","N_13","N_14","t9","N_16"]},
+    {struct:["t10","N_12","t1","N_13","t8","N_14","N_15","t7","t4","t9","N_16"],fuse:["N_17","N_18"]},
+    {struct:["t10","N_12","t1","N_13","t8","N_14","N_15","t7","t4","t9","N_16","t5"],fuse:["N_17","t2","N_18"]}
+  ]},
+  local:{ order:["t8","t7","t4","t9","t5","t2","t3"], steps:[
+    {struct:[],fuse:[]},
+    {struct:["t8"],fuse:["N_13","N_14"]},
+    {struct:["t8","t7"],fuse:["N_13","N_14","N_15","t4"]},
+    {struct:["t8","t7","t4","N_15"],fuse:["N_13","N_14","t9"]},
+    {struct:["N_13","t8","N_14","N_15","t7","t4","t9"],fuse:["N_12","t1"]},
+    {struct:["N_13","t8","N_14","N_15","t7","t4","t9","t5"],fuse:["N_12","t1","N_17","t2"]},
+    {struct:["N_13","t8","N_14","N_15","t7","t4","t9","N_17","t5","t2"],fuse:["N_12","t1","N_16","N_18"]},
+    {struct:["N_13","t8","N_14","N_15","t7","t4","t9","N_17","t5","t2","t3"],fuse:["N_12","t1","N_16","N_18","t6"]}
+  ]}
+};
+
+/* build chips for both deletion pages */
+function buildChips(containerId){
+  const box=document.getElementById(containerId);
+  COORDS.forEach(c=>{ const d=document.createElement("div"); d.className="chip obs"; d.dataset.id=c; d.textContent=c; box.appendChild(d); });
+}
+buildChips("chips"); buildChips("chipsL");
+
+/* deletion controller — one instance per regime page */
+function makeDeletion(regime, ids){
+  const svg=document.getElementById(ids.tree);
+  const rn = regime==="global" ? "全局删除" : "局部删除";
+  let step=-1, elapsed=0, last=0, active=false, raf=null;
+  const STEP=1700, HOLD=1600, dur=7*STEP+HOLD;
+  function draw(){ drawTree(svg, toyTree(), {internalLabels:true}); }
+  function setState(id,state){
+    svg.querySelectorAll(`.edge[data-id="${id}"]`).forEach(e=>{e.classList.remove("state-obs","state-fuse","state-struct");e.classList.add("state-"+state);});
+    svg.querySelectorAll(`text.br-label[data-id="${id}"]`).forEach(e=>{e.classList.remove("st-fuse","st-struct");if(state==="fuse")e.classList.add("st-fuse");if(state==="struct")e.classList.add("st-struct");});
+    const chip=document.querySelector(`#${ids.chips} .chip[data-id="${id}"]`);
+    if(chip){chip.classList.remove("obs","fuse","struct");chip.classList.add(state);}
+  }
+  function render(s){
+    const data=REG[regime], sd=data.steps[s];
+    const structSet=new Set(sd.struct), fuseSet=new Set(sd.fuse);
+    COORDS.forEach(c=> setState(c, structSet.has(c)?"struct":fuseSet.has(c)?"fuse":"obs"));
+    const del=new Set(data.order.slice(0,s));
+    TIPS.forEach(t=> svg.querySelectorAll(`.tip-label[data-id="${t}"]`).forEach(e=>e.classList.toggle("deleted", del.has(t))) );
+    const nS=sd.struct.length, nF=sd.fuse.length, nO=COORDS.length-nS-nF;
+    document.getElementById(ids.obs).textContent=nO;
+    document.getElementById(ids.fuse).textContent=nF;
+    document.getElementById(ids.struct).textContent=nS;
+    document.getElementById(ids.cap).innerHTML = s===0 ? "完整的树 —— 17 个冻结坐标全部被观测"
+      : `${rn} 步骤 ${s}:删除 <b>{ ${data.order.slice(0,s).join(", ")} }</b>`;
+  }
+  function apply(s){ if(s!==step){ step=s; render(s); } }
+  function loop(ts){
+    if(!active){raf=null;return;}
+    if(!last)last=ts; const dt=ts-last; last=ts;
+    if(window.__playing) elapsed=Math.min(elapsed+dt, dur);
+    apply(Math.min(7, Math.floor(elapsed/STEP)));
+    raf=requestAnimationFrame(loop);
+  }
+  return {
+    enter(){ active=true; elapsed=0; step=-1; last=0; draw(); render(0); step=0; raf=requestAnimationFrame(loop); },
+    leave(){ active=false; if(raf)cancelAnimationFrame(raf); raf=null; }
+  };
+}
+const delGlobal=makeDeletion("global", {tree:"delTree",  chips:"chips",  obs:"cObs",  fuse:"cFuse",  struct:"cStruct",  cap:"stepCap"});
+const delLocal =makeDeletion("local",  {tree:"delTreeL", chips:"chipsL", obs:"cObsL", fuse:"cFuseL", struct:"cStructL", cap:"stepCapL"});
+
+/* ---------- player ---------- */
+const scenes=[...document.querySelectorAll(".scene")];
+const DD=7*1700+1600+400;
+const DEL={4:delGlobal, 5:delLocal};
+const durations=[6500,8500,8000,9500, DD, DD, 15500, 9500,10000, 13000, 9000];
+const dots=document.getElementById("dots"), pfill=document.getElementById("pfill");
+const playBtn=document.getElementById("play"), countEl=document.getElementById("count");
+const reduced=matchMedia("(prefers-reduced-motion:reduce)").matches;
+let idx=0, timer=null, tStart=0, tLeft=0;
+window.__playing=!reduced;
+
+scenes.forEach((_,i)=>{ const d=document.createElement("button"); d.className="dot"; d.setAttribute("role","tab"); d.setAttribute("aria-label","Scene "+(i+1)); d.addEventListener("click",()=>go(i)); dots.appendChild(d); });
+
+function render(){
+  scenes.forEach((s,i)=>s.classList.toggle("is-active",i===idx));
+  [...dots.children].forEach((d,i)=>d.classList.toggle("on",i===idx));
+  countEl.textContent=String(idx+1).padStart(2,"0")+" / "+String(scenes.length).padStart(2,"0");
+  playBtn.textContent=window.__playing?"❚❚":"►";
+}
+function armProgress(d,resume){ pfill.style.transition="none"; if(!resume)pfill.style.width="0%"; void pfill.offsetWidth; pfill.style.transition=`width ${d}ms linear`; pfill.style.width="100%"; }
+function schedule(resume){
+  clearTimeout(timer); if(reduced)return;
+  const d=resume?tLeft:durations[idx];
+  if(window.__playing){ tStart=Date.now(); tLeft=d; armProgress(d,resume);
+    timer=setTimeout(()=>{ if(idx<scenes.length-1)go(idx+1); else {window.__playing=false; render();} }, d); }
+}
+function go(i){
+  if(DEL[idx]) DEL[idx].leave();
+  idx=(i+scenes.length)%scenes.length;
+  render();
+  if(DEL[idx]) DEL[idx].enter();
+  schedule(false);
+}
+function toggle(){
+  window.__playing=!window.__playing;
+  if(window.__playing){ schedule(true); }
+  else { clearTimeout(timer); tLeft=Math.max(500,tLeft-(Date.now()-tStart)); const w=getComputedStyle(pfill).width; pfill.style.transition="none"; pfill.style.width=w; }
+  render();
+}
+document.getElementById("next").addEventListener("click",()=>go(idx+1));
+document.getElementById("prev").addEventListener("click",()=>go(idx-1));
+playBtn.addEventListener("click",toggle);
+window.addEventListener("keydown",e=>{
+  if(e.code==="Space"){e.preventDefault();toggle();}
+  else if(e.code==="ArrowRight")go(idx+1);
+  else if(e.code==="ArrowLeft")go(idx-1);
+  else if(e.key==="r"||e.key==="R"){window.__playing=!reduced;go(0);}
+});
+
+render();
+if(DEL[idx])DEL[idx].enter();
+schedule(false);
+</script>
+</body>
+</html>
