@@ -123,6 +123,7 @@
   .sw p{margin:0; color:var(--muted); font-size:15px; line-height:1.55; flex:1}
   .sw .links{display:flex; gap:14px; font-size:14px; flex-wrap:wrap}
 
+
   /* Publications */
   .pub-controls{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
   .fbtn{border:1px solid var(--line); background:var(--surface); color:var(--muted); padding:6px 13px;
@@ -233,7 +234,7 @@
       <div class="prose">
         <p>私は広島大学 生物生産学部の<strong>応用動物植物科学プログラム</strong>に所属し、<strong>動物遺伝育種学</strong>を担当する進化ゲノミクス研究者です。比較ゲノミクス、分子進化、統計遺伝学、バイオインフォマティクスの境界で、哺乳類・鳥類/家禽・家畜・昆虫・ウイルスにわたる大規模ゲノムデータから、共通する進化原理を抽出しています。</p>
         <p>私にとって、動物育種ゲノミクスと進化ゲノミクスは二つではなく一つの枠組みです。哺乳類の生活史進化の年代推定に用いる統計ゲノミクスの道具立ては、そのまま<strong>家禽・家畜の育種</strong>——在来鶏やヤギの起源・集団構造・多様性——にも、保全と個体群管理のための<strong>野生哺乳類のゲノムモニタリング</strong>(アジアクロクマ、ニホンオオカミ、コウモリなど)にも通じます。種分化の長期的な歴史と、種内・品種内の多様性・適応・選抜を、共通の基準の上でつなぎます。</p>
-        <p>医学(学士、山東大学)、バイオインフォマティクス(修士、復旦大学)、統計遺伝学(博士、東京大学、岸野洋久教授)を学び、東京工業大学(日本学術振興会特別研究員)、東海大学医学部(JST CREST)、広島大学で研究を行ってきました。方法論的な研究で一貫するのは、<strong>大規模解析が本当に「同じ進化的対象」を比較しているのか</strong>という問いであり、それを保証する手法・ベンチマーク・再現可能なワークフローの構築です。</p>
+        <p>医学(学士、山東大学)、バイオインフォマティクス(修士、復旦大学、故 鍾揚教授・長谷川政美教授に師事)、統計遺伝学(博士、東京大学、岸野洋久教授)を学び、東京工業大学(日本学術振興会特別研究員)、東海大学医学部(JST CREST)、広島大学で研究を行ってきました。方法論的な研究で一貫するのは、<strong>大規模解析が本当に「同じ進化的対象」を比較しているのか</strong>という問いであり、それを保証する手法・ベンチマーク・再現可能なワークフローの構築です。</p>
       </div>
     </div>
   </section>
@@ -269,7 +270,7 @@
 
       <div class="focus">
         <h3>現在の焦点 — SplitAligner</h3>
-        <p>欠損分類群と遺伝子系統樹の不一致の下での系統ゲノミクスのための枝同一性座標系。射影された種樹スプリットによって枝の同一性を定義し、枝の欠測を明示的で監査可能なカテゴリに分解します。決定論的なグラフオラクル・ベンチマーク(Catnip10)と、開発中の R リファレンス実装を伴います。</p>
+        <p>欠損分類群と遺伝子系統樹の不一致の下での系統ゲノミクスのための枝同一性座標系。射影された種樹スプリットによって枝の同一性を定義し、枝の欠測を明示的で監査可能なカテゴリに分解します。決定論的なグラフ理論的オラクル・ベンチマーク(Catnip10)と、開発中の R リファレンス実装を伴います。枝座標は、表示上の根や節点の位置的な同一性ではなく、正準無根スプリットによって定義されます。そのため、同一の重み付き無根樹を表す等価な表現であれば、生物学的な枝の同一性は保たれます。</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="splitaligner/SplitAligner_explainer_ja.html" target="_blank" rel="noopener">アニメーション解説 ↗</a>
           <a href="splitaligner/SplitAligner_tutorial_ja.html" target="_blank" rel="noopener">チュートリアル ↗</a>
@@ -280,10 +281,10 @@
       </div>
       <div class="focus" style="margin-top:16px">
         <h3>現在の焦点 — Catnip10</h3>
-        <p>固定・共有された参照枝座標軸に値を書き込む枝ベースのワークフローのための、決定論的な 10 葉適合性ベンチマーク。独立したグラフオラクル(graph oracle)が真値対象を与え、ワークフローは 2 つの軸——剪定を考慮した座標適格性と、表示上の根に依存しない座標同一性・可用性——で採点されます。SplitAligner が座標を構築し、Catnip10 がそれを検証します。</p>
+        <p>固定・共有された参照枝座標軸に値を書き込む枝ベースのワークフローのための、決定論的な 10 分類群適合性ベンチマーク。独立したグラフ理論的オラクル(graph oracle)が真値対象を与え、ワークフローは 2 つの軸——剪定を考慮した座標適格性と、表現変化に対して安定な座標同一性・可用性——で採点されます。SplitAligner が座標を構築し、Catnip10 がそれを検証します。</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="catnip10/index_ja.html">概要とオラクルの操作 ↗</a>
-          <a href="catnip10/index_ja.html#oracle">グラフオラクルの仕組み ↗</a>
+          <a href="catnip10/index_ja.html#oracle">グラフ理論的オラクルの仕組み ↗</a>
           <a href="catnip10/index_ja.html#case-study">匿名ケーススタディ ↗</a>
           <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">Catnip10 リポジトリ ↗</a>
         </div>
@@ -313,7 +314,7 @@
         <div class="sw">
           <h3>Catnip10</h3>
           <div class="meta"><span class="pill lang">Python / R</span><span class="pill">MIT</span><span class="pill">適合性ベンチマーク</span></div>
-          <p>固定・共有された参照枝座標軸に値を書き込む枝ベースのワークフローのための、決定論的な 10 葉適合性ベンチマーク。独立したグラフオラクル(graph oracle)が真値対象を与え、ワークフローは 2 つの軸——剪定を考慮した座標適格性と、表示上の根に依存しない座標同一性——で採点されます。SplitAligner の検証エコシステムの中で開発されました。</p>
+          <p>固定・共有された参照枝座標軸に値を書き込む枝ベースのワークフローのための、決定論的な 10 分類群適合性ベンチマーク。独立したグラフ理論的オラクル(graph oracle)が真値対象を与え、ワークフローは 2 つの軸——剪定を考慮した座標適格性と、表現変化に対して安定な座標同一性——で採点されます。SplitAligner の検証エコシステムの中で開発されました。</p>
           <div class="links">
             <a href="catnip10/index_ja.html">概要とオラクルの操作 ↗</a>
             <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub ↗</a>
@@ -323,7 +324,7 @@
         <div class="sw">
           <h3>SplitAlignerR</h3>
           <div class="meta"><span class="pill lang">R</span><span class="pill">GPL-3</span><span class="pill">開発中</span></div>
-          <p>SplitAligner の R リファレンス実装トラック。現在のシード版は Catnip10 グラフオラクル・ベンチマークを、監査可能で文書化されたパッケージデータと検証ヘルパーとして同梱。実データのスプリット写像エンジンは開発中です。</p>
+          <p>SplitAligner の R リファレンス実装トラック。現在のシード版は Catnip10 グラフ理論的オラクル・ベンチマークを、監査可能で文書化されたパッケージデータと検証ヘルパーとして同梱。実データのスプリット写像エンジンは開発中です。</p>
           <div class="links">
             <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">GitHub ↗</a>
           </div>

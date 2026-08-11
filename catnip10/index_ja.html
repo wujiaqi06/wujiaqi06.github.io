@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Catnip10 — 決定論的な枝座標適合性ベンチマーク</title>
-<meta name="description" content="Catnip10 は、固定・共有された参照枝座標軸を用いる枝ベースのワークフローのための決定論的な 10 葉適合性ベンチマークです。独立したグラフオラクル(graph oracle)を真値対象として、剪定を考慮した座標適格性と表示上の根に依存しない座標同一性を検証します。">
+<meta name="description" content="Catnip10 は、固定・共有された参照枝座標軸を用いる枝ベースのワークフローのための決定論的な 10 分類群適合性ベンチマークである。独立したグラフ理論的オラクル(graph oracle)を真値対象として、剪定を考慮した座標適格性と、表現変化に対して安定な座標同一性・可用性を検証する。">
 <link rel="stylesheet" href="../splitaligner/catnip10_game.css">
 <script src="../splitaligner/catnip10_game_data.js" defer></script>
 <script src="../splitaligner/catnip10_game.js" defer></script>
@@ -60,6 +60,10 @@
   .nav-links{display:flex; gap:20px; align-items:center}
   .nav-links a{color:var(--muted); font-size:14.5px}
   .nav-links a:hover{color:var(--accent); text-decoration:none}
+  .lang-switch{display:flex; gap:1px; align-items:center; font-family:var(--mono); font-size:12px}
+  .lang-switch a{color:var(--faint); padding:3px 7px; border-radius:6px; text-decoration:none}
+  .lang-switch a:hover{color:var(--accent)}
+  .lang-switch a.cur{color:var(--accent); background:var(--surface2); font-weight:700}
   .theme-btn{border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:8px;
     width:34px; height:34px; cursor:pointer; font-size:15px; display:grid; place-items:center}
   .theme-btn:hover{color:var(--accent); border-color:var(--accent)}
@@ -288,13 +292,13 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow">適合性ベンチマーク · グラフオラクル</div>
+      <div class="eyebrow">適合性ベンチマーク · グラフ理論的オラクル</div>
       <h1>Catnip10</h1>
-      <div class="tag">小さくても、すべてを見ています。</div>
-      <p class="lead">固定・共有された<em>参照枝座標軸</em>の上に値を書き込む枝ベースのワークフローのための、決定論的な適合性ベンチマークです。10 個の葉と 17 本の凍結された原始座標——完全に追跡できるほど小さく、宣言されたすべての座標主張を検証できるだけの構造を備えています。</p>
+      <div class="tag">小さくても、すべてを見通す。</div>
+      <p class="lead">固定・共有された<em>参照枝座標軸</em>の上に値を書き込む枝ベースのワークフローのための、決定論的な適合性ベンチマーク。10 分類群と 17 個の凍結された原始枝座標——完全に追跡できるほど小さく、宣言されたすべての座標主張を検証できるだけの構造をもつ。</p>
       <div class="axes">
-        <div class="ax"><span class="axl">Axis A</span><b>剪定を考慮した座標適格性</b><span>剪定と収縮のあとで、その値は書き込まれている原始座標の値として独立に成立しているか。</span></div>
-        <div class="ax"><span class="axl">Axis B</span><b>表現に依存しない座標の同一性と可用性</b><span>同じ正準無根スプリットは、等価な直列化をまたいでも同じ同一性と宣言された可用性を保つか。</span></div>
+        <div class="ax"><span class="axl">Axis A</span><b>剪定を考慮した座標適格性</b><span>剪定と収縮の後、その値は書き込まれた原始枝座標の値として独立に成立するか。</span></div>
+        <div class="ax"><span class="axl">Axis B</span><b>表現変化に対して安定な座標同一性と可用性</b><span>同一の正準無根スプリットは、数学的に等価な樹表現の間で同じ座標同一性と宣言された可用状態を保つか。</span></div>
       </div>
       <div class="btns">
         <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub リポジトリ ↗</a>
@@ -304,8 +308,8 @@
       </div>
     </div>
     <figure class="badge-card" style="margin:0">
-      <img src="catnip10_mascot.jpg" alt="Catnip10 のマスコット:虫めがねと監査用クリップボードを持つトイツリーのイラスト。t1 から t10 までの葉が並び、t10 には DISPLAY ROOT と注記されている。">
-      <figcaption class="badge-cap">プロジェクトマスコット · 10 葉の適合性ベンチマーク</figcaption>
+      <img src="catnip10_mascot.jpg" alt="Catnip10 のマスコット:虫めがねと監査用クリップボードを持つトイツリーのイラスト。t1 から t10 までの分類群が並び、t10 には DISPLAY ROOT と注記されている。プロジェクトのマスコットであり、権威あるベンチマークトポロジーではない。">
+      <figcaption class="badge-cap">プロジェクトマスコット · 10 分類群の適合性ベンチマーク</figcaption>
     </figure>
   </div>
 </section>
@@ -315,13 +319,13 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">01</span><h2>数値が正しくても、座標が誤っていることがある</h2></div>
     <div class="prose">
-      <p>比較ゲノミクスのパイプラインは、枝に紐づく値——進化速度、残差、経路長——を、参照樹の枝を列とする行列に日常的に格納します。しかしそれが意味をもつのは、列のラベルが、寄与するすべての遺伝子にわたって同じ進化的対象を指し続けている場合だけです。</p>
-      <p>遺伝子ごとに分類群のカバレッジは異なるため、各遺伝子樹は参照樹の<strong>収縮</strong>になります。葉を 1 つ取り除くと、内部節点の次数が 2 になることがあります。標準的な樹の簡約はその節点を抑制し、接続する 2 本の枝を 1 本に併合します。併合された枝は構成メンバーの長さの総和を正確に保持できます——算術は完全です——が、元の 2 本の枝はその遺伝子ではもはや別々に観測できません。</p>
-      <p>パイプラインがその併合値を、メンバーの一方の名前がついたセルに書き込むと、数値としては妥当でも座標としては妥当ではありません。異常終了も起きず、<code>NA</code> も現れず、算術の正しさだけを確認する検査からは完全に見えません。</p>
+      <p>比較ゲノミクスのパイプラインは、枝に付随する値——進化速度、残差、経路長——を、参照樹の枝を列とする行列に日常的に格納する。しかしそれが意味をもつのは、列のラベルが、寄与するすべての遺伝子にわたって同じ進化的対象を指し続けている場合だけである。</p>
+      <p>遺伝子ごとに分類群のカバレッジは異なるため、各遺伝子系統樹は参照樹の<strong>収縮</strong>となる。分類群を一つ取り除くと、内部節点の次数が 2 になることがある。標準的な樹の簡約はその節点を抑約し、接続する 2 本の辺を 1 本に併合する。併合された辺は構成メンバーの長さの総和を正確に保持しうる——算術は完全である——が、元の 2 本の枝はその遺伝子ではもはや別々に観測できない。</p>
+      <p>パイプラインがその併合値を、メンバーの一方の名前がついたセルに書き込むと、数値としては妥当でも座標としては妥当ではない。異常終了も起こらず、<code>NA</code> も現れず、算術の正しさだけを確認する検査からは完全に見えない。</p>
     </div>
 
     <div class="diagram">
-      <svg viewBox="0 0 800 200" role="img" aria-label="図:葉を削除すると次数 2 の節点が生じ、それを抑制すると 2 本の原始枝が 1 本の複合枝に融合し、その長さは和になる。">
+      <svg viewBox="0 0 800 200" role="img" aria-label="図:分類群を削除すると次数 2 の節点が生じ、それを抑約すると 2 本の原始枝が 1 本の複合辺に融合し、その長さは和となる。">
         <text class="dg-cap" x="20" y="18">1 · 参照樹</text>
         <g>
           <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge hot" d="M90 110 H150"/>
@@ -334,7 +338,7 @@
           <text class="dg-t" x="208" y="56">x</text><text class="dg-t" x="218" y="114">y</text><text class="dg-t" x="208" y="169">z</text>
         </g>
         <path class="dg-arrow" d="M245 110 H285"/><path class="dg-arrow" d="M277 104 L285 110 L277 116"/>
-        <text class="dg-cap" x="300" y="18">2 · 葉 x を削除 → 次数 2 の節点</text>
+        <text class="dg-cap" x="300" y="18">2 · 分類群 x を削除 → 次数 2 の節点</text>
         <g transform="translate(280,0)">
           <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge hot" d="M90 110 H150"/>
           <path class="dg-edge gone" d="M150 110 L150 60 H200"/><path class="dg-edge hot" d="M150 110 H210"/>
@@ -346,7 +350,7 @@
           <text class="dg-t warm" x="208" y="56">x̶</text><text class="dg-t" x="218" y="114">y</text><text class="dg-t" x="208" y="169">z</text>
         </g>
         <path class="dg-arrow" d="M525 110 H565"/><path class="dg-arrow" d="M557 104 L565 110 L557 116"/>
-        <text class="dg-cap" x="580" y="18">3 · 抑制 → 複合枝</text>
+        <text class="dg-cap" x="580" y="18">3 · 抑約 → 複合辺</text>
         <g transform="translate(560,0)">
           <path class="dg-edge" d="M30 110 H90"/><path class="dg-edge fused" d="M90 110 H210"/>
           <path class="dg-edge" d="M90 110 L90 165 H200"/>
@@ -359,7 +363,7 @@
     </div>
 
     <div class="note">
-      <p><strong>Catnip10 が守らせる区別。</strong>複合枝 <span class="mono">{b₁,b₂}</span> は、簡約樹の枝として、あるいは宣言された複合として、まったく妥当な推定対象です。そうではないのは、それが <span class="mono">b₁</span> や <span class="mono">b₂</span> の独立な値であるということです。端点で定義された経路や簡約樹の枝は正当なネイティブ対象であり、この要件が効いてくるのは、値が共有された全樹枝軸の上で整列・比較・解釈されるときだけです。</p>
+      <p><strong>Catnip10 が守らせる区別。</strong>複合辺 <span class="mono">{b₁,b₂}</span> は、簡約樹の辺として、あるいは宣言された複合として、まったく妥当な推定対象である。妥当でないのは、それを <span class="mono">b₁</span> や <span class="mono">b₂</span> の独立した値として扱うことである。端点で定義された経路や簡約辺は正当なネイティブ対象であり、この要件が効くのは、値が共有された全樹枝軸の上で整列・比較・解釈されるときだけである。</p>
     </div>
   </div>
 </section>
@@ -367,22 +371,22 @@
 <!-- 02 -->
 <section class="block" id="oracle">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">02</span><h2>グラフオラクル(graph oracle):来歴を持ち越すグラフ収縮</h2></div>
+    <div class="sec-head"><span class="sec-num">02</span><h2>グラフ理論的オラクル(graph oracle):来歴を保持するグラフ収縮</h2></div>
     <div class="prose">
-      <p>グラフオラクル(graph oracle)は意図的に系統学的手法ではありません。構成によって答えを算出する小さなグラフアルゴリズムであり、そのためベンチマークの真値対象は推定ではなく厳密かつ検査可能です。監査対象のワークフローの出力を参照することは一切ありません。</p>
+      <p>グラフ理論的オラクル(graph oracle)は、グラフの削除・収縮と原始枝の帰属伝播によってベンチマークの真値を直接構成する小さなグラフアルゴリズムである。したがって Catnip10 の真値対象は、被監査ワークフローの出力から推定されたものではなく、確定的かつ厳密で、セル単位で検証できる。オラクルが被監査ワークフローの出力を読むことは一切ない。</p>
     </div>
 
     <ol class="algo">
-      <li>参照樹を凍結し、その枝を<strong>原始座標</strong> <code>B1…B17</code> として列挙します。各枝は離散的な対象であり、取り除けば分類群の二分割が誘導されます。それがラベルの意味を与えます。</li>
-      <li>ある分類群部分集合について、<strong>存在しない葉を削除</strong>し、<strong>次数 2 の頂点をすべて繰り返し抑制</strong>して、接続する 2 本の枝を併合します。これは標準的な樹の簡約——どのパイプラインも暗黙に行っている収縮と同じものです。</li>
-      <li>抑制のたびに<strong>元の枝のメンバーシップを伝播</strong>します。生き残った各簡約枝は、自身が吸収した原始枝の集合を保持し、併合では 2 つのメンバー集合の和をとります。何も捨てないので、来歴が失われることはありません。</li>
-      <li>メンバーシップの帰結によって<strong>各原始座標を分類</strong>します。生き残った枝の唯一のメンバーなら <code>observed</code>、2 本以上を含む枝のメンバーなら <code>NA_fuse</code>、どの生存枝にも含まれなければ <code>NA_struct</code> です。</li>
-      <li><strong>連動する 2 つの台帳</strong>を出力します。すべての原始座標にちょうど 1 つの状態を割り当てる原始座標台帳と、生き残った各複合をそのメンバー集合と合計長で記録する複合枝台帳です。</li>
+      <li>参照樹を凍結し、その辺を<strong>原始枝座標</strong> <code>B1…B17</code> として列挙する。各辺は離散的な対象であり、取り除けば分類群の二分割(スプリット)が誘導される。それがラベルの意味を与える。</li>
+      <li>ある分類群部分集合について、<strong>存在しない分類群を削除</strong>し、<strong>次数 2 の節点をすべて繰り返し抑約</strong>して、接続する 2 本の辺を併合する。これは標準的な樹の簡約——どのパイプラインも暗黙に行っている収縮と同じものである。</li>
+      <li>抑約のたびに<strong>元の辺の帰属を伝播</strong>する。生き残った各簡約辺は、自身が吸収した原始枝の集合を保持し、併合では 2 つのメンバー集合の和をとる。何も捨てないため、来歴が失われることはない。</li>
+      <li>帰属の帰結によって<strong>各原始枝座標を分類</strong>する。生き残った辺の唯一のメンバーであれば <code>observed</code>、2 本以上を含む辺のメンバーであれば <code>NA_fuse</code>、どの生存辺にも含まれなければ <code>NA_struct</code> となる。</li>
+      <li><strong>連動する 2 つの台帳</strong>を出力する。すべての原始枝座標にちょうど 1 つの状態を割り当てる原始枝座標台帳と、生き残った各複合辺をそのメンバー集合と合計長で記録する複合辺台帳である。</li>
     </ol>
 
     <div class="note">
-      <p>手続きが決定論的かつ有限であるため、17 座標すべての期待状態を、任意の分類群部分集合についてあらかじめ列挙できます——シミュレーションも標本抽出も許容誤差もありません。露出したワークフローが検証済みアダプタを備えている場合、凍結オラクルとの不一致は監査可能な適合性ミスマッチです。</p>
-      <p><strong>3 状態の適用範囲。</strong>この固定トポロジーのトイコアの内部では、<code>observed</code>・<code>NA_fuse</code>・<code>NA_struct</code> は排反かつ網羅的です。これはベンチマークの設計上の性質であって、異質な樹を扱うワークフロー一般についての主張ではありません。トポロジー由来の欠測は固定トポロジーコアから意図的に除外されているため、この 3 状態はコア外のワークフローに対する完全な分類として提示するものではありません。</p>
+      <p>手続きが確定的かつ有限であるため、17 座標すべての期待状態を、任意の分類群部分集合についてあらかじめ列挙できる——シミュレーションも標本抽出も許容誤差も不要である。当該座標契約が適用され、かつアダプタが検証済みのワークフローについては、凍結オラクルとの不一致は監査可能な適合性ミスマッチを構成する。</p>
+      <p><strong>3 状態の適用範囲。</strong>この固定トポロジーのトイコアの内部では、<code>observed</code>・<code>NA_fuse</code>・<code>NA_struct</code> は排反かつ網羅的である。これはベンチマークの設計上の性質であって、異質な樹を扱うワークフロー一般についての主張ではない。トポロジー由来の欠測は固定トポロジーコアから意図的に除外されているため、この 3 状態はコア外のワークフローに対する完全な状態分類体系を構成しない。</p>
     </div>
   </div>
 </section>
@@ -392,7 +396,7 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">03</span><h2>3 つの状態と、それぞれが許すこと</h2></div>
     <div class="prose">
-      <p>監査全体は、パイプラインが 1 つにまとめてしまいがちな 2 種類の欠測を分けることにかかっています。消えた枝と、融合した枝は同じ出来事ではなく、下流での扱いも異なります。</p>
+      <p>監査全体は、パイプラインが 1 つにまとめてしまいがちな 2 種類の欠測を分けることにかかっている。消失した枝と、融合した枝は同じ出来事ではなく、下流での扱いも異なる。</p>
     </div>
 
     <div class="tbl-scroll">
@@ -400,21 +404,21 @@
         <thead><tr><th>状態</th><th>座標に何が起きたか</th><th>そのセルの値が意味すること</th></tr></thead>
         <tbody>
           <tr><td class="st sw-obs">observed</td>
-            <td>原始枝は収縮後も単独の枝として生き残り、他の元の枝は併合されていない。</td>
-            <td><strong>正当。</strong>このセルは、その名前の枝の独立した値を保持できる。</td></tr>
+            <td>原始枝は収縮後も単独の辺として生き残り、他の元の辺は併合されていない。</td>
+            <td><strong>正当。</strong>このセルは、その名の枝の独立した値を保持できる。</td></tr>
           <tr><td class="st sw-fus">NA_fuse</td>
-            <td>枝は、少なくとも 1 本の他の元の枝とともに、複合枝の内部でのみ生き残っている。複合の長さはメンバーの長さの正確な和。</td>
-            <td><strong>適格ではない。</strong>ここにある数値は複合のものであって、このメンバーのものではない。算術的に厳密であっても帰属が誤りうる。</td></tr>
+            <td>枝は、少なくとも 1 本の他の原始枝とともに、複合辺の内部でのみ生き残っている。複合辺の長さはメンバーの長さの正確な和である。</td>
+            <td><strong>独立した座標としての適格性をもたない。</strong>ここにある数値は複合辺のものであって、このメンバーのものではない。算術的に厳密であっても帰属は誤りうる。</td></tr>
           <tr><td class="st sw-str">NA_struct</td>
-            <td>枝は構造的に不在:この分類群部分集合では、それを含む生存枝が存在しない。</td>
-            <td><strong>未定義。</strong>セルが指すべき進化的対象が存在しない。ゼロはこれとは異なり、ゼロは観測された「変化なし」の状態である。</td></tr>
+            <td>枝は構造的に消失している。この分類群部分集合では、それを含む生存辺が存在しない。</td>
+            <td><strong>未定義。</strong>セルが指すべき進化的対象が存在しない。なお、ゼロはこれに当たらない。ゼロは実際に観測されたゼロ値の状態である。</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="note">
-      <p><strong>公開表での名称。</strong>機械可読な真値表では、これら 3 状態は <code>OBSERVED_PRIMITIVE</code>・<code>NA_FUSE</code>・<code>NA_STRUCT</code> と表記されます。本ページと図で用いる短い表記はまったく同じ状態を指します。契約にはさらに <code>NA_TOPO</code> がトポロジー由来の欠測用に予約されていますが、固定トポロジーの剪定コアはこの状態を生成しません。</p>
-      <p><strong>最後の行が実務で効く理由。</strong>構造的に利用できないセルに入った数値のゼロは、通常の欠測値フィルタを通過し、座標状態が明示的に検証されない限り、下流では観測されたゼロとして扱われうる。欠測コードはソフトウェアの失敗ではなく座標の状態を記述するものであり、<code>NA_struct</code> と本物の観測ゼロを見分けることは、数値的な検証だけでは答えられない座標レベルの問いです。</p>
+      <p><strong>公開表での名称。</strong>機械可読な真値表では、これら 3 状態は <code>OBSERVED_PRIMITIVE</code>・<code>NA_FUSE</code>・<code>NA_STRUCT</code> と表記される。本ページと図で用いる短い表記はまったく同じ状態を指す。契約にはさらに <code>NA_TOPO</code> がトポロジー由来の欠測用に予約されているが、固定トポロジーの剪定コアはこの状態を生成しない。</p>
+      <p><strong>最後の行が実務で効く理由。</strong>構造的に利用できないセルに入った数値のゼロは、通常の欠測値フィルタを通過し、座標状態が明示的に検証されない限り、下流では実際に観測されたゼロとして扱われうる。欠測コードはソフトウェアの失敗ではなく座標の状態を記述するものであり、<code>NA_struct</code> と真の観測ゼロを見分けることは、数値的な検証だけでは答えられない座標レベルの問いである。</p>
     </div>
   </div>
 </section>
@@ -424,20 +428,20 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">04</span><h2>軸 A — 剪定を考慮した座標適格性</h2></div>
     <div class="prose">
-      <p>第 1 の妥当性軸が問うのはただ 1 点です。剪定と収縮のあとで、その値は書き込まれている原始全樹座標の値として独立に成立しているか。</p>
-      <p>この剪定実験は、食い違いを説明しうるものが剪定だけになるように——<em>この実験の内部では</em>——構成されています。トポロジーと枝長は固定です。真の速度変化も、遺伝子樹と種樹の不一致も、枝長推定誤差も、種樹の不確実性もありません。ここで加えられる摂動は分類群の削除と次数 2 節点の抑制だけです。ベンチマーク全体にはさらに表現統制が含まれており、そちらはまったく別のものを変化させます(下の軸 B)。</p>
-      <p>あらかじめ規定された 2 つの削除スケジュールが対照的な幾何を与えます。表示上の根の側から内側へ進む<strong>漸進的グローバル</strong>系列と、削除を 1 つのクレード内に集中させる<strong>局所</strong>系列です。各系列はベースラインを含めて 8 ステップ。樹が小さいため、オラクルは削除可能な葉の<em>すべて</em>の部分集合について各座標の期待状態を列挙することもできます——下の対話パネルが動かしているのがそれです。</p>
+      <p>第 1 の妥当性軸が問うのはただ 1 点である。剪定と収縮の後、その値は書き込まれた原始全樹座標の値として独立に成立するか。</p>
+      <p>この剪定実験では、トポロジーと枝長は固定され、真の速度シフト、遺伝子系統樹と種樹の不一致、枝長推定誤差、種樹の不確実性はいずれも導入されない。加えられる摂動は分類群の削除と、それに伴う次数 2 の節点の抑約だけである。したがって<em>この実験の内部では</em>、座標状態の変化を説明しうる実験的要因は剪定のみとなる。Catnip10 にはこれとは別に、まったく異なる事柄を検証する表現対照が含まれる(下の軸 B)。</p>
+      <p>あらかじめ規定された 2 つの削除スケジュールが対照的な幾何を与える。表示上の根の側から内側へ進む<strong>漸進的グローバル</strong>系列と、削除を 1 つのクレード内に集中させる<strong>局所</strong>系列である。各系列はベースラインを含めて 8 ステップ。樹が小さいため、オラクルは削除可能な分類群の<em>すべて</em>の部分集合について各座標の期待状態を列挙することもできる——下の対話パネルが動かしているのがそれである。</p>
     </div>
 
     <div class="spec">
-      <div><div class="n">10</div><div class="k">葉、トポロジーと枝長は固定</div></div>
-      <div><div class="n">17</div><div class="k">凍結された原始座標 <span class="mono">B1–B17</span></div></div>
+      <div><div class="n">10</div><div class="k">分類群、トポロジーと枝長は固定</div></div>
+      <div><div class="n">17</div><div class="k">凍結された原始枝座標 <span class="mono">B1–B17</span></div></div>
       <div><div class="n">2</div><div class="k">剪定スケジュール、各 8 ステップ(ベースライン含む)</div></div>
       <div><div class="n">3</div><div class="k">固定トポロジーコアにおける座標状態</div></div>
     </div>
 
     <div class="note">
-      <p><strong>適用範囲について。</strong>これは決定論的な「存在と機構」の設計です。剪定だけで数値的妥当性と座標適格性が分離しうることを示し、その分離を検証可能にします。実データでそうした不一致がどれほど頻繁に生じるかの推定ではなく、これ自体で実際の解析における遺伝子レベルのバイアスを立証するものでもありません。</p>
+      <p><strong>適用範囲。</strong>これは確定的な存在性・機構性の設計である。剪定だけで数値的妥当性と座標適格性が分離しうることを示し、その分離を検証可能にする。実データでそうした不一致がどれほどの頻度で生じるかの推定ではなく、この実験だけから実際の解析における遺伝子レベルのバイアスを結論することもできない。</p>
     </div>
   </div>
 </section>
@@ -445,34 +449,34 @@
 <!-- 05 -->
 <section class="block" id="axis-b">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">05</span><h2>軸 B — 表現に依存しない座標同一性</h2></div>
+    <div class="sec-head"><span class="sec-num">05</span><h2>軸 B — 表現変化に対して安定な座標同一性</h2></div>
     <div class="prose">
-      <p>第 2 の妥当性軸は、生物学的なものを一切変化させません。<em>同じ樹</em>を別のやり方で書き下したときに、同じ正準無根スプリットが同じ同一性と同じ宣言された可用性を保つかどうかを問います。</p>
-      <p class="defn"><strong>表示上の根(display root)。</strong>樹の表現を直列化・走査するために用いる根の位置。権威ある無根の枝同一性の一部ではなく、枝の同一性はあくまで正準スプリットキーです。</p>
-      <p>統制は厳密な等価物として構成されています。分類群集合が同一、正準スプリットキーが同一、正準整列後の枝長も同一。異なるのは樹の書き方だけです。</p>
+      <p>第 2 の妥当性軸は生物学的な対象を一切変化させない。<em>同じ樹</em>を数学的に等価な別の方法で書き下したときに、同一の正準無根スプリットが同じ座標同一性と宣言された可用状態を保つかどうかを問う。</p>
+      <p class="defn"><strong>表示上の根(display root)。</strong>樹の表現を直列化・走査するために用いる根の位置。権威ある無根の枝同一性の一部ではなく、枝の同一性はあくまで正準スプリット鍵によって定まる。</p>
+      <p>これらの表現は厳密な等価物として構成される。分類群集合が同一、正準無根スプリット集合が同一、対応するスプリットの枝長も同一である。異なるのは樹の書き方だけである。</p>
     </div>
 
     <div class="reps">
       <div class="rep">
         <div class="rid">R0</div><h4>ネイティブ表現</h4>
         <ul><li>基準となる直列化</li><li>表示上の根は不変</li></ul>
-        <p>すべての統制が比較される基準点。</p>
+        <p>すべての対照が比較される基準点。</p>
       </div>
       <div class="rep">
-        <div class="rid">R1</div><h4>直列化・子順序の統制</h4>
+        <div class="rid">R1</div><h4>直列化・子順序の対照</h4>
         <ul><li>厳密等価な無根樹</li><li>子の順序を変更</li><li>表示上の根は不変</li></ul>
-        <p><strong>無関係表現の陰性対照</strong>。重要なものは何も変わっていないので、何も動いてはならない。</p>
+        <p><strong>検証対象とは無関係な表現変化の陰性対照。</strong>座標同一性に関わる数学的対象は変化していないため、出力も変化しないはずである。</p>
       </div>
       <div class="rep">
         <div class="rid">R2</div><h4>表示上の根の変位チャレンジ</h4>
-        <ul><li>厳密等価な無根樹</li><li>同じ葉、同じ無根スプリット</li><li>同じスプリット固有の長さ</li><li>表示上の根が実際に移動</li></ul>
-        <p>本来の試験:重み付き無根スプリット対象はそのままに、直列化の根だけが別の頂点に移る。</p>
+        <ul><li>厳密等価な無根樹</li><li>同じ分類群、同じ無根スプリット</li><li>同じスプリット固有の枝長</li><li>表示上の根が実際に移動</li></ul>
+        <p>本来の試験。重み付き無根樹の対象はそのままに、直列化に用いる根だけが別の頂点へ移る。</p>
       </div>
     </div>
 
     <div class="note">
-      <p><strong>Newick 文字列が変わったことは、表現変数が変わった証拠にはならない。</strong>樹を書き直すと、バイト列や子の順序、あるいはその両方が変わりうる一方で、表示上の根はまったく動かないことがあります。そこで Catnip10 は表示上の根シグネチャを「直列化された根頂点に接続する葉集合の非順序分割」として定義し、この軸で参加者を採点する前に<strong>そのシグネチャが実際に変化したかどうかを独立に認証</strong>します。表示上の根の移動を要求したのに並べ替えしか生じなかったケースは no-op 回帰対照として保持され、適用していないチャレンジをベンチマーク実行が自分に加点してしまうことがないようにしています。</p>
-      <p>子順序の変動は陰性対照であり、予測される失敗様式ではありません。本ページのいかなる記述も、子の並べ替えが一般にワークフローを壊すという主張として読まれるべきではありません。</p>
+      <p><strong>Newick 文字列が変化しても、検証対象の表現変数が変化したことにはならない。</strong>樹を書き直すと、バイト列や子の順序、あるいはその両方が変わりうる一方で、表示上の根はまったく動かないことがある。そこで Catnip10 は表示上の根のシグネチャを「直列化された根頂点に接続する分類群集合の非順序分割」として定義し、この軸で参加者を採点する前に<strong>そのシグネチャが実際に変化したかどうかを独立に認証</strong>する。表示上の根の移動を要求したのに並べ替えしか生じなかった場合は no-op 回帰対照として保持され、適用していないチャレンジをベンチマーク実行が自らに加点することがないようにしている。</p>
+      <p>子順序の変動は陰性対照であり、予測される失効様式ではない。本ページのいかなる記述も、子の並べ替えが一般にワークフローを破綻させるという主張として読まれるべきではない。</p>
     </div>
   </div>
 </section>
@@ -482,19 +486,19 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">06</span><h2>4 つの判定</h2></div>
     <div class="prose">
-      <p>ワークフローの監査は機械的な手続きです。1 つの出力層をアダプタ契約に正規化し、その層の露出(exposure)を宣言すれば、採点器がオラクル台帳とセル単位で突き合わせます。結果はちょうど 4 つの判定のいずれかであり、失敗はそのうち 1 つだけです。</p>
+      <p>ワークフローの監査は機械的な手続きである。1 つの出力層をアダプタ契約に正規化し、その層が<strong>この座標契約の適用を受けるか(exposure)</strong>を宣言すれば、採点器がオラクル台帳とセル単位で突き合わせる。結果はちょうど 4 つの判定のいずれかであり、失効はそのうち 1 つだけである。</p>
     </div>
 
     <div class="verdicts">
-      <div class="vd d-pass"><h4>PASS</h4><p>ワークフローは試験対象の座標契約に露出しており、規定されたベンチマーク条件を満たしている。</p></div>
-      <div class="vd d-fail"><h4>FAIL</h4><p>ワークフローは試験対象の座標契約に露出しており、規定されたベンチマーク条件に違反している。</p></div>
-      <div class="vd d-ne"><h4>NOT-EXPOSED</h4><p>ワークフローが宣言したネイティブ推定対象は、試験対象の座標契約を主張していない。これは明確な結果であり、データ欠如の婉曲表現ではない。</p></div>
+      <div class="vd d-pass"><h4>PASS</h4><p>当該ワークフローは検証対象の座標契約の適用を受け、規定されたベンチマーク条件を満たす。</p></div>
+      <div class="vd d-fail"><h4>FAIL</h4><p>当該ワークフローは検証対象の座標契約の適用を受けるが、規定されたベンチマーク条件に違反する。</p></div>
+      <div class="vd d-ne"><h4>NOT-EXPOSED</h4><p>当該ワークフローが宣言したネイティブ推定対象は、検証対象の座標契約を主張しない。したがってこの契約は適用されない。これは明確な判定であり、データ欠如の婉曲表現ではない。</p></div>
       <div class="vd d-un"><h4>UNRESOLVED</h4><p>必要な証拠または有効な試験前提が得られないため、ベンチマークはいずれの側にも裁定できない。</p></div>
     </div>
 
     <div class="note">
-      <p><strong>FAIL が何についてのものか。</strong>判定は、特定のインタフェースにおける宣言された主張に適用されるものであり、ソフトウェアパッケージ全体に対するものではありません。ネイティブな端点・経路対象に対して、原始軸への整列がそもそも主張されていない場合に原始軸 FAIL が与えられることはありません。アダプタ検証はさらに別で、期待行の欠落は入力エラーであって NOT-EXPOSED ではありません。</p>
-      <p><strong>診断的な局在化。</strong>判定ではありませんが、ベンチマークの用途の 1 つです。再現する失敗が存在するとき、座標の同一性または可用性が最初に分岐する表現境界を Catnip10 で追跡できます。</p>
+      <p><strong>FAIL が何についてのものか。</strong>判定は、特定のインタフェースにおける宣言された主張に適用されるものであり、ソフトウェアパッケージ全体に対するものではない。ネイティブな端点・経路対象に対して、原始軸への整列がそもそも主張されていない場合に原始軸 FAIL が与えられることはない。アダプタ検証はさらに別であり、期待行の欠落は入力エラーであって NOT-EXPOSED ではない。</p>
+      <p><strong>診断的な局在化。</strong>これは判定ではなく、ベンチマークの用途の 1 つである。再現する失効が存在するとき、座標の同一性または可用性が最初に分岐する表現境界を Catnip10 で追跡できる。</p>
     </div>
   </div>
 </section>
@@ -504,23 +508,23 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">07</span><h2>匿名ケーススタディ — 適合性監査とはどのようなものか</h2></div>
     <div class="prose">
-      <p>2 つの枝ベースのワークフローを、グローバル系列の同一の剪定入力で実行し、明示的に宣言された露出を通じて凍結座標軸へ写像しました。<strong>参加者の識別情報は公開リリースでは伏せられています</strong>。正確な識別情報、バージョン、アダプタ、実行来歴は封緘アーカイブに保持されています。ここでは Method A・Method B として示します。</p>
-      <p>以下すべての前提となる結果を先に述べます。<strong>ネイティブな経路の算術は両ワークフローとも厳密でした</strong>。いずれかが距離を誤って計算しているという主張はここには一切ありません。監査が調べるのは、その正しい数値が<em>どこに書き込まれているか</em>です。</p>
-      <p class="axnote">このケーススタディが示すのは剪定適格性の軸です。表現安定性は、軸 B の厳密等価統制によって別途試験されます。</p>
+      <p>2 つの枝ベースのワークフローを、グローバル系列の同一の剪定入力で実行し、それぞれが明示的に宣言した exposure に従って凍結座標軸へ写像し監査した。<strong>参加者の識別情報は公開版では伏せられている</strong>。正確な識別情報、バージョン、アダプタ、実行来歴は封緘アーカイブに保持される。ここでは Method A・Method B として示す。</p>
+      <p>以下の結果の前提として、まず 1 点。<strong>ネイティブな経路の算術は両ワークフローとも厳密であった。</strong>いずれかが距離を誤って計算しているという主張はここには一切ない。監査が調べるのは、その正しい数値が<em>どこに書き込まれているか</em>である。</p>
+      <p class="axnote">このケーススタディが示すのは剪定適格性の軸である。表現変化に対する安定性は、軸 B の厳密等価対照によって別途検証される。</p>
     </div>
 
     <div class="subh">A · 代表的な剪定状態</div>
-    <div class="prose"><p>表示上の根の側からの 7 段階の漸進的削除。各樹は、収縮が各座標に何をするかを示しています。赤い破線は座標が構造的に不在になったもの、青は複合の内部でのみ生き残るもの、黒は影響を受けないものです。</p></div>
+    <div class="prose"><p>表示上の根の側からの 7 段階の漸進的削除。各樹は、収縮が各座標に何をもたらすかを示す。赤い破線は座標が構造的に消失したもの、青は複合辺の内部でのみ生き残るもの、黒は影響を受けないものである。</p></div>
 
     <figure style="margin:0">
       <div class="figcard">
-        <img src="oracle_global_deletion.png" alt="参照樹と 7 段階の漸進的削除を示す 8 つの分岐図。各段階で、座標が構造的に不在になった枝は赤い破線、融合した複合枝の内部でのみ生き残る枝は青、影響を受けない枝は黒で描かれている。">
+        <img src="oracle_global_deletion.png" alt="参照樹と 7 段階の漸進的削除を示す 8 つの系統図。各段階で、座標が構造的に消失した枝は赤い破線、融合した複合辺の内部でのみ生き残る枝は青、影響を受けない枝は黒で描かれている。">
       </div>
-      <figcaption class="cap"><b>A.</b> 削除順序 t10 → t1 → t8 → t7 → t4 → t9 → t5。構造的不在は剪定された側から蓄積し、融合は表示上の根へ向かう経路に沿って内側へ伝播します。</figcaption>
+      <figcaption class="cap"><b>A.</b> 削除順序 t10 → t1 → t8 → t7 → t4 → t9 → t5。構造的消失は剪定された側から蓄積し、融合は表示上の根へ向かう経路に沿って内側へ伝播する。</figcaption>
     </figure>
 
     <div class="subh">B · オラクルの期待状態</div>
-    <div class="prose"><p>独立したグラフオラクル(graph oracle)が、各ステップにおけるすべての原始座標の期待状態を与えます。これが参加者を採点する真値対象です。</p></div>
+    <div class="prose"><p>独立したグラフ理論的オラクル(graph oracle)が、各ステップにおけるすべての原始枝座標の期待状態を与える。これが参加者を採点する真値対象である。</p></div>
 
     <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">座標</th>
 <th>t10</th>
@@ -694,10 +698,10 @@
 <td class="o-obs">0.007334</td>
 </tr>
 </tbody></table></div>
-    <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — 複合の内部でのみ生存</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — 構造的に不在</span><span>数値 — 独立に観測可能</span></div>
+    <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — 複合辺の内部でのみ生存</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — 構造的に消失</span><span>数値 — 独立に観測可能</span></div>
 
-    <div class="subh">C · Method A — 固定軸契約に露出</div>
-    <div class="prose"><p>Method A は固定された共有原始層を宣言しているため、適格性契約が適用されます。強調されたセルは、この凍結ベンチマーク構成における座標状態の不一致です。オラクルが独立に観測可能と記録している座標が <code>NA</code> で返ったか、融合により適格でないセルを完全な複合経路量が占めているかのいずれかです。</p></div>
+    <div class="subh">C · Method A — 固定軸契約の適用を受ける</div>
+    <div class="prose"><p>Method A は固定・共有の原始枝座標層を宣言しているため、適格性契約が適用される。強調されたセルは、この凍結ベンチマーク構成における座標状態の不一致である。オラクルが独立に観測可能と記録する座標が <code>NA</code> で返ったか、融合により適格でないセルを完全な複合経路量が占めているかのいずれかである。</p></div>
 
     <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">ステップ</th>
 <th>t10</th>
@@ -879,12 +883,12 @@
       </div>
       <div class="co">
         <h4>凍結構成での結果</h4>
-        <p><span class="big">13</span> オラクルが observed とする座標の脱落<br><span class="big">5</span> 融合により適格でないセルを占める完全な複合量<br><span class="fine">この凍結トイ構成における監査結果の例であり、ソフトウェアのエラー率でも、頻度の推定でもありません。</span></p>
+        <p><span class="big">13</span> オラクルが observed とする座標の脱落<br><span class="big">5</span> 融合により適格でないセルを占める完全な複合量<br><span class="fine">この凍結トイ構成における監査結果の例であり、ソフトウェアのエラー率でも、発生頻度の推定でもない。</span></p>
       </div>
     </div>
 
     <div class="subh">D · Method B — 端点・経路ネイティブの監査射影</div>
-    <div class="prose"><p><strong>ここで示す原始軸契約に対しては NOT-EXPOSED です。</strong>Method B のネイティブ対象は端点および経路に紐づくものであり、原始枝長行列と等価ではなく、そもそもそれを主張していません。印のついたセルは誤りではありません。正当なネイティブ対象を凍結原始軸へ<em>射影</em>したときにどう見えるかを示しています——多くは端点分割による複合の半分、あるいは単一端点に帰属させた複合全体です。</p></div>
+    <div class="prose"><p><strong>ここで示す原始軸契約に対しては NOT-EXPOSED である。</strong>Method B のネイティブ対象は端点および経路に紐づくものであり、原始枝長行列と等価ではなく、そもそもそれを主張していない。印のついたセルは誤りではない。正当なネイティブ対象を凍結原始軸へ<em>射影</em>したときにどう見えるかを示している——多くは端点分割による複合量の半分、あるいは単一端点に帰属させた複合量全体である。</p></div>
 
     <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">ステップ</th>
 <th>t10</th>
@@ -1066,33 +1070,568 @@
       </div>
       <div class="co">
         <h4>単一端点への完全射影</h4>
-        <p>t4: 0.837173 = t4|N_15<br><br><span class="fine">ベースライン行が t10 で異なるのも構成上のものです。端点分割は表示上の根に接する枝を 2 分します。</span></p>
+        <p>t4: 0.837173 = t4|N_15<br><br><span class="fine">ベースライン行が t10 で異なるのも構成上のものである。端点分割は表示上の根に接する辺を 2 分する。</span></p>
       </div>
     </div>
 
     <div class="note">
-      <p><strong>C と D を並べて読む。</strong>入力も算術も同一、書き込みの振る舞いだけが異なり、判定も異なります。2 つの手法が主張しているものが違うからです。この区別は、数値だけを比較する検査からは得られません。座標台帳と宣言された露出が必要であり、両者が存在する理由がまさにそこにあります。</p>
+      <p><strong>C と D を並べて読む。</strong>入力も算術も同一であり、書き込みの振る舞いだけが異なり、判定も異なる。2 つの手法が主張しているものがそもそも違うからである。この区別は、数値だけを比較する検査からは得られない。座標台帳と宣言された exposure が必要であり、両者が存在する理由がまさにそこにある。</p>
     </div>
 
-    <div class="subh">E · 同じ監査を局所系列で</div>
-    <div class="prose"><p>グローバル系列は表示上の根の側から内側へ削除します。<strong>局所</strong>系列は同数の分類群を、1 つのクレード内に集中して取り除くため、融合と構造的不在が別の場所に生じます。同じ監査をその幾何で走らせると、一方の参加者では答えが変わり、もう一方では変わりません。</p></div>
+    <div class="subh">E · 代表的な剪定状態 — 局所系列</div>
+    <div class="prose"><p>グローバル系列は表示上の根の側から内側へ削除する。<strong>局所</strong>系列は同数の分類群を 1 つのクレード内に集中して取り除くため、融合と構造的消失がまったく別の場所に生じる。それ以外はすべて同一である。参照樹も、凍結軸も、宣言された exposure も、監査も同じである。</p></div>
 
-    <div class="verdicts">
-      <div class="vd d-pass">
-        <h4>Method A · 局所系列</h4>
-        <p><b>不一致セルなし。</b>オラクルが observed と記録する座標はすべて値を保持し、適格でないセルはすべて空です——7 ステップ全体にわたって。グローバル幾何で不一致を示したのと同じ露出ワークフローが、ここでは試験条件を満たしています。</p>
+    <figure style="margin:0">
+      <div class="figcard">
+        <img src="oracle_local_deletion.png" alt="参照樹と 7 段階の局所削除を示す 8 つの系統図。座標が構造的に消失した枝は赤い破線、融合した複合辺の内部でのみ生き残る枝は青、影響を受けない枝は黒で描かれている。">
       </div>
-      <div class="vd d-ne">
-        <h4>Method B · 局所系列</h4>
-        <p><b>同じ推定対象の境界、異なるシグネチャ。</b>座標として適格でないネイティブ距離が 10 件——単一端点への完全射影が融合適格でないセルに入るものを含む——に加えて、オラクルが observed とする座標が監査射影では利用できないセルが 4 件。依然として端点ネイティブな対象であり、原始座標の主張ではありません。</p>
-      </div>
+      <figcaption class="cap"><b>E.</b> 削除順序 t8 → t7 → t4 → t9 → t5 → t2 → t3。削除が集中しているため、表示上の根の側は最後まで無傷であり、融合は根へ向かう経路ではなく該当クレードの内部に蓄積する。</figcaption>
+    </figure>
+
+    <div class="subh">F · オラクルの期待状態 — 局所</div>
+    <div class="prose"><p>同じグラフ理論的オラクルを、局所の分類群部分集合に対して実行したもの。この台帳がグローバルのものとどれほど異なるかに注意されたい。融合する座標と消失する座標は、ほぼ別の集合である。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">座標</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">参照樹</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-obs">0.737596</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+</tr>
+</tbody></table></div>
+    <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — 複合辺の内部でのみ生存</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — 構造的に消失</span><span>数値 — 独立に観測可能</span></div>
+
+    <div class="subh">G · Method A — 局所系列</div>
+    <div class="prose"><p>同じ露出ワークフロー、同じ固定軸契約であり、今回は<strong>オラクルと食い違うセルが 1 つもない</strong>。オラクルが独立に観測可能と記録する座標はすべて値を保持し、適格でないセルはすべて空である。7 ステップ全体で強調すべきセルは存在しない。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">ステップ</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">参照樹</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co"><h4>不一致セルなし</h4><p><span class="big">0</span> オラクルが observed とする座標の脱落<br><span class="big">0</span> 融合適格でないセルを占める複合量<br><span class="fine">同一の実装、同一の座標契約、異なる事前規定の剪定構成。</span></p></div>
+      <div class="co"><h4>これが認証するもの</h4><p>この構成のみである。局所系列で問題がなかったことはグローバル系列について何も語らず、グローバル系列の結果もこの系列について何も語らない。</p></div>
+    </div>
+
+    <div class="subh">H · Method B — 局所系列</div>
+    <div class="prose"><p><strong>原始軸契約に対しては依然として NOT-EXPOSED である。</strong>推定対象の境界は動いていないが、射影の特徴は変わる。幾何が異なれば印のつくセルの集合も異なり、融合適格でないセルへの単一端点完全射影も含まれる。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">ステップ</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">ネイティブ基準</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="mk-proj" title="監査射影ではこの座標が利用できない">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.460880</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="mk-proj" title="監査射影ではこの座標が利用できない">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.837173</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="mk-proj" title="監査射影ではこの座標が利用できない">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">2.296884</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="監査射影ではこの座標が利用できない">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.496225</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.741544</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="mk-proj" title="端点ネイティブ値が原始軸の期待値と異なる">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="複合量をこの原始セルへ射影したもの">0.748878</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co"><h4>座標として適格でないネイティブ距離</h4><p>t1: 1.127602 = t1|N_12 · N_14: 1.460880 = N_14|N_13 · t4: 0.837173 = t4|N_15<br>t9: 2.296884 = t9|N_13|N_14 · t2: 1.496225 = t2|N_17 · N_18: 0.741544 = N_18|N_16<br>t6: 0.748878 = t6|N_18|N_16</p></div>
+      <div class="co"><h4>射影における可用性</h4><p><span class="big">4</span> オラクルが observed とする座標が監査射影では利用できない<br><span class="fine">ベースラインが t10 で異なるのも構成上のものである。端点分割は表示上の根に接する辺を 2 分する。</span></p></div>
     </div>
 
     <div class="note">
-      <p><strong>点数ではなく 4 つの判定を持つ理由がここにあります。</strong>判定は、特定の構成における宣言された主張を記述するものであり、パッケージでも恒久的な性質でもありません。同一の実装と座標契約であっても、あらかじめ規定された剪定構成が異なれば、適合性の結果は異なりうるのです。どちらか一方の結果だけを報告すれば、そのワークフローを誤って伝えることになります。</p>
+      <p><strong>両方の系列を示す理由。</strong>ある剪定幾何で契約を満たしたワークフローが、別の幾何でも満たすことは示されていない。ここでは同一の露出実装が、グローバル系列ではオラクルと食い違い、局所系列では完全に一致する。融合する座標が単に異なるからであり、ワークフローは一方の融合パターンを正しく扱いながら他方を取り違えうる。単一の系列で認証し、そこから一般化することこそ、このベンチマークが防ごうとしている推論である。両方の系列がベンチマークに同梱されているのはそのためである。</p>
     </div>
 
-    <figcaption class="cap" style="margin-top:22px"><b>匿名グローバル剪定ケーススタディ。</b>(A) 代表的な削除状態は、剪定が凍結 10 葉軸上の原始座標適格性をどのように変えるかを示す。(B) 独立したグラフオラクルがすべての原始座標の期待状態を与える。(C) Method A は試験対象の固定軸契約に露出しており、強調セルはこの凍結トイ構成における座標状態の不一致——オラクルが observed とする座標の脱落と、融合適格でない原始セルを占める完全な複合経路量——を示す。(D) Method B は端点・経路ネイティブな推定対象をもち、原始軸への監査射影としてのみ示される。その端点に紐づくシグネチャは推定対象の境界を示すものであり、当該手法が主張していない原始座標契約の失敗として分類されるものではない。(E) 局所削除系列での同じ監査では Method A に不一致セルがなく、判定がソフトウェアパッケージの性質ではなく特定構成における宣言された主張を記述するものであることを示す。参加者の識別情報は初回公開リリースでは伏せられ、正確な識別情報・バージョン・実行来歴は凍結された封緘アーカイブに保持される。</figcaption>
+    <figcaption class="cap" style="margin-top:22px"><b>匿名グローバル剪定ケーススタディ。</b>(A) 代表的な削除状態は、剪定が凍結 10 分類群軸上の原始枝座標の適格性をどのように変えるかを示す。(B) 独立したグラフ理論的オラクルがすべての原始枝座標の期待状態を与える。(C) Method A は検証対象の固定軸契約の適用を受け、強調セルはこの凍結トイ構成における座標状態の不一致——オラクルが observed とする座標の脱落と、融合適格でない原始セルを占める完全な複合経路量——を示す。(D) Method B は端点・経路ネイティブな推定対象をもち、原始軸への監査射影としてのみ示される。その端点に紐づく射影特徴は推定対象の境界を示すものであり、当該手法が主張していない原始枝座標契約の失効として分類されるものではない。(E) 局所削除系列での同じ監査では Method A に不一致セルがなく、判定がソフトウェアパッケージの性質ではなく特定構成における宣言された主張を記述するものであることを示す。本ケースは封緘アーカイブに凍結された参加者ビルドを反映する。参加者の識別情報は初回公開版では伏せられ、正確な識別情報・バージョン・実行来歴は同アーカイブに保持される。以後の実装の変更は本ページの結果に反映されない。</figcaption>
   </div>
 </section>
 
@@ -1100,19 +1639,19 @@
 <section class="block" id="explore">
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">08</span><h2>オラクルを操作する</h2></div>
-    <div class="prose"><p>葉を削除して台帳の変化を見てください。表示される状態はすべて、その分類群部分集合に対するオラクルの厳密な答えです。枝を選ぶと、どの座標がそれと融合し、どれが完全に消えるかが分かります。</p></div>
-    <div class="catnip-game" data-lang="ja"><noscript>Catnip10 の操作には JavaScript が必要です。</noscript></div>
+    <div class="prose"><p>分類群を削除すると、台帳の変化を確認できる。表示される状態はすべて、その分類群部分集合に対するオラクルの厳密な答えである。枝を選ぶと、どの座標がそれと融合し、どれが完全に消失するかを確認できる。</p></div>
+    <div class="catnip-game" data-lang="ja"><noscript>Catnip10 の操作には JavaScript が必要である。</noscript></div>
   </div>
 </section>
 
 <!-- 09 -->
 <section class="block" id="fit">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">09</span><h2>SplitAligner が座標を作り、Catnip10 がそれを試験する</h2></div>
+    <div class="sec-head"><span class="sec-num">09</span><h2>SplitAligner が座標を構築し、Catnip10 がそれを検証する</h2></div>
     <div class="prose">
-      <p><strong>SplitAligner</strong> は枝座標の枠組みを構築し解釈します。射影された種樹スプリットによって枝の同一性を定義し、あらゆる種類の枝の欠測に名前を与えます。<strong>Catnip10</strong> は、実装が宣言された座標契約を保存しているかどうかを試験します。両者は異なる問いに答えるものであり、どちらか一方が他方の代わりになることはありません。</p>
-      <p>Catnip10 は SplitAligner の検証エコシステムの中で開発されました。独立した真値対象の必要性が具体的な形をとったのがそこだったからです。そのオラクルと採点契約は実装非依存です。真値層はグラフ収縮によって導かれるものであって、答えを SplitAligner に尋ねて得るものではありません。SplitAligner は枠組みの参照インフラであり、ベンチマークのオラクルではなく、いずれの参加者の正体でもありません。</p>
-      <p>座標系そのもの——射影スプリットがどのように枝の同一性を定義し、欠測がどう分解されるか——を知りたい場合は、解説とチュートリアルから始めてください。</p>
+      <p><strong>SplitAligner</strong> は枝座標の枠組みを構築し解釈する。射影された種樹スプリットによって枝の同一性を定義し、枝の欠測を種類ごとに区別する。<strong>Catnip10</strong> は、実装が宣言された座標契約を保存しているかどうかを検証する。両者は異なる問いに答えるものであり、互いに代替しない。</p>
+      <p>Catnip10 は SplitAligner の検証エコシステムの中で開発された。独立した真値対象の必要性が具体的な形をとったのがそこだったからである。そのオラクルと採点契約は実装非依存であり、真値層はグラフ収縮によって導かれるものであって、答えを SplitAligner に尋ねて得るものではない。SplitAligner は枠組みの参照インフラであり、ベンチマークのオラクルでも、いずれの参加者の正体でもない。</p>
+      <p>座標系そのもの——射影スプリットがどのように枝の同一性を定義し、欠測がどう分解されるか——については、解説とチュートリアルで詳しく説明している。</p>
     </div>
     <div class="linkrow">
       <a href="../splitaligner/SplitAligner_explainer_ja.html">アニメーション解説 — スプリットに基づく枝の同一性 ↗</a>
@@ -1127,10 +1666,10 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">10</span><h2>自分のワークフローを採点する</h2></div>
     <div class="prose">
-      <p>採点を受けるために実装を公開する必要はありません。1 つの出力層をロングテーブルのアダプタ契約に正規化し、その層の露出を宣言して採点器を実行するだけです。公開リポジトリには、規範的な仕様、凍結されたベンチマーク入力、オラクルの真値表と複合台帳、機械可読なテーブルスキーマ、手法非依存の採点エンジン、合成アダプタの例、そして匿名化された正規化済み参加者出力が含まれます。参加者固有のアダプタ、ソースバージョン、実行コマンドは、参加者の識別につながるため公開されません。</p>
+      <p>採点を受けるために実装を公開する必要はない。1 つの出力層をロングテーブルのアダプタ契約に正規化し、その層の exposure を宣言して採点器を実行すればよい。公開リポジトリには、規範文書、凍結されたベンチマーク入力、オラクルの真値表と複合辺台帳、機械可読なテーブルスキーマ、手法非依存の採点エンジン、合成アダプタの例、そして匿名化された正規化済み参加者出力が含まれる。参加者固有のアダプタ、ソースバージョン、実行コマンドは、参加者の識別につながるため公開されない。</p>
     </div>
 
-<pre><code><span class="cm"># 軸 A — 露出した固定・共有の原始層を採点する</span>
+<pre><code><span class="cm"># 軸 A — 固定・共有の原始層が適用対象となるワークフローを採点する</span>
 python3 tools/score_participant.py \
   --truth oracle/primitive_truth_tables/global_truth.tsv \
   --input tutorial/example_scoring/pass_output.tsv \
@@ -1158,8 +1697,8 @@ python3 -m unittest discover -s tests -v
 </code></pre>
 
     <div class="prose" style="margin-top:20px">
-      <p>軸 A は採点前に、期待される正準キーの完全な集合を要求します。欠落・重複・未知・不整合なクロスウォーク行は、参加者の結果ではなくアダプタ検証のエラーです。軸 B は参加者を採点する前に独立に計算された認証記録を要求し、その後、正準スプリット同一性によって出力を整列します。合成された PASS・FAIL・NOT-EXPOSED・真の変位・直列化のみの no-op の各ケースは、いずれもテストスイートで検証されています。権威ある数値資産は TSV ファイルであり、レンダリングされた文書や図はビューであって真値の源ではありません。</p>
-      <p><strong>引用について。</strong>座標構築の枠組みについては SplitAligner を、Catnip10 についてはバージョン管理された Catnip10 リポジトリを引用してください。MIT ライセンスで公開されています。</p>
+      <p>軸 A は採点前に、期待される正準鍵の完全な集合を要求する。欠落・重複・未知・不整合なクロスウォーク行は、参加者の結果ではなくアダプタ検証のエラーである。軸 B は参加者を採点する前に独立に計算された認証記録を要求し、その後、正準スプリット同一性によって出力を整列する。合成された PASS・FAIL・NOT-EXPOSED・真の変位・直列化のみの no-op の各ケースは、いずれもテストスイートで検証されている。権威ある数値資産は TSV ファイルであり、レンダリングされた文書や図はビューであって真値の源ではない。</p>
+      <p><strong>引用について。</strong>SplitAligner と Catnip10 の引用先は、いずれも <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener">SplitAligner 本文</a>——現時点ではプレプリント——である。ベンチマーク資料そのものを用いる場合は、Catnip10 リポジトリを併記する。MIT ライセンスで公開されている。</p>
     </div>
 
     <div class="linkrow">

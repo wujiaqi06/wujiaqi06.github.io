@@ -86,6 +86,17 @@
     background:linear-gradient(180deg,var(--accent-soft),transparent); border-radius:12px;
     color:var(--muted); font-size:15px; max-width:58ch}
   .note strong{color:var(--ink)}
+  .note p{margin:0 0 10px}
+  .note p:last-child{margin:0}
+  .repfig{margin:14px 0 0; padding:14px 12px; background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; overflow-x:auto}
+  .repfig svg{display:block; width:100%; min-width:560px; max-width:660px; margin:0 auto; height:auto}
+  .rf-e{fill:none; stroke:var(--muted); stroke-width:1.7; stroke-linecap:round}
+  .rf-r{fill:var(--accent-2)}
+  .rf-t{font-family:var(--mono); font-size:11px; fill:var(--ink)}
+  .rf-cap{font-family:var(--mono); font-size:10.5px; fill:var(--faint)}
+  .rf-key{font-family:var(--mono); font-size:13px; font-weight:700; fill:var(--accent)}
+  .rf-a{fill:none; stroke:var(--line); stroke-width:1.6}
 
   .toc{margin:30px 0 6px; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:8px}
   .toc a{font-family:var(--mono); font-size:12.5px; color:var(--muted); border:1px solid var(--line);
@@ -159,8 +170,8 @@
   <div class="wrap">
     <div class="eyebrow">チュートリアル</div>
     <h1>SplitAligner を、はじめから終わりまで</h1>
-    <p class="sub">種の系統樹と遺伝子系統樹の集合を<em>枝座標行列</em>に変換します。各枝は数値、または明示的な欠測状態——構造的・融合関連・トポロジー由来・残余 NA——を持ちます。本チュートリアルは同梱のトイ例を使うので、すべての出力をご自分の環境で再現できます。</p>
-    <div class="note">SplitAligner は小さく依存の少ない <strong>Perl</strong> プログラムです。コンパイルは不要——リポジトリをクローンして <code>SplitAligner.pl</code> を実行するだけ。以下のコマンドは <code>examples/run.sh</code> の処理手順に対応しています。</div>
+    <p class="sub">種の系統樹と遺伝子系統樹の集合を<em>枝座標行列</em>に変換する。各枝は数値、または明示的な欠測状態——構造的・融合関連・トポロジー由来・残余 NA——を持つ。本チュートリアルは同梱のトイ例を使うので、すべての出力を自分の環境で再現できる。</p>
+    <div class="note">SplitAligner は小さく依存の少ない <strong>Perl</strong> プログラムである。コンパイルは不要——リポジトリをクローンして <code>SplitAligner.pl</code> を実行するだけ。以下のコマンドは <code>examples/run.sh</code> の処理手順に対応している。</div>
     <ul class="toc">
       <li><a href="#idea">考え方</a></li>
       <li><a href="#install">1 · インストール</a></li>
@@ -180,10 +191,41 @@
   <div class="wrap">
     <div class="step-head"><span class="step-num">考え方</span><h2>枝とは、それが作るスプリットである</h2></div>
     <div class="prose">
-      <p>SplitAligner は枝を、描かれた位置や節点の順序ではなく、それが分類群に誘導する<strong>二分割(スプリット)</strong>で同定します。一部の分類群 T<sub>g</sub> しか含まない遺伝子 <em>g</em> について、種の系統樹の各枝 <em>b</em> を、実際に存在する分類群へ<strong>射影</strong>します:</p>
+      <p>SplitAligner は枝を、描かれた位置や節点の順序ではなく、それが分類群に誘導する<strong>二分割(スプリット)</strong>で同定する。一部の分類群 T<sub>g</sub> しか含まない遺伝子 <em>g</em> について、種の系統樹の各枝 <em>b</em> を、実際に存在する分類群へ<strong>射影</strong>する:</p>
       <div class="identity">σ<sub>g</sub>(b) = ( A<sub>b</sub> ∩ T<sub>g</sub>  |  B<sub>b</sub> ∩ T<sub>g</sub> )</div>
-      <p>種樹の制限木とトポロジーが一致する基準層では、削除されていない二本の原始枝の射影スプリットが一致することと、同じ縮約枝へ写ることは同値です。これは元の二枝が同じ枝になったという意味ではありません。その遺伝子の分類群集合では二枝を<strong>独立に区別できなくなった</strong>、つまり<em>融合</em>したという意味です。射影後の片側が空なら、代わりに<em>構造的</em>欠測となります。経験的な free トポロジー遺伝子樹については、独立に観測可能な各射影スプリットが回収されたかを別に判定します。</p>
-      <p>ワークフローには二つのモードがあります。<code>matrix</code> が座標系を構築し、全遺伝子をそこへ射影します。<code>finalize</code> が、対応する証拠に基づいて欠測状態を分類します。</p>
+      <p>種樹の制限木とトポロジーが一致する基準層では、削除されていない二本の原始枝の射影スプリットが一致することと、同じ簡約辺へ写ることは同値である。これは元の二枝が同じ枝になったという意味ではない。その遺伝子の分類群集合では二枝を<strong>独立に区別できなくなった</strong>、つまり<em>融合</em>したという意味である。射影後の片側が空なら、代わりに<em>構造的</em>欠測となる。経験的な free トポロジー遺伝子樹については、独立に観測可能な各射影スプリットが回収されたかを別に判定する。</p>
+
+      <div class="note">
+        <p><strong>表示上の根は座標ではない。</strong>SplitAligner の生物学的座標は正準無根スプリットであり、描画された根の位置、内部節点の番号、走査順序、子の順序ではない。二つの Newick 表現が同一の重み付き無根スプリット対象を符号化しているならば、表示上の根や直列化だけを変えても、基礎にある生物学的なスプリットの同一性は変わらない。</p>
+        <p>可読性のための <code>B</code> エイリアスは直列化に固有であり、独立に直列化された種樹の間では変わりうる。独立した表現どうしを比較する場合、権威ある同一性は <code>B</code> 番号そのものではなく正準スプリット鍵である。</p>
+        <p>根の位置は、方向や祖先関係を要する解析では依然として生物学的な意味をもちうる。それが SplitAligner の枝座標の同一性を定義しないというだけである。</p>
+      </div>      <div class="repfig">
+        <svg viewBox="0 0 660 150" role="img" aria-label="Two Newick renderings of the same unrooted four-taxon tree: one rooted on the internal edge, one rooted on the A branch. Both induce the same canonical split A,B versus C,D.">
+          <text class="rf-cap" x="6" y="14">表現 A — 内部辺で根を置く</text>
+          <g>
+            <path class="rf-e" d="M20 74 H62"/><path class="rf-e" d="M62 44 V104"/>
+            <path class="rf-e" d="M62 44 H96"/><path class="rf-e" d="M96 30 V58"/><path class="rf-e" d="M96 30 H130"/><path class="rf-e" d="M96 58 H130"/>
+            <path class="rf-e" d="M62 104 H96"/><path class="rf-e" d="M96 90 V118"/><path class="rf-e" d="M96 90 H130"/><path class="rf-e" d="M96 118 H130"/>
+            <circle class="rf-r" cx="20" cy="74" r="3.4"/>
+            <text class="rf-t" x="137" y="34">A</text><text class="rf-t" x="137" y="62">B</text>
+            <text class="rf-t" x="137" y="94">C</text><text class="rf-t" x="137" y="122">D</text>
+          </g>
+          <text class="rf-cap" x="250" y="14">表現 B — 枝 A で根を置く</text>
+          <g>
+            <path class="rf-e" d="M264 74 H300"/><path class="rf-e" d="M300 30 V104"/><path class="rf-e" d="M300 30 H374"/>
+            <path class="rf-e" d="M300 104 H330"/><path class="rf-e" d="M330 62 V132"/><path class="rf-e" d="M330 62 H374"/>
+            <path class="rf-e" d="M330 132 H360"/><path class="rf-e" d="M360 118 V146"/><path class="rf-e" d="M360 118 H374"/><path class="rf-e" d="M360 146 H374"/>
+            <circle class="rf-r" cx="264" cy="74" r="3.4"/>
+            <text class="rf-t" x="381" y="34">A</text><text class="rf-t" x="381" y="66">B</text>
+            <text class="rf-t" x="381" y="122">C</text><text class="rf-t" x="381" y="150">D</text>
+          </g>
+          <path class="rf-a" d="M448 74 H482"/><path class="rf-a" d="M475 68 L482 74 L475 80"/>
+          <text class="rf-cap" x="496" y="58">正準スプリット鍵は同一</text>
+          <text class="rf-key" x="496" y="82">A,B | C,D</text>
+          <text class="rf-cap" x="496" y="104">B エイリアスは異なりうる</text>
+        </svg>
+      </div>
+      <p>ワークフローには二つのモードがある。<code>matrix</code> が座標系を構築し、全遺伝子をそこへ射影する。<code>finalize</code> が、対応する証拠に基づいて欠測状態を分類する。</p>
     </div>
   </div>
 </section>
@@ -192,7 +234,7 @@
   <div class="wrap">
     <div class="step-head"><span class="step-num">1</span><h2>インストール</h2></div>
     <div class="prose">
-      <p><strong>Perl 5</strong> が必要です(macOS や多くの Linux には最初から入っています)。SplitAligner はコアモジュールのみを使い、CPAN パッケージのインストールは不要です。</p>
+      <p><strong>Perl 5</strong> が必要である(macOS や多くの Linux には最初から入っている)。SplitAligner はコアモジュールのみを使い、CPAN パッケージのインストールは不要である。</p>
     </div>
     <div class="code"><pre><span class="c"># リポジトリをクローン</span>
 <span class="k">git clone</span> https://github.com/wujiaqi06/SplitAligner
@@ -201,7 +243,7 @@
 <span class="c"># 動作確認(使い方バナーが表示される)</span>
 <span class="k">perl</span> SplitAligner.pl</pre></div>
     <div class="prose">
-      <p>インストールはこれで全部です。メインの制御は <code>SplitAligner.pl</code>。各ステップの補助スクリプトは <code>scripts/</code> にあり、自動的に呼び出されます。</p>
+      <p>インストールはこれで全部である。メインの制御は <code>SplitAligner.pl</code>。各ステップの補助スクリプトは <code>scripts/</code> にあり、自動的に呼び出される。</p>
     </div>
   </div>
 </section>
@@ -210,21 +252,21 @@
   <div class="wrap">
     <div class="step-head"><span class="step-num">2</span><h2>入力を用意する</h2></div>
     <div class="prose">
-      <p><strong>種の系統樹</strong> — Newick 一本。枝長やサポート値は許容され、スプリットに基づくマッピングでは単純に無視されます。</p>
+      <p><strong>種の系統樹</strong> — Newick 一本。枝長やサポート値は許容され、スプリットに基づくマッピングでは単純に無視される。</p>
     </div>
     <div class="code"><pre>((A:0.1,B:0.2):0.2,(C:0.1,D:0.1):0.1):0.1;</pre></div>
     <div class="prose">
-      <p><strong>遺伝子系統樹</strong> — Newick、<strong>一行一レコード</strong>。各行は遺伝子識別子で始まり、その直後に系統樹が続きます。分類群名は種の系統樹と一致していなければなりません。</p>
+      <p><strong>遺伝子系統樹</strong> — Newick、<strong>一行一レコード</strong>。各行は遺伝子識別子で始まり、その直後に系統樹が続く。分類群名は種の系統樹と一致していなければならない。</p>
     </div>
     <div class="code"><pre>GeneA((A:0.1,B:0.2):0.2,(C:0.1,D:0.1):0.1):0.1;
 GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
     <div class="prose">
-      <p>SplitAligner は二種類の遺伝子系統樹入力を区別し、通常は両方を与えます:</p>
+      <p>SplitAligner は二種類の遺伝子系統樹入力を区別し、通常は両方を与える:</p>
       <ul>
         <li><strong>free</strong> — 各遺伝子を独立に推定した系統樹(トポロジーが種樹と食い違ってよい);</li>
         <li><strong>fix</strong> — 種樹トポロジーに拘束して推定した系統樹(枝長のみ)。</li>
       </ul>
-      <p>この二つを比較することが、のちに<em>カバレッジ由来</em>の欠測と<em>不一致由来</em>の欠測を分ける鍵になります。</p>
+      <p>この二つを比較することが、のちに<em>カバレッジ由来</em>の欠測と<em>不一致由来</em>の欠測を分ける鍵になる。</p>
     </div>
   </div>
 </section>
@@ -233,11 +275,11 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">3</span><h2>クイックスタート:トイ例</h2></div>
     <div class="prose">
-      <p>リポジトリには <code>examples/302mammal/</code> に小さな例(free / fix 遺伝子系統樹のサブセット)が同梱されており、端から端までの動作確認を素早く行えます。リポジトリのルートから:</p>
+      <p>リポジトリには <code>examples/302mammal/</code> に小さな例(free / fix 遺伝子系統樹のサブセット)が同梱されており、端から端までの動作確認を素早く行える。リポジトリのルートから:</p>
     </div>
     <div class="code"><pre><span class="k">bash</span> examples/run.sh toy</pre></div>
     <div class="prose">
-      <p>これは以下の三回のプログラム呼び出しを順に実行します。本チュートリアルの残りでは、各ステップが何をし何を生成するかを解きほぐします。</p>
+      <p>これは以下の三回のプログラム呼び出しを順に実行する。本チュートリアルの残りでは、各ステップが何をし何を生成するかを解きほぐす。</p>
     </div>
   </div>
 </section>
@@ -246,7 +288,7 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">4</span><h2><span class="mono">matrix</span> モード — 座標系を構築する</h2></div>
     <div class="prose">
-      <p><code>matrix</code> は遺伝子系統樹の集合ごとに一度実行します。種樹の枝にラベルを付け、全遺伝子をそこへ射影し、遺伝子 × 枝の行列を書き出します。</p>
+      <p><code>matrix</code> は遺伝子系統樹の集合ごとに一度実行する。種樹の枝にラベルを付け、全遺伝子をそこへ射影し、遺伝子 × 枝の行列を書き出す。</p>
     </div>
     <div class="code"><pre><span class="c"># リポジトリのルートから開始</span>
 <span class="k">cd</span> examples/302mammal
@@ -263,12 +305,12 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
     <div class="prose">
       <p>主な出力(<code>--label</code> が接頭辞):</p>
       <ul>
-        <li><code>species_tree.splits.txt</code> — 標準的な枝座標系(種樹バックボーン上の <code>B1</code>, <code>B2</code>, …)。全遺伝子が測られる共通の軸です。</li>
+        <li><code>species_tree.splits.txt</code> — 標準的な枝座標系(種樹バックボーン上の <code>B1</code>, <code>B2</code>, …)。全遺伝子が測られる共通の軸である。</li>
         <li><code>&lt;label&gt;.matrix_no_fuse.txt</code> — 原始枝のみ。</li>
-        <li><code>&lt;label&gt;.matrix_with_fuse.txt</code> — それに加えて、分類群の刈り込みで融合する枝の明示的な<strong>融合枝カラム</strong>(例 <code>B12|B47</code>)。</li>
+        <li><code>&lt;label&gt;.matrix_with_fuse.txt</code> — それに加えて、分類群の剪定で融合する枝の明示的な<strong>融合枝カラム</strong>(例 <code>B12|B47</code>)。</li>
         <li><code>&lt;label&gt;_splits/</code>、<code>&lt;label&gt;_split_branch_label/</code> — 遺伝子ごとのスプリット表現と、そのバックボーンへの対応付け。</li>
       </ul>
-      <p>各セルは、枝の射影スプリットが回収された場合はその枝長(数値)を、そうでない場合は <code>NA</code> を——<em>まだ</em>——持ちます。この <code>NA</code> に名前を与えるのが次のステップです。</p>
+      <p>各セルは、枝の射影スプリットが回収された場合はその枝長(数値)を、そうでない場合は <code>NA</code> を——<em>まだ</em>——持つ。この <code>NA</code> に名前を与えるのが次のステップである。</p>
     </div>
     <div class="code"><pre>gene   B1           B2   B3           B4           ...
 A1BG   0.1809315089 NA   0.0047384154 0.0057110032 ...
@@ -281,7 +323,7 @@ A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">5</span><h2><span class="mono">finalize</span> モード — 欠測状態を分類する</h2></div>
     <div class="prose">
-      <p><code>finalize</code> に両方の行列を渡します。まず、数値を持つ融合座標で説明できる原始枝の <code>NA</code> を <code>NA_fuse</code> として識別し、次に共有遺伝子上で free と fix の行列を比較して、構造的欠測(<code>NA_struct</code>)とトポロジー由来の欠測(<code>NA_topo</code>)を切り分けます。fix 側に判定可能な数値的証拠がなければ、残余 <code>NA</code> を保持します。<code>--species_tree</code> を渡すと枝ごとのサポートも計算します。</p>
+      <p><code>finalize</code> に両方の行列を渡す。まず、数値を持つ融合座標で説明できる原始枝の <code>NA</code> を <code>NA_fuse</code> として識別し、次に共有遺伝子上で free と fix の行列を比較して、構造的欠測(<code>NA_struct</code>)とトポロジー由来の欠測(<code>NA_topo</code>)を切り分ける。fix 側に判定可能な数値的証拠がなければ、残余 <code>NA</code> を保持する。<code>--species_tree</code> を渡すと枝ごとのサポートも計算する。</p>
     </div>
     <div class="code"><pre><span class="k">perl</span> ../../SplitAligner.pl <span class="f">--mode</span> finalize \
   <span class="f">--free</span> free.matrix_with_fuse.txt \
@@ -295,7 +337,7 @@ A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
         <li><code>&lt;input&gt;.na_fuse.txt</code> — 融合救済の中間テーブル;</li>
         <li><code>final.support_b.txt</code> と <code>species_tree.support_b.nwk</code> — 枝ごとのサポート(ステップ 7)。</li>
       </ul>
-      <p>比較は<strong>両方</strong>の入力に存在する遺伝子についてのみ定義されます。共有遺伝子が無ければ、SplitAligner は推測せずエラーで停止します。</p>
+      <p>比較は<strong>両方</strong>の入力に存在する遺伝子についてのみ定義される。共有遺伝子が無ければ、SplitAligner は推測せずエラーで停止する。</p>
     </div>
     <div class="code"><pre>gene   B1           B2         B3           ...
 A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
@@ -307,14 +349,14 @@ A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">6</span><h2>状態の読み方</h2></div>
     <div class="prose">
-      <p>すべての遺伝子 × 枝のセルは、最終的に以下のいずれか一つの値を取ります。残余 <code>NA</code> は意図的な記帳状態です。fix 側の数値的証拠なしに <code>NA_topo</code> へ格上げすることはありません。</p>
+      <p>すべての遺伝子 × 枝のセルは、最終的に以下のいずれか一つの値を取る。残余 <code>NA</code> は意図的な記帳状態である。fix 側の数値的証拠なしに <code>NA_topo</code> へ格上げすることはない。</p>
     </div>
     <div class="tbl-scroll">
     <table class="states">
       <thead><tr><th>セルの値</th><th>意味</th></tr></thead>
       <tbody>
         <tr><td class="st-map">数値</td><td><strong>Mapped(マップ済)。</strong>枝の射影スプリットがこの遺伝子で観測された。値はその枝長。</td></tr>
-        <tr><td class="st-fuse">NA_fuse</td><td>分類群の刈り込み後、この原始枝は独立には観測できない。<strong>融合</strong>座標は数値の枝長を持ち得るが、その値は各原始枝の独立した推定値ではない。</td></tr>
+        <tr><td class="st-fuse">NA_fuse</td><td>分類群の剪定後、この原始枝は独立には観測できない。<strong>融合</strong>座標は数値の枝長を持ち得るが、その値は各原始枝の独立した推定値ではない。</td></tr>
         <tr><td class="st-struct">NA_struct</td><td>射影された側が空になり、この遺伝子について枝が<strong>射影上の同一性を持たず</strong>評価不能(カバレッジの効果)。</td></tr>
         <tr><td class="st-topo">NA_topo</td><td>fix 側には原始枝の数値的証拠があるが、その射影スプリットが<strong>推定された free トポロジー樹では回収されない</strong>——トポロジー由来の不一致と整合する状態。</td></tr>
         <tr><td class="st-res">NA</td><td>残余:fix 側に判定できる数値的根拠が無いときに保持される。</td></tr>
@@ -322,9 +364,9 @@ A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
     </table>
     </div>
     <div class="prose">
-      <p>これらのカテゴリは軸を分割します——台帳全体を足し合わせます:</p>
+      <p>これらのカテゴリは軸を分割します——台帳全体を足し合わせる:</p>
       <div class="identity">|C| = Mapped + NA_fuse + NA_struct + NA_topo + 残余 NA</div>
-      <p><code>NA</code> を<em>理由</em>ごとに分ければ、下流の速度・選択解析で各状態を明示的に処理、フィルタリング、監査できます。すべての欠測を一つの不透明な値として扱う必要はありません。</p>
+      <p><code>NA</code> を<em>理由</em>ごとに分ければ、下流の速度・選択解析で各状態を明示的に処理、フィルタリング、監査できる。すべての欠測を一つの不透明な値として扱う必要はない。</p>
     </div>
   </div>
 </section>
@@ -333,7 +375,7 @@ A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">7</span><h2>枝ごとの Support</h2></div>
     <div class="prose">
-      <p><code>--species_tree</code> を渡すと、<code>finalize</code> は <code>final.support_b.txt</code> を書き出します。バックボーンの各枝について、共有遺伝子上で fix の系統樹に対する free の系統樹での数値的根拠の保持度を示します。</p>
+      <p><code>--species_tree</code> を渡すと、<code>finalize</code> は <code>final.support_b.txt</code> を書き出す。バックボーンの各枝について、共有遺伝子上で fix の系統樹に対する free の系統樹での数値的根拠の保持度を示す。</p>
     </div>
     <div class="code"><pre>branch_id  branch_type  n_shared_genes  n_fix_non_na  n_free_non_na  support_percent  discordance_percent
 B1         terminal     5               5             5              100.0000000000   0.0000000000
@@ -341,7 +383,7 @@ B2         terminal     5               4             4              100.0000000
 B3         terminal     5               4             4              100.0000000000   0.0000000000</pre></div>
     <div class="cap">final.support_b.txt(先頭)</div>
     <div class="prose">
-      <p>対になる <code>species_tree.support_b.nwk</code> は、各内部枝の <code>Support</code> をブートストラップ位置に書き込んだ標準 Newick 樹です。任意の樹ビューア(例 FigTree)で開けば、一致度をトポロジー上に直接投影して見られます。</p>
+      <p>対になる <code>species_tree.support_b.nwk</code> は、各内部枝の <code>Support</code> をブートストラップ位置に書き込んだ標準 Newick 樹である。任意の樹ビューア(例 FigTree)で開けば、一致度をトポロジー上に直接投影して見られる。</p>
     </div>
   </div>
 </section>
@@ -350,11 +392,11 @@ B3         terminal     5               4             4              100.0000000
   <div class="wrap">
     <div class="step-head"><span class="step-num">8</span><h2>スケールアップ</h2></div>
     <div class="prose">
-      <p>同じ二つのモードが本番規模でも動きます。同梱のプレプリント例は、302 種の哺乳類にわたる 2,275 本の free トポロジーと 2,275 本の fix トポロジーの遺伝子系統樹を使います:</p>
+      <p>同じ二つのモードが本番規模でも動く。同梱のプレプリント例は、302 種の哺乳類にわたる 2,275 本の free トポロジーと 2,275 本の fix トポロジーの遺伝子系統樹を使う:</p>
     </div>
     <div class="code"><pre><span class="k">bash</span> examples/run.sh preprint</pre></div>
     <div class="prose">
-      <p>共通の一致性サブ問題において、SplitAligner の <code>Support(b)</code> は <strong>PhyParts</strong> と高い一致を示します(299 本の内部枝で Pearson r = 0.99997)。論文で報告した同一マシン上の比較では、SplitAligner の全工程は 9 分 52 秒、PhyParts の quick concordance 設定は 1 時間 50 分 53 秒で、このデータセットでは約 <strong>11 倍高速</strong>でした。これは校正と実行時間の比較であり、機能的な同等性を主張するものではありません。</p>
+      <p>共通の一致性サブ問題において、SplitAligner の <code>Support(b)</code> は <strong>PhyParts</strong> と高い一致を示す(299 本の内部枝で Pearson r = 0.99997)。論文で報告した同一マシン上の比較では、SplitAligner の全工程は 9 分 52 秒、PhyParts の quick concordance 設定は 1 時間 50 分 53 秒で、このデータセットでは約 <strong>11 倍高速</strong>であった。これは校正と実行時間の比較であり、機能的な同等性を主張するものではない。</p>
       <div class="next">
         <a href="SplitAligner_explainer_ja.html"><div class="t">アニメーション解説 ↗</div><div class="d">同じ考え方を視覚的に——融合、射影、そしてすべての状態。</div></a>
         <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener"><div class="t">プレプリント(bioRxiv) ↗</div><div class="d">手法と 302 種哺乳類の解析。</div></a>
@@ -369,9 +411,9 @@ B3         terminal     5               4             4              100.0000000
   <div class="wrap">
     <div class="step-head"><span class="step-num">9</span><h2>Catnip10 を動かす</h2></div>
     <div class="prose">
-      <p>遺伝子樹の不一致を加えず、分類群の刈り込みだけを作用させます。完全な <code>B1–B17</code> 軸は固定されたまま、削除のたびにグラフで定まる台帳が <strong>observed</strong>、<strong>NA_fuse</strong>、<strong>NA_struct</strong> へ更新されます。この実験では <code>NA_topo</code> は常にゼロです。</p>
+      <p>遺伝子樹の不一致を加えず、分類群の剪定だけを作用させる。完全な <code>B1–B17</code> 軸は固定されたまま、削除のたびにグラフで定まる台帳が <strong>observed</strong>、<strong>NA_fuse</strong>、<strong>NA_struct</strong> へ更新される。この実験では <code>NA_topo</code> は常にゼロである。</p>
     </div>
-    <div class="catnip-game" data-lang="ja"><noscript>Catnip10 の操作には JavaScript が必要です。</noscript></div>
+    <div class="catnip-game" data-lang="ja"><noscript>Catnip10 の操作には JavaScript が必要である。</noscript></div>
   </div>
 </section>
 </main>

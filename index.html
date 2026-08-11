@@ -123,6 +123,7 @@
   .sw p{margin:0; color:var(--muted); font-size:15px; line-height:1.55; flex:1}
   .sw .links{display:flex; gap:14px; font-size:14px; flex-wrap:wrap}
 
+
   /* Publications */
   .pub-controls{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
   .fbtn{border:1px solid var(--line); background:var(--surface); color:var(--muted); padding:6px 13px;
@@ -233,7 +234,7 @@
       <div class="prose">
         <p>I am an evolutionary genomicist in the <strong>Applied Animal and Plant Science</strong> program at Hiroshima University's School of Applied Biological Science, where I teach <strong>animal genetics and breeding</strong>. I work at the intersection of comparative genomics, molecular evolution, statistical genetics, and bioinformatics, extracting shared evolutionary principles from large-scale genomic data across mammals, birds and poultry, livestock, insects, and viruses.</p>
         <p>To me, animal-breeding genomics and evolutionary genomics are one framework, not two. The same statistical-genomics toolkit that dates mammalian life-history evolution also speaks to <strong>poultry and livestock breeding</strong> — the origins, population structure, and diversity of native chickens and goats — and to the <strong>genomic monitoring of wild mammals</strong> for conservation and population management, as in my work on the Asian black bear, Japanese wolves, and bats. I connect the deep history of species divergence with within-species and within-breed diversity, adaptation, and selection on a common footing.</p>
-        <p>Trained in medicine (BS, Shandong University), bioinformatics (MS, Fudan University), and statistical genetics (PhD, The University of Tokyo, with Prof. Hirohisa Kishino), I have since held positions at Tokyo Institute of Technology (JSPS Research Fellow), Tokai University School of Medicine (JST CREST), and Hiroshima University. A recurring theme in my methodological work is <strong>whether large-scale analyses are really comparing the same evolutionary object</strong> — and building the methods, benchmarks, and reproducible workflows that make sure they are.</p>
+        <p>Trained in medicine (BS, Shandong University), bioinformatics (MS, Fudan University, with the late Prof. Yang Zhong and Prof. Masami Hasegawa), and statistical genetics (PhD, The University of Tokyo, with Prof. Hirohisa Kishino), I have since held positions at Tokyo Institute of Technology (JSPS Research Fellow), Tokai University School of Medicine (JST CREST), and Hiroshima University. A recurring theme in my methodological work is <strong>whether large-scale analyses are really comparing the same evolutionary object</strong> — and building the methods, benchmarks, and reproducible workflows that make sure they are.</p>
       </div>
     </div>
   </section>
@@ -269,7 +270,7 @@
 
       <div class="focus">
         <h3>Current focus — SplitAligner</h3>
-        <p>A branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance. It defines branch identity through projected species-tree splits and decomposes branch absence into explicit, auditable categories, with a deterministic graph-oracle benchmark (Catnip10) and an R reference implementation in progress.</p>
+        <p>A branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance. It defines branch identity through projected species-tree splits and decomposes branch absence into explicit, auditable categories, with a deterministic graph-oracle benchmark (Catnip10) and an R reference implementation in progress. Its branch coordinates are defined by canonical unrooted splits rather than display-root or positional node identities, so equivalent representations of the same weighted unrooted tree preserve the same biological branch identities.</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="splitaligner/SplitAligner_explainer.html" target="_blank" rel="noopener">Animated explainer ↗</a>
           <a href="splitaligner/SplitAligner_tutorial.html" target="_blank" rel="noopener">Tutorial ↗</a>

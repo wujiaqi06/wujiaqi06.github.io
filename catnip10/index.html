@@ -1124,22 +1124,557 @@
       <p><strong>Reading C and D together.</strong> Identical inputs, identical arithmetic, two different filing behaviours — and two different dispositions, because the two methods claim different things. That distinction is not available to any check that only compares numbers. It needs the coordinate ledger and a declared exposure, which is the whole reason both exist.</p>
     </div>
 
-    <div class="subh">E · The same audit on the localized schedule</div>
-    <div class="prose"><p>The global schedule deletes inward from the display-root side. The <strong>localized</strong> schedule removes the same number of taxa but concentrates them inside one clade, so fusion and structural absence fall in different places. Running the identical audit on that geometry changes the answer for one participant and not for the other.</p></div>
+    <div class="subh">E · Representative pruning states — localized schedule</div>
+    <div class="prose"><p>The global schedule deletes inward from the display-root side. The <strong>localized</strong> schedule removes the same number of taxa but concentrates them inside one clade, so fusion and structural absence fall in entirely different places. Everything else is identical: the same reference tree, the same frozen axis, the same declared exposure, the same audit.</p></div>
 
-    <div class="verdicts">
-      <div class="vd d-pass">
-        <h4>Method A · localized schedule</h4>
-        <p><b>No discrepant cells.</b> Every coordinate the oracle records as observed carries its value, and every ineligible cell is empty, across all seven steps. The same exposed workflow that showed mismatches under the global geometry satisfies the tested condition here.</p>
+    <figure style="margin:0">
+      <div class="figcard">
+        <img src="oracle_local_deletion.png" alt="Eight cladograms showing the reference tree and seven localized deletion steps. Branches whose coordinate becomes structurally absent are drawn red-dashed, branches surviving only inside a fused composite are blue, and unaffected branches are black.">
       </div>
-      <div class="vd d-ne">
-        <h4>Method B · localized schedule</h4>
-        <p><b>Same estimand boundary, different signature.</b> Ten coordinate-ineligible native-distance entries, including single-endpoint full projections into fusion-ineligible cells, plus four cells where an oracle-observed coordinate is simply unavailable in the projection. Still an endpoint-native object, still not a primitive-coordinate claim.</p>
-      </div>
+      <figcaption class="cap"><b>E.</b> Deletion order t8 → t7 → t4 → t9 → t5 → t2 → t3. Because the deletions are concentrated, the display-root side stays intact throughout and fusion accumulates inside the affected clade instead of along the path to the root.</figcaption>
+    </figure>
+
+    <div class="subh">F · The oracle's expected states — localized</div>
+    <div class="prose"><p>The same graph oracle, run on the localized taxon subsets. Note how different this ledger looks from the global one: the coordinates that fuse and the coordinates that vanish are almost a different set.</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">coordinate</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">reference tree</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-obs">0.737596</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+</tr>
+</tbody></table></div>
+    <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — survives only inside a composite</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — structurally absent</span><span>numeric — independently observable</span></div>
+
+    <div class="subh">G · Method A — localized schedule</div>
+    <div class="prose"><p>The same exposed workflow, the same declared fixed-axis contract, and this time <strong>no cell disagrees with the oracle</strong>. Every coordinate the oracle records as independently observable carries its value; every ineligible cell is empty. Across all seven steps there is nothing to highlight.</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">step</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">reference tree</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co"><h4>No discrepant cells</h4><p><span class="big">0</span> oracle-observed coordinate dropouts<br><span class="big">0</span> composite quantities in fusion-ineligible cells<br><span class="fine">Same implementation, same coordinate contract, different prespecified pruning configuration.</span></p></div>
+      <div class="co"><h4>What that certifies</h4><p>Only this configuration. A clean result under the localized schedule says nothing about the global one, and the global result said nothing about this one.</p></div>
+    </div>
+
+    <div class="subh">H · Method B — localized schedule</div>
+    <div class="prose"><p><strong>Still NOT-EXPOSED to the primitive-axis contract.</strong> The estimand boundary has not moved, but the projection signature has: a different geometry produces a different set of marked cells, including single-endpoint full projections into fusion-ineligible cells.</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">step</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">baseline</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="mk-proj" title="coordinate not available in the audit projection">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.460880</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="mk-proj" title="coordinate not available in the audit projection">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.837173</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="mk-proj" title="coordinate not available in the audit projection">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">2.296884</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="coordinate not available in the audit projection">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.496225</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.741544</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="mk-proj" title="endpoint-native value differs from the primitive-axis expectation">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="projection of a composite quantity onto this primitive cell">0.748878</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co"><h4>Coordinate-ineligible native distances</h4><p>t1: 1.127602 = t1|N_12 · N_14: 1.460880 = N_14|N_13 · t4: 0.837173 = t4|N_15<br>t9: 2.296884 = t9|N_13|N_14 · t2: 1.496225 = t2|N_17 · N_18: 0.741544 = N_18|N_16<br>t6: 0.748878 = t6|N_18|N_16</p></div>
+      <div class="co"><h4>Availability under projection</h4><p><span class="big">4</span> oracle-observed coordinates unavailable in the audit projection<br><span class="fine">The baseline again differs at t10 by construction: an endpoint split halves the display-root-incident edge.</span></p></div>
     </div>
 
     <div class="note">
-      <p><strong>This is the point of having four dispositions rather than a score.</strong> A disposition describes a declared claim in a specified configuration — not a package, and not a permanent property. The same implementation and coordinate contract can yield different conformance outcomes under different prespecified pruning configurations. Reporting either result alone would misrepresent the workflow.</p>
+      <p><strong>Why both schedules are shown.</strong> A workflow that satisfies the contract under one pruning geometry has not been shown to satisfy it under another. Here the same exposed implementation disagrees with the oracle under the global schedule and agrees with it completely under the localized one — the coordinates that fuse are simply different, and a workflow can handle one fusion pattern while mishandling another. Certifying a single schedule and generalizing from it is exactly the inference this benchmark exists to prevent. Both schedules ship with the benchmark for that reason.</p>
     </div>
 
     <figcaption class="cap" style="margin-top:22px"><b>Anonymous global-pruning case study.</b> (A) Representative deletion states show how pruning changes primitive-coordinate eligibility on the frozen 10-tip axis. (B) The independent graph oracle supplies the expected state of every primitive coordinate. (C) Method A is exposed to the tested fixed-axis contract; highlighted cells show coordinate-state mismatches in the frozen toy configuration, including oracle-observed dropout and complete composite-path quantities occupying fusion-ineligible primitive cells. (D) Method B has an endpoint/path-native estimand and is shown only as an audit projection onto the primitive axis. Its endpoint-associated signatures illustrate an estimand boundary and are not classified as failures of a primitive-coordinate contract the method does not claim. (E) The same audit on the localized deletion schedule, where Method A shows no discrepant cells, illustrates that a disposition describes a declared claim in a specified configuration rather than a property of a software package. Participant identities are withheld in the initial public benchmark release; exact identities, versions and execution provenance are retained in a frozen sealed archive.</figcaption>
@@ -1212,7 +1747,7 @@ python3 -m unittest discover -s tests -v
 
     <div class="prose" style="margin-top:20px">
       <p>Axis A requires the complete expected canonical-key set before scoring: missing, duplicate, unknown or inconsistent crosswalk rows are adapter-validation errors rather than participant results. Axis B requires an independently computed certification record before any participant is scored, then aligns outputs by canonical split identity. Synthetic PASS, FAIL, NOT-EXPOSED, true-shift and serialization-only no-op cases are all exercised by the test suite. The authoritative numerical assets are TSV files; rendered documents and figures are views, not the source of truth.</p>
-      <p><strong>Citing this work.</strong> For the coordinate-construction framework, cite SplitAligner. For Catnip10, cite the versioned Catnip10 repository. Released under the MIT licence.</p>
+      <p><strong>Citing this work.</strong> Both SplitAligner and Catnip10 are cited through the <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener">SplitAligner main text</a>, currently available as a preprint. The Catnip10 repository may be referenced in addition when the benchmark materials themselves are used. Released under the MIT licence.</p>
     </div>
 
     <div class="linkrow">

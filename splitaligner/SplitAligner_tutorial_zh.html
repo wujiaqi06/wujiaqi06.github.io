@@ -86,6 +86,17 @@
     background:linear-gradient(180deg,var(--accent-soft),transparent); border-radius:12px;
     color:var(--muted); font-size:15px; max-width:52ch}
   .note strong{color:var(--ink)}
+  .note p{margin:0 0 10px}
+  .note p:last-child{margin:0}
+  .repfig{margin:14px 0 0; padding:14px 12px; background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; overflow-x:auto}
+  .repfig svg{display:block; width:100%; min-width:560px; max-width:660px; margin:0 auto; height:auto}
+  .rf-e{fill:none; stroke:var(--muted); stroke-width:1.7; stroke-linecap:round}
+  .rf-r{fill:var(--accent-2)}
+  .rf-t{font-family:var(--mono); font-size:11px; fill:var(--ink)}
+  .rf-cap{font-family:var(--mono); font-size:10.5px; fill:var(--faint)}
+  .rf-key{font-family:var(--mono); font-size:13px; font-weight:700; fill:var(--accent)}
+  .rf-a{fill:none; stroke:var(--line); stroke-width:1.6}
 
   .toc{margin:30px 0 6px; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:8px}
   .toc a{font-family:var(--mono); font-size:12.5px; color:var(--muted); border:1px solid var(--line);
@@ -183,6 +194,37 @@
       <p>SplitAligner 识别一根枝,靠的不是它画在哪里、也不是节点顺序,而是它在类群上诱导出的<strong>二分划分(split)</strong>。对于只采样了部分类群 T<sub>g</sub> 的基因 <em>g</em>,把物种树的每根枝 <em>b</em> <strong>投影</strong>到实际存在的类群上:</p>
       <div class="identity">σ<sub>g</sub>(b) = ( A<sub>b</sub> ∩ T<sub>g</sub>  |  B<sub>b</sub> ∩ T<sub>g</sub> )</div>
       <p>在与物种树限制拓扑一致的基准层中,两根未被删除的原始枝投影划分相同,当且仅当它们落到同一条约化枝上。这并不是说两根原始枝变成了同一根;而是它们在该基因的类群集合下<strong>无法再独立区分</strong>,形成<em>融合</em>。若投影后有一侧为空,则是<em>结构性</em>缺失。对于经验 free 拓扑基因树,SplitAligner 还会另行判断每个可独立观测的投影划分是否被找回。</p>
+
+      <div class="note">
+        <p><strong>显示根不是坐标。</strong>SplitAligner 的生物学坐标是规范化无根 split，而不是绘制出来的根位置、内部节点编号、遍历顺序或子节点顺序。若两个 Newick 表示编码的是同一个加权无根 split 对象，那么仅改变显示根或序列化方式，并不会改变底层的生物学 split 身份。</p>
+        <p>便于阅读的 <code>B</code> 别名是序列化局部的，在独立序列化的物种树之间可能不同。比较独立表示时，权威身份是规范化 split key，而不是 <code>B</code> 编号本身。</p>
+        <p>在需要方向或祖先关系的分析中，生根仍然可以承载生物学含义；它只是不定义 SplitAligner 的枝坐标身份。</p>
+      </div>      <div class="repfig">
+        <svg viewBox="0 0 660 150" role="img" aria-label="Two Newick renderings of the same unrooted four-taxon tree: one rooted on the internal edge, one rooted on the A branch. Both induce the same canonical split A,B versus C,D.">
+          <text class="rf-cap" x="6" y="14">表示 A — 在内部边上生根</text>
+          <g>
+            <path class="rf-e" d="M20 74 H62"/><path class="rf-e" d="M62 44 V104"/>
+            <path class="rf-e" d="M62 44 H96"/><path class="rf-e" d="M96 30 V58"/><path class="rf-e" d="M96 30 H130"/><path class="rf-e" d="M96 58 H130"/>
+            <path class="rf-e" d="M62 104 H96"/><path class="rf-e" d="M96 90 V118"/><path class="rf-e" d="M96 90 H130"/><path class="rf-e" d="M96 118 H130"/>
+            <circle class="rf-r" cx="20" cy="74" r="3.4"/>
+            <text class="rf-t" x="137" y="34">A</text><text class="rf-t" x="137" y="62">B</text>
+            <text class="rf-t" x="137" y="94">C</text><text class="rf-t" x="137" y="122">D</text>
+          </g>
+          <text class="rf-cap" x="250" y="14">表示 B — 在枝 A 上生根</text>
+          <g>
+            <path class="rf-e" d="M264 74 H300"/><path class="rf-e" d="M300 30 V104"/><path class="rf-e" d="M300 30 H374"/>
+            <path class="rf-e" d="M300 104 H330"/><path class="rf-e" d="M330 62 V132"/><path class="rf-e" d="M330 62 H374"/>
+            <path class="rf-e" d="M330 132 H360"/><path class="rf-e" d="M360 118 V146"/><path class="rf-e" d="M360 118 H374"/><path class="rf-e" d="M360 146 H374"/>
+            <circle class="rf-r" cx="264" cy="74" r="3.4"/>
+            <text class="rf-t" x="381" y="34">A</text><text class="rf-t" x="381" y="66">B</text>
+            <text class="rf-t" x="381" y="122">C</text><text class="rf-t" x="381" y="150">D</text>
+          </g>
+          <path class="rf-a" d="M448 74 H482"/><path class="rf-a" d="M475 68 L482 74 L475 80"/>
+          <text class="rf-cap" x="496" y="58">规范化 split key 相同</text>
+          <text class="rf-key" x="496" y="82">A,B | C,D</text>
+          <text class="rf-cap" x="496" y="104">B 别名可能不同</text>
+        </svg>
+      </div>
       <p>整个流程有两个模式:<code>matrix</code> 构建坐标系并把所有基因投影上去;<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>

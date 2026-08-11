@@ -1078,22 +1078,557 @@
       <p><strong>把 C 和 D 放在一起读：</strong>输入相同、算术相同，填写行为不同，判定也不同——因为这两个方法主张的东西本就不同。这个区分，任何只比较数值的检验都得不到；它需要坐标账本和明确声明的 exposure，而这正是两者存在的理由。</p>
     </div>
 
-    <div class="subh">E · 同一套审计，换到局部序列</div>
-    <div class="prose"><p>全局序列从显示根一侧向内删除。<strong>局部</strong>序列删除同样数量的类群，但集中在单个分支内部，因此融合与结构性缺失落在不同的位置。把同一套审计放到这个几何上运行，一个参与者的答案变了，另一个没变。</p></div>
+    <div class="subh">E · 代表性的剪枝状态 — 局部序列</div>
+    <div class="prose"><p>全局序列从显示根一侧向内删除。<strong>局部</strong>序列删除同样数量的类群，但集中在单个分支内部，因此融合与结构性缺失落在完全不同的位置。其余一切都相同：同一棵参考树、同一条冻结轴、同样声明的 exposure、同一套审计。</p></div>
 
-    <div class="verdicts">
-      <div class="vd d-pass">
-        <h4>Method A · 局部序列</h4>
-        <p><b>无不一致格。</b>凡 oracle 记为 observed 的坐标都带着数值，凡不具资格的格子都是空的——七步全程如此。在全局几何下出现不一致的同一个工作流，在这里满足了被检验的条件。</p>
+    <figure style="margin:0">
+      <div class="figcard">
+        <img src="oracle_local_deletion.png" alt="八张进化树图，展示参考树与七步局部删除。坐标结构性缺失的分枝以红色虚线绘制，仅在融合复合边内部存活的分枝以蓝色绘制，未受影响的分枝以黑色绘制。">
       </div>
-      <div class="vd d-ne">
-        <h4>Method B · 局部序列</h4>
-        <p><b>同一估计对象边界，不同的投影特征。</b>10 个在原始分枝轴上不具独立资格的原生距离值，其中包括进入融合不合格格子的单端点完整投影；另有 4 个 oracle 判为 observed 的坐标在审计投影中不可用。它依然是一个端点原生对象，依然不是原始坐标主张。</p>
-      </div>
+      <figcaption class="cap"><b>E.</b> 删除顺序 t8 → t7 → t4 → t9 → t5 → t2 → t3。由于删除是集中的，显示根一侧全程完好，融合在受影响的分支内部累积，而不是沿着通往根的路径。</figcaption>
+    </figure>
+
+    <div class="subh">F · Oracle 的期望状态 — 局部</div>
+    <div class="prose"><p>同一个图论 oracle，在局部类群子集上运行。请注意这份账本与全局那份差别有多大：融合的坐标与消失的坐标几乎是两组不同的集合。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">坐标</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">参考树</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-obs">0.946668</td>
+<td class="o-obs">0.082438</td>
+<td class="o-obs">0.514212</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.390203</td>
+<td class="o-obs">0.905738</td>
+<td class="o-obs">0.446970</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.836004</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="o-obs">1.464364</td>
+<td class="o-obs">0.138710</td>
+<td class="o-obs">0.988892</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-obs">0.737596</td>
+<td class="o-obs">0.811055</td>
+<td class="o-obs">0.388108</td>
+<td class="o-obs">0.685170</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-obs">0.737596</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.003948</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-obs">0.832916</td>
+<td class="o-obs">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="o-obs">1.464364</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+<td class="o-struct">NA_struct</td>
+<td class="o-fuse">NA_fuse</td>
+</tr>
+</tbody></table></div>
+    <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — 仅在复合边内部存活</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — 结构性缺失</span><span>数值 — 可独立观测</span></div>
+
+    <div class="subh">G · Method A — 局部序列</div>
+    <div class="prose"><p>同一个暴露工作流、同一份固定轴契约，而这一次<strong>没有任何一格与 oracle 不一致</strong>。凡 oracle 记为可独立观测的坐标都带着数值，凡不具资格的格子都是空的。七步全程没有需要高亮的格子。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">步骤</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">参考树</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="">1.464364</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="">1.464364</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co"><h4>无不一致格</h4><p><span class="big">0</span> 处 oracle 判为 observed 的坐标脱落<br><span class="big">0</span> 处复合量占据融合不合格的格子<br><span class="fine">同一实现、同一坐标契约、不同的预设剪枝配置。</span></p></div>
+      <div class="co"><h4>它认证了什么</h4><p>只认证这一种配置。局部序列下干净,并不说明全局序列如何;反过来,全局序列的结果也不说明这一序列如何。</p></div>
+    </div>
+
+    <div class="subh">H · Method B — 局部序列</div>
+    <div class="prose"><p><strong>对原始轴契约而言依然属于 NOT-EXPOSED。</strong>估计对象的边界没有移动，但投影特征变了：几何不同，被标记的格子也是另一组，其中包括进入融合不合格格子的单端点完整投影。</p></div>
+
+    <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">步骤</th>
+<th>t10</th>
+<th>N_12</th>
+<th>t1</th>
+<th>N_13</th>
+<th>t8</th>
+<th>N_14</th>
+<th>N_15</th>
+<th>t7</th>
+<th>t4</th>
+<th>t9</th>
+<th>N_16</th>
+<th>N_17</th>
+<th>t5</th>
+<th>t2</th>
+<th>N_18</th>
+<th>t3</th>
+<th>t6</th>
+</tr></thead><tbody>
+<tr><td class="rl">原生基线</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="">0.138710</td>
+<td class="">0.988892</td>
+<td class="">0.946668</td>
+<td class="">0.082438</td>
+<td class="">0.514212</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step1</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="mk-proj" title="该坐标在审计投影中不可用">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.460880</td>
+<td class="">0.390203</td>
+<td class="">0.905738</td>
+<td class="">0.446970</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step2</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="mk-proj" title="该坐标在审计投影中不可用">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.837173</td>
+<td class="">0.836004</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step3</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="mk-proj" title="该坐标在审计投影中不可用">NA</td>
+<td class="">0.988892</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">2.296884</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step4</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">0.737596</td>
+<td class="">0.811055</td>
+<td class="">0.388108</td>
+<td class="">0.685170</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step5</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="该坐标在审计投影中不可用">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.496225</td>
+<td class="">0.003948</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step6</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.741544</td>
+<td class="">0.832916</td>
+<td class="">0.007334</td>
+</tr>
+<tr><td class="rl">local_step7</td>
+<td class="mk-proj" title="端点原生值与原始轴期望不同">0.732182</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">1.127602</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="">NA</td>
+<td class="mk-proj" title="复合量向这条原始坐标的投影">0.748878</td>
+</tr>
+</tbody></table></div>
+
+    <div class="callouts">
+      <div class="co"><h4>坐标不具资格的原生距离</h4><p>t1: 1.127602 = t1|N_12 · N_14: 1.460880 = N_14|N_13 · t4: 0.837173 = t4|N_15<br>t9: 2.296884 = t9|N_13|N_14 · t2: 1.496225 = t2|N_17 · N_18: 0.741544 = N_18|N_16<br>t6: 0.748878 = t6|N_18|N_16</p></div>
+      <div class="co"><h4>投影中的可用性</h4><p><span class="big">4</span> 处 oracle 判为 observed 的坐标在审计投影中不可用<br><span class="fine">基线在 t10 处的差异同样源自构造：端点分割会把与显示根相邻的边对半分。</span></p></div>
     </div>
 
     <div class="note">
-      <p><strong>这正是要用四种判定而不是一个分数的原因。</strong>判定描述的是特定配置下被声明的主张——不是一个软件包，也不是一项永久属性。同一个实现和同一份坐标契约，在不同的预设剪枝配置下可以产生不同的一致性结果。只报告其中一类结果，都会造成误导。</p>
+      <p><strong>为什么两套序列都要给。</strong>一个工作流在某种剪枝几何下满足契约，并不等于它在另一种几何下也满足。这里同一个暴露实现在全局序列下与 oracle 不一致，在局部序列下则完全一致——原因只是融合的坐标不同，而一个工作流完全可能正确处理一种融合模式、却处理错另一种。只认证一套序列并由此推广，正是这个基准要防止的推断。两套序列都随基准发布,原因就在这里。</p>
     </div>
 
     <figcaption class="cap" style="margin-top:22px"><b>匿名全局剪枝案例研究。</b>（A）代表性删除状态展示剪枝如何改变冻结 10 叶轴上的原始坐标资格。（B）独立的图论 oracle 给出每条原始坐标的期望状态。（C）Method A 适用被检验的固定轴契约；高亮格子显示该冻结 toy 配置下的坐标状态不一致，包括 oracle 判为 observed 的坐标脱落，以及完整复合路径量占据融合不合格的原始格。（D）Method B 具有端点/路径原生的估计对象，此处仅作为向原始轴的审计投影展示；其端点相关的投影特征说明的是估计对象的边界，不被归类为对该方法并未主张的原始坐标契约的失败。（E）在局部删除序列上的同一套审计中 Method A 无不一致格，说明判定描述的是特定配置下被声明的主张，而非某个软件包的属性。本案例反映的是封存档案中冻结的参与者构建；参与者身份在首次公开版本中不予披露，确切身份、版本与执行溯源保存于该档案，此后实现发生的变化不反映在本页结果中。</figcaption>
@@ -1163,7 +1698,7 @@ python3 -m unittest discover -s tests -v
 
     <div class="prose" style="margin-top:20px">
       <p>轴 A 在评分前要求提供完整的规范化 key 集合：缺失、重复、未知或不一致的 crosswalk 行属于适配器校验错误，而不是参与者结果。轴 B 在为参与者评分前要求一份独立计算的认证记录，然后按规范化 split identity 对齐输出。合成的 PASS、FAIL、NOT-EXPOSED、真实位移与仅序列化 no-op 各种情形，都由测试套件覆盖。权威的数值资产是 TSV 文件；渲染出的文档与图是视图，不是真值来源。</p>
-      <p><strong>关于引用：</strong>坐标构建框架请引用 SplitAligner；Catnip10 请引用当前 GitHub 仓库。正式版本发布后，请优先引用相应 release。以 MIT 许可发布。</p>
+      <p><strong>关于引用：</strong>SplitAligner 与 Catnip10 均请引用 <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener">SplitAligner 正文</a>——目前为预印本。若直接使用基准材料本身，可另外注明 Catnip10 仓库。以 MIT 许可发布。</p>
     </div>
 
     <div class="linkrow">

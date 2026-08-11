@@ -211,6 +211,19 @@
   .scene-count{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums}
   .hint{font-size:11.5px; color:var(--faint)}
 
+  /* Mobile: a scene taller than the viewport scrolls instead of being clipped.
+     Scenes are position:absolute inset:0 inside .stage, so each active scene
+     becomes its own scroll container; the deck navigation is unaffected. */
+  @media (max-width:880px){
+    .scene{
+      overflow-y:auto; overflow-x:hidden;
+      -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+      place-items:start center;            /* top-align so the first line stays reachable */
+      padding:64px 5vw 116px;              /* bottom clears the fixed control bar */
+    }
+    .scene .wrap{gap:22px}
+  }
+
   @media (prefers-reduced-motion:reduce){
     .rv,.edge,.cell,.bar span{transition:none !important}
     .rv{opacity:1;transform:none}
