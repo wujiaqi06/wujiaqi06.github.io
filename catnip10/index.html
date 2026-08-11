@@ -440,6 +440,8 @@ For each primitive coordinate b:
       NA_STRUCT
 </code></pre>
 
+    <div class="prose" style="margin-top:14px"><p class="axnote">This oracle was first written as the independent validation layer of the SplitAligner benchmark, which is where Catnip10 began. The original construction — inputs, scripts and audit outputs — lives in the <a href="https://github.com/wujiaqi06/SplitAligner/tree/main/benchmark" target="_blank" rel="noopener">SplitAligner benchmark directory</a>.</p></div>
+
     <div class="note">
       <p>Because the procedure is deterministic and finite, the expected state of all 17 coordinates can be enumerated for every taxon subset in advance — no simulation, no sampling, no tolerance. For an exposed workflow with a validated adapter, disagreement with the frozen oracle is an auditable conformance mismatch.</p>
       <p><strong>Scope of the three states.</strong> Within this fixed-topology toy core, <code>observed</code>, <code>NA_fuse</code> and <code>NA_struct</code> are mutually exclusive and exhaustive. That is a property of the benchmark's design, not a claim about heterogeneous-tree workflows in general: topology-driven absence is intentionally excluded from the fixed-topology core, so these three states are not offered as a complete taxonomy for workflows outside it.</p>

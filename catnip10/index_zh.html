@@ -420,6 +420,8 @@ For each primitive coordinate b:
       NA_STRUCT
 </code></pre>
 
+    <div class="prose" style="margin-top:14px"><p class="axnote">这个 oracle 最初是作为 SplitAligner 基准的独立验证层写出来的，也正是 Catnip10 的出生地。包含输入、脚本与审计输出的原始构造，放在 <a href="https://github.com/wujiaqi06/SplitAligner/tree/main/benchmark" target="_blank" rel="noopener">SplitAligner 的 benchmark 目录</a>。</p></div>
+
     <div class="note">
       <p>由于整个过程是确定且有限的，17 条坐标在任意类群子集下的期望状态都可以预先穷举——不需要模拟、不需要抽样，也不需要数值容差。对于适用该坐标契约且适配器已通过验证的工作流，与冻结 oracle 的不一致构成可审计的一致性偏差。</p>
       <p><strong>三种状态的适用范围：</strong>在这个固定拓扑的 toy core 中，<code>observed</code>、<code>NA_fuse</code> 和 <code>NA_struct</code> 互斥且完备。这是本基准设计的性质，并不是对所有异质树工作流的一般性断言。拓扑导致的缺失被有意排除在固定拓扑 core 之外，因此这三种状态并不构成其他工作流的完整状态分类体系。</p>

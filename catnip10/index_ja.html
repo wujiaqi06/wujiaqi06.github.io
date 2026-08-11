@@ -420,6 +420,8 @@ For each primitive coordinate b:
       NA_STRUCT
 </code></pre>
 
+    <div class="prose" style="margin-top:14px"><p class="axnote">このオラクルは、もともと SplitAligner ベンチマークの独立検証層として書かれたものであり、Catnip10 の出発点でもある。入力・スクリプト・監査出力を含む原型は <a href="https://github.com/wujiaqi06/SplitAligner/tree/main/benchmark" target="_blank" rel="noopener">SplitAligner の benchmark ディレクトリ</a>にある。</p></div>
+
     <div class="note">
       <p>手続きが確定的かつ有限であるため、17 座標すべての期待状態を、任意の分類群部分集合についてあらかじめ列挙できる——シミュレーションも標本抽出も許容誤差も不要である。当該座標契約が適用され、かつアダプタが検証済みのワークフローについては、凍結オラクルとの不一致は監査可能な適合性ミスマッチを構成する。</p>
       <p><strong>3 状態の適用範囲。</strong>この固定トポロジーのトイコアの内部では、<code>observed</code>・<code>NA_fuse</code>・<code>NA_struct</code> は排反かつ網羅的である。これはベンチマークの設計上の性質であって、異質な樹を扱うワークフロー一般についての主張ではない。トポロジー由来の欠測は固定トポロジーコアから意図的に除外されているため、この 3 状態はコア外のワークフローに対する完全な状態分類体系を構成しない。</p>
