@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Catnip10 — deterministic branch-coordinate conformance benchmark</title>
-<meta name="description" content="Catnip10 is a deterministic 10-tip conformance benchmark for branch-wise workflows that use a fixed or shared reference-branch axis. It tests pruning-aware coordinate eligibility and representation-stable coordinate identity against an independent graph-contraction oracle.">
+<meta name="description" content="Catnip10 is a deterministic 10-tip conformance benchmark for branch-wise workflows that use a fixed or shared reference-branch axis. It tests pruning-aware coordinate eligibility and representation-stable coordinate identity and availability against an independent graph-contraction oracle.">
 <link rel="stylesheet" href="../splitaligner/catnip10_game.css">
 <script src="../splitaligner/catnip10_game_data.js" defer></script>
 <script src="../splitaligner/catnip10_game.js" defer></script>
@@ -398,13 +398,13 @@
 
     <ol class="algo">
       <li>Freeze a reference tree and enumerate its edges as <strong>primitive coordinates</strong> <code>B1…B17</code>. Every edge is a discrete object; removing it induces a taxon bipartition, which is what gives the label its meaning.</li>
-      <li>For a taxon subset, <strong>delete the absent tips</strong> and repeatedly <strong>suppress every degree-2 vertex</strong>, merging its two incident edges. This is standard tree reduction — the same contraction any pipeline performs implicitly.</li>
+      <li>For a taxon subset, <strong>delete the absent tips</strong> and repeatedly <strong>suppress every degree-2 internal vertex</strong>, merging its two incident edges. This is the standard tree-reduction operation modeled by the benchmark.</li>
       <li><strong>Propagate original-edge membership</strong> through every suppression. Each surviving reduced edge carries the set of primitive edges it absorbed; a merge takes the union of the two member sets. Nothing is discarded, so provenance is never lost.</li>
       <li><strong>Classify each primitive coordinate</strong> by the fate of its membership: sole member of a surviving edge → <code>observed</code>; member of a surviving edge with two or more members → <code>NA_fuse</code>; contained in no surviving edge → <code>NA_struct</code>.</li>
       <li>Emit <strong>two linked ledgers</strong>: a primitive-coordinate ledger assigning every original coordinate exactly one state, and a composite-edge ledger listing each surviving composite keyed by its member set and summed length.</li>
     </ol>
 
-    <div class="prose"><p>The same procedure, written out. Membership is the only thing carried across contraction, and the three states fall out of it at the end rather than being assigned along the way.</p></div>
+    <div class="prose"><p>Primitive identity and branch length are propagated separately: membership by set union and length by addition. Primitive-coordinate state is derived only from the final membership sets.</p></div>
 
 <pre><code>Input:
   weighted unrooted tree G = (V,E)
@@ -416,34 +416,38 @@ Initialize:
 
 Delete all tips not in S and their incident edges.
 
-Repeat until no change:
-  if a non-tip vertex v has degree 1:
-      delete v and its incident edge          <span class="cm"># an entire clade has disappeared</span>
+While there exists a suppressible degree-2 internal vertex v:
+  let e1=(u,v), e2=(v,w)
+  replace e1,e2,v by e*=(u,w)
 
-  if a non-tip vertex v has degree 2:
-      let e1=(u,v), e2=(v,w)
-      replace e1,e2,v by e*=(u,w)
-
-      M(e*) = M(e1) &#8746; M(e2)
-      &#8467;(e*) = &#8467;(e1) + &#8467;(e2)
+  M(e*) = M(e1) &#8746; M(e2)
+  &#8467;(e*) = &#8467;(e1) + &#8467;(e2)
 
 For each surviving edge e:
   compute its canonical unrooted split key
   record [split key, M(e), &#8467;(e)]
 
 For each primitive coordinate b:
-  if some surviving edge has M(e) = {b}:
+  containers = surviving edges whose member set contains b
+
+  if exactly one container exists and M(container) = {b}:
       OBSERVED_PRIMITIVE
-  else if b &#8712; M(e) for some surviving edge with |M(e)| &gt; 1:
+  else if exactly one container exists and |M(container)| &gt; 1:
       NA_FUSE
   else:
       NA_STRUCT
 </code></pre>
 
-    <div class="prose" style="margin-top:14px"><p class="axnote">This oracle was first written as the independent validation layer of the SplitAligner benchmark, which is where Catnip10 began. The original construction — inputs, scripts and audit outputs — lives in the <a href="https://github.com/wujiaqi06/SplitAligner/tree/main/benchmark" target="_blank" rel="noopener">SplitAligner benchmark directory</a>.</p></div>
+    <div class="note">
+      <p><strong>No circular oracle.</strong> Canonical split keys are computed only after graph reduction and are used to identify and align surviving reduced edges; they do not derive pruning state. Primitive-coordinate state comes solely from graph deletion, contraction, and propagated original-edge membership.</p>
+      <p>The oracle consumes neither SplitAligner output nor participant output, package-specific branch numbering, or participant-specific mapping logic.</p>
+    </div>
+
+
+    <div class="prose" style="margin-top:14px"><p class="axnote"><strong>Historical provenance.</strong> Catnip10 grew out of an independent validation layer originally developed for the SplitAligner benchmark. That <a href="https://github.com/wujiaqi06/SplitAligner/tree/main/benchmark" target="_blank" rel="noopener">benchmark directory</a> preserves the historical predecessor. The authoritative Catnip10 oracle specification, truth tables and composite ledgers are maintained in the <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">current Catnip10 repository</a>.</p></div>
 
     <div class="note">
-      <p>Because the procedure is deterministic and finite, the expected state of all 17 coordinates can be enumerated for every taxon subset in advance — no simulation, no sampling, no tolerance. For an exposed workflow with a validated adapter, disagreement with the frozen oracle is an auditable conformance mismatch.</p>
+      <p>Because the procedure is deterministic and finite, the expected state of all 17 coordinates can be enumerated for every retained-tip subset permitted by the benchmark, in advance — no simulation, no sampling, no tolerance. For an exposed workflow with a validated adapter, disagreement with the frozen oracle is an auditable conformance mismatch.</p>
       <p><strong>Scope of the three states.</strong> Within this fixed-topology toy core, <code>observed</code>, <code>NA_fuse</code> and <code>NA_struct</code> are mutually exclusive and exhaustive. That is a property of the benchmark's design, not a claim about heterogeneous-tree workflows in general: topology-driven absence is intentionally excluded from the fixed-topology core, so these three states are not offered as a complete taxonomy for workflows outside it.</p>
     </div>
   </div>
@@ -515,7 +519,7 @@ For each primitive coordinate b:
 <!-- 05 AXIS B -->
 <section class="block" id="axis-b">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">05</span><h2>Axis B — representation-stable coordinate identity</h2></div>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Axis B — representation-stable coordinate identity and availability</h2></div>
     <div class="prose">
       <p>The second validity axis varies nothing biological at all. It asks whether the same canonical unrooted split keeps the same identity and the same declared availability when the <em>same tree</em> is written down a different way.</p>
       <p class="defn"><strong>Display root.</strong> The root location used to serialize or traverse a tree representation. It is not part of the authoritative unrooted branch identity, which remains the canonical split key.</p>

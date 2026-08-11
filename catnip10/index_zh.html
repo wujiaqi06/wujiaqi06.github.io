@@ -378,13 +378,13 @@
 
     <ol class="algo">
       <li>冻结一棵参考树，把它的分枝枚举为<strong>原始坐标</strong> <code>B1…B17</code>。每条分枝都是一个离散对象；移除它会在类群上诱导一个二分划分，这正是标签意义的来源。</li>
-      <li>对某个类群子集，<strong>删除缺失的叶节点</strong>，并反复<strong>抑制每一个度为 2 的顶点</strong>，把与之相连的两条分枝合并。这就是标准的树简约——任何流程都在隐式执行的同一种收缩。</li>
+      <li>对某个类群子集，<strong>删除缺失的叶节点</strong>，并反复<strong>抑制每一个度为 2 的内部节点</strong>，把与之相连的两条分枝合并。这是本基准所建模的标准树简约操作。</li>
       <li>在每一次抑制中<strong>传播原始分枝的成员归属</strong>。每条存活的简约分枝都携带它所吸收的原始分枝集合，合并时取两个成员集合的并集。不丢弃任何信息，溯源因此永不丢失。</li>
       <li>按成员归属的去向<strong>对每条原始坐标分类</strong>：是某条存活分枝的唯一成员 → <code>observed</code>；是含两条及以上成员的存活分枝的成员 → <code>NA_fuse</code>；不被任何存活分枝包含 → <code>NA_struct</code>。</li>
       <li>输出<strong>两本相互关联的账本</strong>：为每条原始坐标分配恰好一个状态的原始坐标账本，以及按成员集合与长度之和登记每条存活复合分枝的复合分枝账本。</li>
     </ol>
 
-    <div class="prose"><p>把同一套流程明确写出来。在收缩过程中被带下去的只有成员归属集合，三个状态不是沿途指派的，而是最后从它推导出来的。</p></div>
+    <div class="prose"><p>原始分枝身份与枝长分别传播：成员集合取并集，枝长相加。原始坐标状态只由最终的成员集合推导。</p></div>
 
 <pre><code>Input:
   weighted unrooted tree G = (V,E)
@@ -396,34 +396,38 @@ Initialize:
 
 Delete all tips not in S and their incident edges.
 
-Repeat until no change:
-  if a non-tip vertex v has degree 1:
-      delete v and its incident edge          <span class="cm"># an entire clade has disappeared</span>
+While there exists a suppressible degree-2 internal vertex v:
+  let e1=(u,v), e2=(v,w)
+  replace e1,e2,v by e*=(u,w)
 
-  if a non-tip vertex v has degree 2:
-      let e1=(u,v), e2=(v,w)
-      replace e1,e2,v by e*=(u,w)
-
-      M(e*) = M(e1) &#8746; M(e2)
-      &#8467;(e*) = &#8467;(e1) + &#8467;(e2)
+  M(e*) = M(e1) &#8746; M(e2)
+  &#8467;(e*) = &#8467;(e1) + &#8467;(e2)
 
 For each surviving edge e:
   compute its canonical unrooted split key
   record [split key, M(e), &#8467;(e)]
 
 For each primitive coordinate b:
-  if some surviving edge has M(e) = {b}:
+  containers = surviving edges whose member set contains b
+
+  if exactly one container exists and M(container) = {b}:
       OBSERVED_PRIMITIVE
-  else if b &#8712; M(e) for some surviving edge with |M(e)| &gt; 1:
+  else if exactly one container exists and |M(container)| &gt; 1:
       NA_FUSE
   else:
       NA_STRUCT
 </code></pre>
 
-    <div class="prose" style="margin-top:14px"><p class="axnote">这个 oracle 最初是作为 SplitAligner 基准的独立验证层写出来的，也正是 Catnip10 的出生地。包含输入、脚本与审计输出的原始构造，放在 <a href="https://github.com/wujiaqi06/SplitAligner/tree/main/benchmark" target="_blank" rel="noopener">SplitAligner 的 benchmark 目录</a>。</p></div>
+    <div class="note">
+      <p><strong>不循环的 oracle。</strong>规范化 split key 只在图简约<em>之后</em>计算，用于识别并对齐存活的简约边；它不产生剪枝状态。原始坐标状态完全来自图的删除、收缩，以及被传播的原始边成员归属。</p>
+      <p>该 oracle 不以 SplitAligner 的输出、参与者的输出、包特有的分枝编号或参与者特有的映射逻辑作为输入。</p>
+    </div>
+
+
+    <div class="prose" style="margin-top:14px"><p class="axnote"><strong>历史沿革。</strong>Catnip10 源自最初为 SplitAligner 基准开发的独立验证层。那个<a href="https://github.com/wujiaqi06/SplitAligner/tree/main/benchmark" target="_blank" rel="noopener">benchmark 目录</a>保存的是历史前身。权威的 Catnip10 oracle 规范、真值表与复合分枝账本，维护在<a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">当前的 Catnip10 仓库</a>中。</p></div>
 
     <div class="note">
-      <p>由于整个过程是确定且有限的，17 条坐标在任意类群子集下的期望状态都可以预先穷举——不需要模拟、不需要抽样，也不需要数值容差。对于适用该坐标契约且适配器已通过验证的工作流，与冻结 oracle 的不一致构成可审计的一致性偏差。</p>
+      <p>由于整个过程是确定且有限的，17 条坐标在基准所允许的每一个保留叶节点子集下的期望状态都可以预先穷举——不需要模拟、不需要抽样，也不需要数值容差。对于适用该坐标契约且适配器已通过验证的工作流，与冻结 oracle 的不一致构成可审计的一致性偏差。</p>
       <p><strong>三种状态的适用范围：</strong>在这个固定拓扑的 toy core 中，<code>observed</code>、<code>NA_fuse</code> 和 <code>NA_struct</code> 互斥且完备。这是本基准设计的性质，并不是对所有异质树工作流的一般性断言。拓扑导致的缺失被有意排除在固定拓扑 core 之外，因此这三种状态并不构成其他工作流的完整状态分类体系。</p>
     </div>
   </div>
@@ -1304,7 +1308,7 @@ For each primitive coordinate b:
     <div class="tkey"><span><i class="mono" style="color:#2f5cc4">NA_fuse</i> — 仅在复合分枝内部存活</span><span><i class="mono" style="color:#bf3625">NA_struct</i> — 结构性缺失</span><span>数值 — 可独立观测</span></div>
 
     <div class="subh">G · Method A — 局部序列</div>
-    <div class="prose"><p>同一个暴露工作流、同一份固定轴契约，而这一次<strong>没有任何一格与 oracle 不一致</strong>。凡 oracle 记为可独立观测的坐标都带着数值，凡不具资格的格子都是空的。七步全程没有需要高亮的格子。</p></div>
+    <div class="prose"><p>同一个受该坐标契约约束的工作流、同一份固定轴契约，而这一次<strong>没有任何一格与 oracle 不一致</strong>。凡 oracle 记为可独立观测的坐标都带着数值，凡不具资格的格子都是空的。七步全程没有需要高亮的格子。</p></div>
 
     <div class="axis-wrap"><table class="axis"><thead><tr><th class="rl">步骤</th>
 <th>t10</th>
@@ -1666,7 +1670,7 @@ For each primitive coordinate b:
     </div>
 
     <div class="note">
-      <p><strong>为什么两套序列都要给。</strong>一个工作流在某种剪枝几何下满足契约，并不等于它在另一种几何下也满足。这里同一个暴露实现在全局序列下与 oracle 不一致，在局部序列下则完全一致——原因只是融合的坐标不同，而一个工作流完全可能正确处理一种融合模式、却处理错另一种。只认证一套序列并由此推广，正是这个基准要防止的推断。两套序列都随基准发布，原因就在这里。</p>
+      <p><strong>为什么两套序列都要给。</strong>一个工作流在某种剪枝几何下满足契约，并不等于它在另一种几何下也满足。这里同一个受该坐标契约约束的实现在全局序列下与 oracle 不一致，在局部序列下则完全一致——原因只是融合的坐标不同，而一个工作流完全可能正确处理一种融合模式、却处理错另一种。只认证一套序列并由此推广，正是这个基准要防止的推断。两套序列都随基准发布，原因就在这里。</p>
     </div>
 
     <figcaption class="cap" style="margin-top:22px"><b>匿名剪枝案例研究。</b>（A）代表性的全局删除状态展示剪枝如何改变冻结 10 分类群轴上的原始枝坐标资格。（B）独立的图论 oracle 给出全局序列下每条原始枝坐标的期望状态。（C）Method A 适用被检验的固定轴契约；高亮格子显示该冻结配置下的坐标状态不一致，包括 oracle 判为 observed 的坐标脱落，以及完整复合路径量占据融合不合格的原始格。（D）Method B 具有端点/路径原生的估计对象，此处仅作为向原始轴的审计投影展示；其端点相关的投影特征说明的是估计对象的边界，不被归类为对该方法并未主张的原始枝坐标契约的违反。（E）代表性的局部删除状态：删除同样数量的类群，但集中在单个演化支内部。（F）局部序列下 oracle 的期望状态，与全局序列的账本差别很大。（G）局部序列下 Method A 没有不一致格。（H）Method B 依然是 NOT-EXPOSED，只是投影特征不同。把（C）与（G）放在一起读可以看到：同一个实现、同一份坐标契约，在不同的预设剪枝配置下可以产生不同的一致性结果。参与者身份在首次公开版本中不予披露；参与者构建冻结于封存档案，此后实现发生的变化不反映在本页结果中。</figcaption>
