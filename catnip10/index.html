@@ -404,6 +404,42 @@
       <li>Emit <strong>two linked ledgers</strong>: a primitive-coordinate ledger assigning every original coordinate exactly one state, and a composite-edge ledger listing each surviving composite keyed by its member set and summed length.</li>
     </ol>
 
+    <div class="prose"><p>The same procedure, written out. Membership is the only thing carried across contraction, and the three states fall out of it at the end rather than being assigned along the way.</p></div>
+
+<pre><code>Input:
+  weighted unrooted tree G = (V,E)
+  primitive label p(e) and length &#8467;(e) for every reference edge
+  retained tip set S
+
+Initialize:
+  M(e) = {p(e)}
+
+Delete all tips not in S and their incident edges.
+
+Repeat until no change:
+  if a non-tip vertex v has degree 1:
+      delete v and its incident edge          <span class="cm"># an entire clade has disappeared</span>
+
+  if a non-tip vertex v has degree 2:
+      let e1=(u,v), e2=(v,w)
+      replace e1,e2,v by e*=(u,w)
+
+      M(e*) = M(e1) &#8746; M(e2)
+      &#8467;(e*) = &#8467;(e1) + &#8467;(e2)
+
+For each surviving edge e:
+  compute its canonical unrooted split key
+  record [split key, M(e), &#8467;(e)]
+
+For each primitive coordinate b:
+  if some surviving edge has M(e) = {b}:
+      OBSERVED_PRIMITIVE
+  else if b &#8712; M(e) for some surviving edge with |M(e)| &gt; 1:
+      NA_FUSE
+  else:
+      NA_STRUCT
+</code></pre>
+
     <div class="note">
       <p>Because the procedure is deterministic and finite, the expected state of all 17 coordinates can be enumerated for every taxon subset in advance — no simulation, no sampling, no tolerance. For an exposed workflow with a validated adapter, disagreement with the frozen oracle is an auditable conformance mismatch.</p>
       <p><strong>Scope of the three states.</strong> Within this fixed-topology toy core, <code>observed</code>, <code>NA_fuse</code> and <code>NA_struct</code> are mutually exclusive and exhaustive. That is a property of the benchmark's design, not a claim about heterogeneous-tree workflows in general: topology-driven absence is intentionally excluded from the fixed-topology core, so these three states are not offered as a complete taxonomy for workflows outside it.</p>
