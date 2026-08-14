@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SplitAligner — 教程</title>
-<meta name="description" content="SplitAligner 实操教程:安装、运行示例、生成枝坐标矩阵、读懂缺失状态与枝级 Support,并互动探索 Catnip10 图论 oracle。">
+<meta name="description" content="SplitAligner 实操教程：安装、运行示例、生成枝坐标矩阵、读懂缺失状态与枝级 Support，并互动探索 Catnip10 图论 oracle。">
 <link rel="stylesheet" href="catnip10_game.css">
 <script src="catnip10_game_data.js" defer></script>
 <script src="catnip10_game.js" defer></script>
@@ -169,8 +169,8 @@
 <section class="hero">
   <div class="wrap">
     <div class="eyebrow">教程</div>
-    <h1>SplitAligner:从头到尾走一遍</h1>
-    <p class="sub">把一棵物种树和一组基因树,变成一张<em>枝坐标矩阵</em>——每根枝要么携带数值,要么带有明确的缺失状态:结构性、融合相关、拓扑导致,或残余 NA。本教程使用随附的示例,你可以在自己的机器上复现每一份输出。</p>
+    <h1>SplitAligner：从头到尾走一遍</h1>
+    <p class="sub">把一棵物种树和一组基因树，变成一张<em>枝坐标矩阵</em>——每根枝要么携带数值，要么带有明确的缺失状态：结构性、融合相关、拓扑导致，或残余 NA。本教程使用随附的示例，你可以在自己的机器上复现每一份输出。</p>
     <div class="note">SplitAligner 是一个小巧、几乎无依赖的 <strong>Perl</strong> 程序。无需编译——克隆仓库、运行 <code>SplitAligner.pl</code> 即可。下面的命令对应 <code>examples/run.sh</code> 中的实际步骤。</div>
     <ul class="toc">
       <li><a href="#idea">核心思想</a></li>
@@ -189,11 +189,11 @@
 
 <section class="step" id="idea">
   <div class="wrap">
-    <div class="step-head"><span class="step-num">思想</span><h2>一根枝,就是它所作的那个划分</h2></div>
+    <div class="step-head"><span class="step-num">思想</span><h2>一根枝，就是它所作的那个划分</h2></div>
     <div class="prose">
-      <p>SplitAligner 识别一根枝,靠的不是它画在哪里、也不是节点顺序,而是它在类群上诱导出的<strong>二分划分(split)</strong>。对于只采样了部分类群 T<sub>g</sub> 的基因 <em>g</em>,把物种树的每根枝 <em>b</em> <strong>投影</strong>到实际存在的类群上:</p>
+      <p>SplitAligner 识别一根枝，靠的不是它画在哪里、也不是节点顺序，而是它在类群上诱导出的<strong>二分划分（split）</strong>。对于只采样了部分类群 T<sub>g</sub> 的基因 <em>g</em>，把物种树的每根枝 <em>b</em> <strong>投影</strong>到实际存在的类群上：</p>
       <div class="identity">σ<sub>g</sub>(b) = ( A<sub>b</sub> ∩ T<sub>g</sub>  |  B<sub>b</sub> ∩ T<sub>g</sub> )</div>
-      <p>在与物种树限制拓扑一致的基准层中,两根未被删除的原始枝投影划分相同,当且仅当它们落到同一条约化枝上。这并不是说两根原始枝变成了同一根;而是它们在该基因的类群集合下<strong>无法再独立区分</strong>,形成<em>融合</em>。若投影后有一侧为空,则是<em>结构性</em>缺失。对于经验 free 拓扑基因树,SplitAligner 还会另行判断每个可独立观测的投影划分是否被找回。</p>
+      <p>在与物种树限制拓扑一致的基准层中，两根未被删除的原始枝投影划分相同，当且仅当它们落到同一条约化枝上。这并不是说两根原始枝变成了同一根；而是它们在该基因的类群集合下<strong>无法再独立区分</strong>，形成<em>融合</em>。若投影后有一侧为空，则是<em>结构性</em>缺失。对于经验 free 拓扑基因树，SplitAligner 还会另行判断每个可独立观测的投影划分是否被找回。</p>
 
       <div class="note">
         <p><strong>显示根不是坐标。</strong>SplitAligner 的生物学坐标是规范化无根 split，而不是绘制出来的根位置、内部节点编号、遍历顺序或子节点顺序。若两个 Newick 表示编码的是同一个加权无根 split 对象，那么仅改变显示根或序列化方式，并不会改变底层的生物学 split 身份。</p>
@@ -225,7 +225,7 @@
           <text class="rf-cap" x="496" y="104">B 别名可能不同</text>
         </svg>
       </div>
-      <p>整个流程有两个模式:<code>matrix</code> 构建坐标系并把所有基因投影上去;<code>finalize</code> 再根据成对证据区分缺失状态。</p>
+      <p>整个流程有两个模式：<code>matrix</code> 构建坐标系并把所有基因投影上去；<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>
 </section>
@@ -234,7 +234,7 @@
   <div class="wrap">
     <div class="step-head"><span class="step-num">1</span><h2>安装</h2></div>
     <div class="prose">
-      <p>你需要 <strong>Perl 5</strong>(macOS 和大多数 Linux 自带)。SplitAligner 只用核心模块——无需安装任何 CPAN 包。</p>
+      <p>你需要 <strong>Perl 5</strong>（macOS 和大多数 Linux 自带）。SplitAligner 只用核心模块——无需安装任何 CPAN 包。</p>
     </div>
     <div class="code"><pre><span class="c"># 克隆仓库</span>
 <span class="k">git clone</span> https://github.com/wujiaqi06/SplitAligner
@@ -243,7 +243,7 @@
 <span class="c"># 确认可运行(会打印用法说明)</span>
 <span class="k">perl</span> SplitAligner.pl</pre></div>
     <div class="prose">
-      <p>安装到此为止。主控脚本是 <code>SplitAligner.pl</code>;各步骤的辅助脚本在 <code>scripts/</code> 中,会被自动调用。</p>
+      <p>安装到此为止。主控脚本是 <code>SplitAligner.pl</code>；各步骤的辅助脚本在 <code>scripts/</code> 中，会被自动调用。</p>
     </div>
   </div>
 </section>
@@ -252,30 +252,30 @@
   <div class="wrap">
     <div class="step-head"><span class="step-num">2</span><h2>准备输入</h2></div>
     <div class="prose">
-      <p><strong>物种树</strong> —— 一棵 Newick 树。允许带枝长和支持度,在基于划分的映射中会被直接忽略。</p>
+      <p><strong>物种树</strong> —— 一棵 Newick 树。允许带枝长和支持度，在基于划分的映射中会被直接忽略。</p>
     </div>
     <div class="code"><pre>((A:0.1,B:0.2):0.2,(C:0.1,D:0.1):0.1):0.1;</pre></div>
     <div class="prose">
-      <p><strong>基因树</strong> —— Newick 格式,<strong>一行一条记录</strong>,每行以基因标识符开头,紧接着是该基因的树。类群名必须与物种树一致。</p>
+      <p><strong>基因树</strong> —— Newick 格式，<strong>一行一条记录</strong>，每行以基因标识符开头，紧接着是该基因的树。类群名必须与物种树一致。</p>
     </div>
     <div class="code"><pre>GeneA((A:0.1,B:0.2):0.2,(C:0.1,D:0.1):0.1):0.1;
 GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
     <div class="prose">
-      <p>SplitAligner 区分两类基因树输入,通常两者都要提供:</p>
+      <p>SplitAligner 区分两类基因树输入，通常两者都要提供：</p>
       <ul>
-        <li><strong>free</strong> —— 每个基因独立推断的树(拓扑可以与物种树不一致);</li>
-        <li><strong>fix</strong> —— 在物种树拓扑约束下推断的树(只有枝长)。</li>
+        <li><strong>free</strong> —— 每个基因独立推断的树（拓扑可以与物种树不一致）；</li>
+        <li><strong>fix</strong> —— 在物种树拓扑约束下推断的树（只有枝长）。</li>
       </ul>
-      <p>比较这两者,正是之后区分<em>覆盖度导致</em>的缺失与<em>不一致导致</em>的缺失的关键。</p>
+      <p>比较这两者，正是之后区分<em>覆盖度导致</em>的缺失与<em>不一致导致</em>的缺失的关键。</p>
     </div>
   </div>
 </section>
 
 <section class="step" id="quickstart">
   <div class="wrap">
-    <div class="step-head"><span class="step-num">3</span><h2>快速开始:示例数据</h2></div>
+    <div class="step-head"><span class="step-num">3</span><h2>快速开始：示例数据</h2></div>
     <div class="prose">
-      <p>仓库在 <code>examples/302mammal/</code> 下附带了一个小示例(free / fix 基因树的子集),用于快速的端到端冒烟测试。在仓库根目录下运行:</p>
+      <p>仓库在 <code>examples/302mammal/</code> 下附带了一个小示例（free / fix 基因树的子集），用于快速的端到端冒烟测试。在仓库根目录下运行：</p>
     </div>
     <div class="code"><pre><span class="k">bash</span> examples/run.sh toy</pre></div>
     <div class="prose">
@@ -288,7 +288,7 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">4</span><h2><span class="mono">matrix</span> 模式 —— 构建坐标系</h2></div>
     <div class="prose">
-      <p>每组基因树运行一次 <code>matrix</code>。它给物种树的枝打标签,把所有基因投影上去,写出一张基因 × 枝矩阵。</p>
+      <p>每组基因树运行一次 <code>matrix</code>。它给物种树的枝打标签，把所有基因投影上去，写出一张基因 × 枝矩阵。</p>
     </div>
     <div class="code"><pre><span class="c"># 从仓库根目录开始</span>
 <span class="k">cd</span> examples/302mammal
@@ -303,19 +303,19 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
   <span class="f">--gene</span> input/fix_tree.examples.nwk \
   <span class="f">--label</span> fix</pre></div>
     <div class="prose">
-      <p>主要输出(以 <code>--label</code> 为前缀):</p>
+      <p>主要输出（以 <code>--label</code> 为前缀）：</p>
       <ul>
-        <li><code>species_tree.splits.txt</code> —— 标准的枝坐标系(物种树骨架上的 <code>B1</code>、<code>B2</code>……)。这是所有基因据以度量的共同坐标轴。</li>
+        <li><code>species_tree.splits.txt</code> —— 标准的枝坐标系（物种树骨架上的 <code>B1</code>、<code>B2</code>……）。这是所有基因据以度量的共同坐标轴。</li>
         <li><code>&lt;label&gt;.matrix_no_fuse.txt</code> —— 仅原始枝。</li>
-        <li><code>&lt;label&gt;.matrix_with_fuse.txt</code> —— 在此基础上,额外加入显式的<strong>融合枝列</strong>(如 <code>B12|B47</code>),对应因类群修剪而合并的枝。</li>
-        <li><code>&lt;label&gt;_splits/</code> 和 <code>&lt;label&gt;_split_branch_label/</code> —— 每个基因的划分表示,及其到骨架的映射。</li>
+        <li><code>&lt;label&gt;.matrix_with_fuse.txt</code> —— 在此基础上，额外加入显式的<strong>融合枝列</strong>（如 <code>B12|B47</code>），对应因类群修剪而合并的枝。</li>
+        <li><code>&lt;label&gt;_splits/</code> 和 <code>&lt;label&gt;_split_branch_label/</code> —— 每个基因的划分表示，及其到骨架的映射。</li>
       </ul>
-      <p>若枝的投影划分被找回,单元格即为其枝长(数值);否则为 <code>NA</code>——但只是<em>暂时</em>的。为这些 <code>NA</code> 命名,就是下一步。</p>
+      <p>若枝的投影划分被找回，单元格即为其枝长（数值）；否则为 <code>NA</code>——但只是<em>暂时</em>的。为这些 <code>NA</code> 命名，就是下一步。</p>
     </div>
     <div class="code"><pre>gene   B1           B2   B3           B4           ...
 A1BG   0.1809315089 NA   0.0047384154 0.0057110032 ...
 A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
-    <div class="cap">free.matrix_with_fuse.txt(节选)</div>
+    <div class="cap">free.matrix_with_fuse.txt（节选）</div>
   </div>
 </section>
 
@@ -323,7 +323,7 @@ A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">5</span><h2><span class="mono">finalize</span> 模式 —— 区分缺失状态</h2></div>
     <div class="prose">
-      <p>把两张矩阵都交给 <code>finalize</code>。它先识别由数值融合坐标解释的原始枝 <code>NA</code>,标为 <code>NA_fuse</code>;再在共享基因上比较 free 与 fix 矩阵,把结构性缺失(<code>NA_struct</code>)与拓扑导致的缺失(<code>NA_topo</code>)分开。若 fix 侧没有可供判断的数值证据,则保留残余 <code>NA</code>。传入 <code>--species_tree</code> 时,还会计算枝级支持度。</p>
+      <p>把两张矩阵都交给 <code>finalize</code>。它先识别由数值融合坐标解释的原始枝 <code>NA</code>，标为 <code>NA_fuse</code>；再在共享基因上比较 free 与 fix 矩阵，把结构性缺失（<code>NA_struct</code>）与拓扑导致的缺失（<code>NA_topo</code>）分开。若 fix 侧没有可供判断的数值证据，则保留残余 <code>NA</code>。传入 <code>--species_tree</code> 时，还会计算枝级支持度。</p>
     </div>
     <div class="code"><pre><span class="k">perl</span> ../../SplitAligner.pl <span class="f">--mode</span> finalize \
   <span class="f">--free</span> free.matrix_with_fuse.txt \
@@ -331,13 +331,13 @@ A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
   <span class="f">--final_label</span> final \
   <span class="f">--species_tree</span> species_tree.forSplit.nwk</pre></div>
     <div class="prose">
-      <p>输出:</p>
+      <p>输出：</p>
       <ul>
-        <li><code>final.free.na_classified.txt</code> / <code>final.fix.na_classified.txt</code> —— 完成状态分类的矩阵;fix 侧缺少数值证据时会保留残余 <code>NA</code>;</li>
-        <li><code>&lt;input&gt;.na_fuse.txt</code> —— 融合救回的中间表;</li>
-        <li><code>final.support_b.txt</code> 和 <code>species_tree.support_b.nwk</code> —— 枝级支持度(见第 7 步)。</li>
+        <li><code>final.free.na_classified.txt</code> / <code>final.fix.na_classified.txt</code> —— 完成状态分类的矩阵；fix 侧缺少数值证据时会保留残余 <code>NA</code>;</li>
+        <li><code>&lt;input&gt;.na_fuse.txt</code> —— 融合救回的中间表；</li>
+        <li><code>final.support_b.txt</code> 和 <code>species_tree.support_b.nwk</code> —— 枝级支持度（见第 7 步）。</li>
       </ul>
-      <p>比较只对<strong>两个</strong>输入都存在的基因有定义;若没有共享基因,SplitAligner 会直接报错停止,而不去猜。</p>
+      <p>比较只对<strong>两个</strong>输入都存在的基因有定义；若没有共享基因，SplitAligner 会直接报错停止，而不去猜。</p>
     </div>
     <div class="code"><pre>gene   B1           B2         B3           ...
 A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
@@ -349,24 +349,24 @@ A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">6</span><h2>读懂各状态</h2></div>
     <div class="prose">
-      <p>每个基因 × 枝单元格最终都恰好取下列一种值。残余 <code>NA</code> 是有意保留的记账状态:没有 fix 侧数值证据时,不能把它升级为 <code>NA_topo</code>。</p>
+      <p>每个基因 × 枝单元格最终都恰好取下列一种值。残余 <code>NA</code> 是有意保留的记账状态：没有 fix 侧数值证据时，不能把它升级为 <code>NA_topo</code>。</p>
     </div>
     <div class="tbl-scroll">
     <table class="states">
       <thead><tr><th>单元格取值</th><th>含义</th></tr></thead>
       <tbody>
-        <tr><td class="st-map">数值</td><td><strong>Mapped(已映射)。</strong>该枝的投影划分在此基因中被观测到;数值即其枝长。</td></tr>
-        <tr><td class="st-fuse">NA_fuse</td><td>类群修剪后,该原始枝不再能被独立观测。一个<strong>融合</strong>坐标可以带有数值枝长,但该数值不是这根原始枝的独立估计。</td></tr>
-        <tr><td class="st-struct">NA_struct</td><td>投影后有一侧为空,该枝对此基因<strong>没有投影身份</strong>、无法评估(覆盖度效应)。</td></tr>
-        <tr><td class="st-topo">NA_topo</td><td>fix 侧有原始枝数值证据,但该投影划分<strong>没有在推断出的 free 拓扑树中找回</strong>——与拓扑导致的不一致相符。</td></tr>
-        <tr><td class="st-res">NA</td><td>残余:当 fix 侧没有可据以判定的数值证据时保留。</td></tr>
+        <tr><td class="st-map">数值</td><td><strong>Mapped（已映射）。</strong>该枝的投影划分在此基因中被观测到；数值即其枝长。</td></tr>
+        <tr><td class="st-fuse">NA_fuse</td><td>类群修剪后，该原始枝不再能被独立观测。一个<strong>融合</strong>坐标可以带有数值枝长，但该数值不是这根原始枝的独立估计。</td></tr>
+        <tr><td class="st-struct">NA_struct</td><td>投影后有一侧为空，该枝对此基因<strong>没有投影身份</strong>、无法评估（覆盖度效应）。</td></tr>
+        <tr><td class="st-topo">NA_topo</td><td>fix 侧有原始枝数值证据，但该投影划分<strong>没有在推断出的 free 拓扑树中找回</strong>——与拓扑导致的不一致相符。</td></tr>
+        <tr><td class="st-res">NA</td><td>残余：当 fix 侧没有可据以判定的数值证据时保留。</td></tr>
       </tbody>
     </table>
     </div>
     <div class="prose">
-      <p>这些类别对坐标轴构成一个划分——加起来就是整本台账:</p>
+      <p>这些类别对坐标轴构成一个划分——加起来就是整本台账：</p>
       <div class="identity">|C| = Mapped + NA_fuse + NA_struct + NA_topo + 残余 NA</div>
-      <p>一旦 <code>NA</code> 按<em>原因</em>拆开,下游的速率或选择分析就能明确地处理、过滤和审计各类状态,而不是把所有缺失都压成同一个不透明的值。</p>
+      <p>一旦 <code>NA</code> 按<em>原因</em>拆开，下游的速率或选择分析就能明确地处理、过滤和审计各类状态，而不是把所有缺失都压成同一个不透明的值。</p>
     </div>
   </div>
 </section>
@@ -375,15 +375,15 @@ A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">7</span><h2>枝级 Support</h2></div>
     <div class="prose">
-      <p>当你传入 <code>--species_tree</code>,<code>finalize</code> 会写出 <code>final.support_b.txt</code>:对骨架上的每根枝,给出它在共享基因上、free 树相对 fix 树保留了多少数值证据。</p>
+      <p>当你传入 <code>--species_tree</code>,<code>finalize</code> 会写出 <code>final.support_b.txt</code>：对骨架上的每根枝，给出它在共享基因上、free 树相对 fix 树保留了多少数值证据。</p>
     </div>
     <div class="code"><pre>branch_id  branch_type  n_shared_genes  n_fix_non_na  n_free_non_na  support_percent  discordance_percent
 B1         terminal     5               5             5              100.0000000000   0.0000000000
 B2         terminal     5               4             4              100.0000000000   0.0000000000
 B3         terminal     5               4             4              100.0000000000   0.0000000000</pre></div>
-    <div class="cap">final.support_b.txt(表头)</div>
+    <div class="cap">final.support_b.txt（表头）</div>
     <div class="prose">
-      <p>配套的 <code>species_tree.support_b.nwk</code> 是一棵标准 Newick 树,把每根内部枝的 <code>Support</code> 写在自展值(bootstrap)位置上,可在任意树浏览器(如 FigTree)中打开,直接把一致度映射到拓扑上查看。</p>
+      <p>配套的 <code>species_tree.support_b.nwk</code> 是一棵标准 Newick 树，把每根内部枝的 <code>Support</code> 写在自展值（bootstrap）位置上，可在任意树浏览器（如 FigTree）中打开，直接把一致度映射到拓扑上查看。</p>
     </div>
   </div>
 </section>
@@ -392,15 +392,15 @@ B3         terminal     5               4             4              100.0000000
   <div class="wrap">
     <div class="step-head"><span class="step-num">8</span><h2>扩展到全量</h2></div>
     <div class="prose">
-      <p>同样这两个模式,在全量规模上照样运行。随附的 preprint 示例使用了 302 种哺乳类、2,275 棵 free 拓扑与 2,275 棵 fix 拓扑基因树:</p>
+      <p>同样这两个模式，在全量规模上照样运行。随附的 preprint 示例使用了 302 种哺乳类、2,275 棵 free 拓扑与 2,275 棵 fix 拓扑基因树：</p>
     </div>
     <div class="code"><pre><span class="k">bash</span> examples/run.sh preprint</pre></div>
     <div class="prose">
-      <p>在共享的一致性子问题上,SplitAligner 的 <code>Support(b)</code> 与 <strong>PhyParts</strong> 高度一致(299 根内部枝上 Pearson r = 0.99997)。在论文报告的同机测试中,SplitAligner 完整流程用时 9 分 52 秒,PhyParts 的快速一致性设置用时 1 小时 50 分 53 秒——在这套数据上约快 <strong>11 倍</strong>。这是校准与运行时间比较,并不表示两种方法功能等价。</p>
+      <p>在共享的一致性子问题上，SplitAligner 的 <code>Support(b)</code> 与 <strong>PhyParts</strong> 高度一致（299 根内部枝上 Pearson r = 0.99997）。在论文报告的同机测试中，SplitAligner 完整流程用时 9 分 52 秒，PhyParts 的快速一致性设置用时 1 小时 50 分 53 秒——在这套数据上约快 <strong>11 倍</strong>。这是校准与运行时间比较，并不表示两种方法功能等价。</p>
       <div class="next">
-        <a href="SplitAligner_explainer_zh.html"><div class="t">动画讲解 ↗</div><div class="d">同一个思想的可视化——融合、投影,以及每一种状态。</div></a>
-        <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener"><div class="t">预印本(bioRxiv) ↗</div><div class="d">方法以及 302 种哺乳类的分析。</div></a>
-        <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener"><div class="t">SplitAligner(GitHub) ↗</div><div class="d">源码、示例与 preprint 数据,以及 docs/ 规范。</div></a>
+        <a href="SplitAligner_explainer_zh.html"><div class="t">动画讲解 ↗</div><div class="d">同一个思想的可视化——融合、投影，以及每一种状态。</div></a>
+        <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener"><div class="t">预印本（bioRxiv） ↗</div><div class="d">方法以及 302 种哺乳类的分析。</div></a>
+        <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener"><div class="t">SplitAligner(GitHub) ↗</div><div class="d">源码、示例与 preprint 数据，以及 docs/ 规范。</div></a>
         <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener"><div class="t">SplitAlignerR + Catnip10 ↗</div><div class="d">附带确定性 Catnip10 审计基准的 R 包。</div></a>
       </div>
     </div>
@@ -411,7 +411,7 @@ B3         terminal     5               4             4              100.0000000
   <div class="wrap">
     <div class="step-head"><span class="step-num">9</span><h2>动手玩 Catnip10</h2></div>
     <div class="prose">
-      <p>这里只让类群缺失发生,不引入基因树不一致。完整的 <code>B1–B17</code> 坐标轴始终冻结;每次删除后,由图决定的台账会更新为 <strong>observed</strong>、<strong>NA_fuse</strong> 或 <strong>NA_struct</strong>。在这个实验里,<code>NA_topo</code> 始终为零。</p>
+      <p>这里只让类群缺失发生，不引入基因树不一致。完整的 <code>B1–B17</code> 坐标轴始终冻结；每次删除后，由图决定的台账会更新为 <strong>observed</strong>、<strong>NA_fuse</strong> 或 <strong>NA_struct</strong>。在这个实验里，<code>NA_topo</code> 始终为零。</p>
     </div>
     <div class="catnip-game" data-lang="zh"><noscript>Catnip10 互动需要启用 JavaScript。</noscript></div>
   </div>
@@ -420,8 +420,8 @@ B3         terminal     5               4             4              100.0000000
 
 <footer>
   <div class="wrap">
-    <span>© <span id="yr"></span> 吴佳齐(呉佳齊)· 广岛大学</span>
-    <span>SplitAligner · 一本安静的台账,每一处缺失都有名字</span>
+    <span>© <span id="yr"></span> 吴佳齐（呉佳齊）· 广岛大学</span>
+    <span>SplitAligner · 一本安静的台账，每一处缺失都有名字</span>
   </div>
 </footer>
 

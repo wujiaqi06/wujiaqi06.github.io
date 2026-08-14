@@ -246,9 +246,9 @@
       <svg class="bg-tree no-draw" id="bgTree" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
       <div class="wrap">
         <div class="eyebrow rv">系统发育基因组学 · 分支可比性</div>
-        <h1 class="title rv" style="--d:.08s">同一条分支,<br>贯穿每一个基因。</h1>
-        <p class="lede rv" style="--d:.18s">当类群缺失、或基因树彼此不一致时,一条分支可能消失、与邻枝融合、或掉头离开——而这些统统被压成一个无从区分的 <span class="tok res">NA</span>。SplitAligner 为每一种缺失赋予名字。</p>
-        <p class="tagline rv" style="--d:.3s">一本安静的账本,每一次缺失都有名字。</p>
+        <h1 class="title rv" style="--d:.08s">同一条分支，<br>贯穿每一个基因。</h1>
+        <p class="lede rv" style="--d:.18s">当类群缺失、或基因树彼此不一致时，一条分支可能消失、与邻枝融合、或掉头离开——而这些统统被压成一个无从区分的 <span class="tok res">NA</span>。SplitAligner 为每一种缺失赋予名字。</p>
+        <p class="tagline rv" style="--d:.3s">一本安静的账本，每一次缺失都有名字。</p>
       </div>
     </section>
 
@@ -258,9 +258,9 @@
         <div class="panel rv"><svg id="treePremise" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="带 17 个分支坐标标签的 10 类群基准物种树"></svg></div>
         <div style="display:grid; gap:20px">
           <div class="eyebrow rv">基准</div>
-          <h2 class="headline rv" style="--d:.08s">固定一棵树,给每条分支命名。</h2>
-          <p class="lede rv" style="--d:.18s">一棵刻意做到最简的 10 类群树——由 R/APE 生成的随机拓扑(<span class="mono">seed 42</span>),枝长固定,<em>没有</em>任何速率变化、不一致或估计误差。它的无根轴定义了 <em>17 个原始分支坐标</em>:10 条末端分支 <span class="mono">t1–t10</span> 与 7 条内部分支 <span class="mono">N_12–N_18</span>。</p>
-          <p class="lede rv" style="--d:.26s">这就是被冻结的坐标系。我们唯一改变的,是某个基因恰好采样了哪些类群。</p>
+          <h2 class="headline rv" style="--d:.08s">固定一棵树，给每条分支命名。</h2>
+          <p class="lede rv" style="--d:.18s">一棵刻意做到最简的 10 类群树——由 R/APE 生成的随机拓扑（<span class="mono">seed 42</span>），枝长固定，<em>没有</em>任何速率变化、不一致或估计误差。它的无根轴定义了 <em>17 个原始分支坐标</em>：10 条末端分支 <span class="mono">t1–t10</span> 与 7 条内部分支 <span class="mono">N_12–N_18</span>。</p>
+          <p class="lede rv" style="--d:.26s">这就是被冻结的坐标系。我们唯一改变的，是某个基因恰好采样了哪些类群。</p>
         </div>
       </div>
     </section>
@@ -271,11 +271,11 @@
         <div class="panel rv"><svg id="treeSplit" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="一条内部分支把树切成两个类群集合"></svg></div>
         <div style="display:grid; gap:18px">
           <div class="eyebrow rv">核心思想</div>
-          <h2 class="headline rv" style="--d:.08s">一条分支,<em>就是</em>它所形成的分裂。</h2>
-          <p class="lede rv" style="--d:.18s">剪断分支 <span class="mono" style="color:var(--accent)">N_13</span>,树就分成两组。这个二分(分裂)——而非它画出来的位置或生根方式——<em>才是</em>分支的身份。</p>
+          <h2 class="headline rv" style="--d:.08s">一条分支，<em>就是</em>它所形成的分裂。</h2>
+          <p class="lede rv" style="--d:.18s">剪断分支 <span class="mono" style="color:var(--accent)">N_13</span>，树就分成两组。这个二分（分裂）——而非它画出来的位置或生根方式——<em>才是</em>分支的身份。</p>
           <div class="formula rv" style="--d:.26s">
             &sigma;(N_13) = ( <span style="color:var(--sideA)">t8, t7, t4, t9</span> &nbsp;|&nbsp; <span style="color:var(--sideB)">t1, t10, t5, t2, t3, t6</span> )<br>
-            <span class="dim">两条分支「相同」,当且仅当它们的分裂一致</span>
+            <span class="dim">两条分支「相同」，当且仅当它们的分裂一致</span>
           </div>
         </div>
       </div>
@@ -286,7 +286,7 @@
       <div class="wrap" style="gap:14px">
         <div style="display:grid; gap:8px; margin-bottom:6px">
           <div class="eyebrow rv">机制</div>
-          <h2 class="headline rv" style="--d:.06s">去掉一个类群,两条分支就融合为一。</h2>
+          <h2 class="headline rv" style="--d:.06s">去掉一个类群，两条分支就融合为一。</h2>
         </div>
         <div class="split-cols">
           <div class="panel rv" style="--d:.12s">
@@ -294,15 +294,15 @@
             <svg id="treeFuseBefore" class="no-draw" viewBox="0 0 360 250" role="img" aria-label="删除 t8 之前的子树"></svg>
           </div>
           <div class="panel rv" style="--d:.2s">
-            <div style="font-family:var(--mono); font-size:12px; color:var(--muted); margin-bottom:6px">删除后 &mdash; t8 移除,N_13 与 N_14 合并</div>
-            <svg id="treeFuseAfter" class="no-draw" viewBox="0 0 360 250" role="img" aria-label="删除 t8 之后的子树,显示融合的分支"></svg>
+            <div style="font-family:var(--mono); font-size:12px; color:var(--muted); margin-bottom:6px">删除后 &mdash; t8 移除，N_13 与 N_14 合并</div>
+            <svg id="treeFuseAfter" class="no-draw" viewBox="0 0 360 250" role="img" aria-label="删除 t8 之后的子树，显示融合的分支"></svg>
           </div>
         </div>
         <div class="fuse-eq rv" style="--d:.24s">
           L(N_13&#124;N_14) = L(N_13) + L(N_14) = 0.946668 + 0.514212 = <b>1.460880</b>
         </div>
         <div class="formula rv" style="--d:.34s; max-width:none; font-size:13.5px">
-          移除 <span class="tok struct">t8</span> 会消除一个二度节点:相邻的两条边合并,<span style="color:var(--fuse)">N_13</span>、<span style="color:var(--fuse)">N_14</span> 变成融合坐标 <span style="color:var(--fuse)">N_13&#124;N_14</span> &mdash; 但上面那条枝长并<em>未</em>丢失。所以 <span class="tok fuse">NA_fuse</span> 意味着<em>失去独立身份</em>,而非缺少长度;<span class="tok struct">NA_struct</span> 则是被删除、根本没有投影的分支。
+          移除 <span class="tok struct">t8</span> 会消除一个二度节点：相邻的两条边合并，<span style="color:var(--fuse)">N_13</span>、<span style="color:var(--fuse)">N_14</span> 变成融合坐标 <span style="color:var(--fuse)">N_13&#124;N_14</span> &mdash; 但上面那条枝长并<em>未</em>丢失。所以 <span class="tok fuse">NA_fuse</span> 意味着<em>失去独立身份</em>，而非缺少长度；<span class="tok struct">NA_struct</span> 则是被删除、根本没有投影的分支。
         </div>
       </div>
     </section>
@@ -315,7 +315,7 @@
           <span class="regime-badge">全局删除 · 从外类群开始</span>
         </div>
         <div class="del-grid">
-          <div class="panel"><svg id="delTree" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="全局(从外类群开始)删除类群下的基准树"></svg></div>
+          <div class="panel"><svg id="delTree" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="全局（从外类群开始）删除类群下的基准树"></svg></div>
           <div>
             <div class="step-cap" id="stepCap">完整的树 —— 17 个冻结坐标全部被观测</div>
             <div class="chips" id="chips" style="margin-top:12px"></div>
@@ -325,11 +325,11 @@
               <div class="count struct"><div class="v" id="cStruct">0</div><div class="k">NA_struct</div></div>
             </div>
             <div class="legend-inline" style="margin-top:16px">
-              <span><span class="sw obs"></span>观测(数值)</span>
-              <span><span class="sw fuse"></span>NA_fuse(融合)</span>
-              <span><span class="sw struct"></span>NA_struct(缺失)</span>
+              <span><span class="sw obs"></span>观测（数值）</span>
+              <span><span class="sw fuse"></span>NA_fuse（融合）</span>
+              <span><span class="sw struct"></span>NA_struct（缺失）</span>
             </div>
-            <p class="lede" style="font-size:13.5px; margin-top:16px">删除顺序 <span class="mono">t10, t1, t8, t7, t4, t9, t5</span> 从根部向内层层剥离。整个演化支坍塌,于是 <span class="tok struct">NA_struct</span> 迅速攀升。每个坐标都与一个独立的图论判定器核对——不凭空捏造,也不悄悄丢弃。这里没有不一致,所以 <span class="tok topo">NA_topo</span> = 0。</p>
+            <p class="lede" style="font-size:13.5px; margin-top:16px">删除顺序 <span class="mono">t10, t1, t8, t7, t4, t9, t5</span> 从根部向内层层剥离。整个演化支坍塌，于是 <span class="tok struct">NA_struct</span> 迅速攀升。每个坐标都与一个独立的图论判定器核对——不凭空捏造，也不悄悄丢弃。这里没有不一致，所以 <span class="tok topo">NA_topo</span> = 0。</p>
           </div>
         </div>
       </div>
@@ -339,11 +339,11 @@
     <section class="scene" id="s4L">
       <div class="wrap" style="gap:12px">
         <div class="del-head">
-          <div class="eyebrow" style="margin-right:auto">审计 · 同一轴,不同的印记</div>
+          <div class="eyebrow" style="margin-right:auto">审计 · 同一轴，不同的印记</div>
           <span class="regime-badge alt">局部删除 · 集中于一处</span>
         </div>
         <div class="del-grid">
-          <div class="panel"><svg id="delTreeL" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="局部(集中于一处)删除类群下的基准树"></svg></div>
+          <div class="panel"><svg id="delTreeL" class="no-draw" viewBox="0 0 540 430" role="img" aria-label="局部（集中于一处）删除类群下的基准树"></svg></div>
           <div>
             <div class="step-cap" id="stepCapL">完整的树 —— 17 个冻结坐标全部被观测</div>
             <div class="chips" id="chipsL" style="margin-top:12px"></div>
@@ -353,11 +353,11 @@
               <div class="count struct"><div class="v" id="cStructL">0</div><div class="k">NA_struct</div></div>
             </div>
             <div class="legend-inline" style="margin-top:16px">
-              <span><span class="sw obs"></span>观测(数值)</span>
-              <span><span class="sw fuse"></span>NA_fuse(融合)</span>
-              <span><span class="sw struct"></span>NA_struct(缺失)</span>
+              <span><span class="sw obs"></span>观测（数值）</span>
+              <span><span class="sw fuse"></span>NA_fuse（融合）</span>
+              <span><span class="sw struct"></span>NA_struct（缺失）</span>
             </div>
-            <p class="lede" style="font-size:13.5px; margin-top:16px">删除顺序 <span class="mono">t8, t7, t4, t9, t5, t2, t3</span> 只攻击一个演化支,因此融合集中在一处,而另一侧能长久保留其数值坐标。同一个被冻结的轴,却呈现不同的缺失印记——而 <span class="tok topo">NA_topo</span> 依旧 = 0。</p>
+            <p class="lede" style="font-size:13.5px; margin-top:16px">删除顺序 <span class="mono">t8, t7, t4, t9, t5, t2, t3</span> 只攻击一个演化支，因此融合集中在一处，而另一侧能长久保留其数值坐标。同一个被冻结的轴，却呈现不同的缺失印记——而 <span class="tok topo">NA_topo</span> 依旧 = 0。</p>
           </div>
         </div>
       </div>
@@ -374,24 +374,24 @@
           <div class="formula rv" style="--d:.12s; max-width:none">
             固定物种树 <b style="color:var(--paper)">S</b> 与每个基因所保留的类群 <b style="color:var(--paper)">T<sub>g</sub></b>。剪枝诱导出一个<em style="color:var(--paper); font-style:normal">唯一</em>的映射<br>
             <span style="color:var(--accent)">&pi;<sub>g</sub> : B(S) &rarr; E(&rho;<sub>Tg</sub>(S)) &#8852; {&perp;}</span><br>
-            <span class="dim">每条原始分支 &rarr; 吸收它的简约边;若被剪掉则映到 &perp;。</span><br><br>
+            <span class="dim">每条原始分支 &rarr; 吸收它的简约边；若被剪掉则映到 &perp;。</span><br><br>
             status(g,b) = <span style="color:var(--obs)">observed</span> &nbsp;&nbsp;|fiber| = 1<br>
             <span style="display:inline-block; width:7.2em"></span>= <span style="color:var(--fuse)">NA_fuse</span> &nbsp;&nbsp;&nbsp;|fiber| &ge; 2<br>
             <span style="display:inline-block; width:7.2em"></span>= <span style="color:var(--struct)">NA_struct</span> &nbsp;&pi;<sub>g</sub>(b) = &perp;
           </div>
           <div class="proof">
-            <div class="step rv" style="--d:.16s">剪枝后的树 <b>&rho;<sub>Tg</sub>(S)</b> 是唯一的——标准的树限制操作(<span class="mono">ape::drop.tip</span>),不依赖任何标签或分裂。</div>
-            <div class="step rv" style="--d:.24s">二度节点消除是一种<b>边商</b>:每条分支恰好落入一条简约边,或被删除。因此 <b>&pi;<sub>g</sub></b> 是良定义的。</div>
-            <div class="step rv" style="--d:.32s">|fiber| = 1、|fiber| &ge; 2、以及「被删除」<b>互斥且穷尽</b>——构成一个划分;status 是 |fiber| 的函数。</div>
-            <div class="step rv" style="--d:.4s">当 |fiber| = 1 时,简约边的长度等于 <b>&ell;(b)</b>:观测<em>值</em>同样唯一。</div>
-            <div class="step rv" style="--d:.48s">每条纤维都是一段<b>连通的路径</b>——融合坐标是一条路径,而非零散的集合。<span class="qed">&#8718;</span></div>
+            <div class="step rv" style="--d:.16s">剪枝后的树 <b>&rho;<sub>Tg</sub>(S)</b> 是唯一的——标准的树限制操作（<span class="mono">ape::drop.tip</span>），不依赖任何标签或分裂。</div>
+            <div class="step rv" style="--d:.24s">二度节点消除是一种<b>边商</b>：每条分支恰好落入一条简约边，或被删除。因此 <b>&pi;<sub>g</sub></b> 是良定义的。</div>
+            <div class="step rv" style="--d:.32s">|fiber| = 1、|fiber| &ge; 2、以及「被删除」<b>互斥且穷尽</b>——构成一个划分；status 是 |fiber| 的函数。</div>
+            <div class="step rv" style="--d:.4s">当 |fiber| = 1 时，简约边的长度等于 <b>&ell;(b)</b>：观测<em>值</em>同样唯一。</div>
+            <div class="step rv" style="--d:.48s">每条纤维都是一段<b>连通的路径</b>——融合坐标是一条路径，而非零散的集合。<span class="qed">&#8718;</span></div>
           </div>
           <div class="formula rv" style="--d:.2s; max-width:none; text-align:center">
             |B(S)| = <span style="color:var(--obs)">|observed|</span> + <span style="color:var(--fuse)">|NA_fuse|</span> + <span style="color:var(--struct)">|NA_struct|</span>
           </div>
-          <div class="cor-chip rv" style="--d:.56s"><span class="lbl">引理1 · 分裂 = 纤维</span><br>&sigma;<sub>g</sub>(b) = &sigma;<sub>g</sub>(b&prime;) &nbsp;&hArr;&nbsp; &pi;<sub>g</sub>(b) = &pi;<sub>g</sub>(b&prime;)。SplitAligner 的分裂投影<b>忠实地计算出</b>由图确定的账本——分裂键是纤维的精确编码,而非另一套定义。</div>
-          <p class="lede rv" style="--d:.28s; font-size:14px">每个 status 都是<em>单值</em>的——它是那个唯一映射 &pi;<sub>g</sub> 的函数。一旦确定采样了谁,每个格子就只有一个正确答案。<em>「每一次缺失都有名字」——这是一条定理。</em></p>
-          <div class="cor-chip rv" style="--d:.6s"><span class="lbl">推论2.5 · 真值层 vs 复原层</span><br>真值层只依赖 <b>(S, T<sub>g</sub>)</b>——绝不依赖基因树的拓扑。不一致无法扰乱 <span class="tok struct">NA_struct</span>&thinsp;/&thinsp;<span class="tok fuse">NA_fuse</span>;它只会开启另一个独立的复原层 <span class="tok topo">NA_topo</span>。</div>
+          <div class="cor-chip rv" style="--d:.56s"><span class="lbl">引理1 · 分裂 = 纤维</span><br>&sigma;<sub>g</sub>(b) = &sigma;<sub>g</sub>(b&prime;) &nbsp;&hArr;&nbsp; &pi;<sub>g</sub>(b) = &pi;<sub>g</sub>(b&prime;)。SplitAligner 的分裂投影<b>忠实地计算出</b>由图确定的账本——分裂键是纤维的精确编码，而非另一套定义。</div>
+          <p class="lede rv" style="--d:.28s; font-size:14px">每个 status 都是<em>单值</em>的——它是那个唯一映射 &pi;<sub>g</sub> 的函数。一旦确定采样了谁，每个格子就只有一个正确答案。<em>「每一次缺失都有名字」——这是一条定理。</em></p>
+          <div class="cor-chip rv" style="--d:.6s"><span class="lbl">推论2.5 · 真值层 vs 复原层</span><br>真值层只依赖 <b>(S, T<sub>g</sub>)</b>——绝不依赖基因树的拓扑。不一致无法扰乱 <span class="tok struct">NA_struct</span>&thinsp;/&thinsp;<span class="tok fuse">NA_fuse</span>；它只会开启另一个独立的复原层 <span class="tok topo">NA_topo</span>。</div>
         </div>
       </div>
     </section>
@@ -406,7 +406,7 @@
         <div class="fates">
           <div class="fate mapped rv" style="--d:.10s">
             <div class="cap"><span class="name" style="color:var(--mapped)">Mapped</span><span class="swatch" style="background:var(--mapped)"></span></div>
-            <div class="why">投影分裂唯一可辨,<em>且</em>确实出现在基因树中。<b>分支被回收。</b></div>
+            <div class="why">投影分裂唯一可辨，<em>且</em>确实出现在基因树中。<b>分支被回收。</b></div>
           </div>
           <div class="fate struct rv" style="--d:.18s">
             <div class="cap"><span class="name" style="color:var(--struct)">NA_struct</span><span class="swatch" style="background:var(--struct)"></span></div>
@@ -414,11 +414,11 @@
           </div>
           <div class="fate fuse rv" style="--d:.26s">
             <div class="cap"><span class="name" style="color:var(--fuse)">NA_fuse</span><span class="swatch" style="background:var(--fuse)"></span></div>
-            <div class="why">节点坍塌后,分裂与邻枝共享。<b>信号落在复合分支上。</b></div>
+            <div class="why">节点坍塌后，分裂与邻枝共享。<b>信号落在复合分支上。</b></div>
           </div>
           <div class="fate topo rv" style="--d:.34s">
             <div class="cap"><span class="name" style="color:var(--topo)">NA_topo</span><span class="swatch" style="background:var(--topo)"></span></div>
-            <div class="why">覆盖度没问题,但基因树拓扑<b>不一致</b>——分裂根本不存在。<b>拓扑冲突。</b></div>
+            <div class="why">覆盖度没问题，但基因树拓扑<b>不一致</b>——分裂根本不存在。<b>拓扑冲突。</b></div>
           </div>
         </div>
         <div class="split-cols rv" style="--d:.42s; gap:28px; align-items:stretch">
@@ -429,7 +429,7 @@
               <div class="mini-note">分支 <em style="color:var(--accent); font-style:normal">b</em> = 分裂 {t5,t2} → <span class="tok mapped">Mapped</span></div>
             </div>
             <div style="display:grid; gap:7px; justify-items:center; border-left:1px solid var(--line); padding-left:14px">
-              <div class="mini-cap" style="color:var(--topo)">基因树(不一致)</div>
+              <div class="mini-cap" style="color:var(--topo)">基因树（不一致）</div>
               <svg id="treeGe" class="no-draw" viewBox="0 0 210 165" role="img" aria-label="t5 与 t2 不构成演化支的不一致基因树"></svg>
               <div class="mini-note" style="color:var(--topo)">{t5,t2} 缺失 → <span class="tok topo">NA_topo</span></div>
             </div>
@@ -437,9 +437,9 @@
           <div style="display:grid; gap:14px; align-content:center">
             <div class="topo-call">
               <div class="h">NA_topo —— 头号主角</div>
-              <div class="b">同样的类群、同样的覆盖度——但基因树把它们分到了不同组,于是这个分裂根本不存在。在 302 种哺乳动物的数据里,它占了全部非映射项的 <b style="color:var(--paper)">76.7%</b>。</div>
+              <div class="b">同样的类群、同样的覆盖度——但基因树把它们分到了不同组，于是这个分裂根本不存在。在 302 种哺乳动物的数据里，它占了全部非映射项的 <b style="color:var(--paper)">76.7%</b>。</div>
             </div>
-            <p class="lede" style="font-size:13px">10 类群基准在设计上排除了不一致,因此能干净地分离 <span class="tok struct">NA_struct</span> 与 <span class="tok fuse">NA_fuse</span>。真实的基因树则打开了第四列 <span class="tok topo">NA_topo</span>;而第五列 <span class="tok res">residual_NA</span>,在固定侧没有可供提升的数值证据时,作为诚实的保留项存在。</p>
+            <p class="lede" style="font-size:13px">10 类群基准在设计上排除了不一致，因此能干净地分离 <span class="tok struct">NA_struct</span> 与 <span class="tok fuse">NA_fuse</span>。真实的基因树则打开了第四列 <span class="tok topo">NA_topo</span>；而第五列 <span class="tok res">residual_NA</span>，在固定侧没有可供提升的数值证据时，作为诚实的保留项存在。</p>
           </div>
         </div>
       </div>
@@ -449,8 +449,8 @@
     <section class="scene" id="s6">
       <div class="wrap" style="gap:26px">
         <div style="display:grid; gap:8px">
-          <div class="eyebrow rv">不丢失,不捏造</div>
-          <h2 class="headline rv" style="--d:.06s">每个 基因×分支 格子,都恰好落入一列。</h2>
+          <div class="eyebrow rv">不丢失，不捏造</div>
+          <h2 class="headline rv" style="--d:.06s">每个 基因×分支 格子，都恰好落入一列。</h2>
         </div>
         <div class="ledger">
           <div style="display:grid; gap:20px">
@@ -484,17 +484,17 @@
       <div class="wrap" style="gap:12px; justify-items:center">
         <div class="eyebrow rv">方法之魂 —— 摘自 README</div>
         <div class="poem">
-          <div class="line rv" style="--d:.1s">在固定的物种树脊梁之上,</div>
-          <div class="line rv" style="--d:.5s">我们只问一件事:分支 <em style="font-style:normal; color:var(--accent)">b</em> 是否依然成立?</div>
+          <div class="line rv" style="--d:.1s">在固定的物种树脊梁之上，</div>
+          <div class="line rv" style="--d:.5s">我们只问一件事：分支 <em style="font-style:normal; color:var(--accent)">b</em> 是否依然成立？</div>
           <div class="spacer"></div>
-          <div class="line rv" style="--d:1.0s">投影这个分裂:</div>
+          <div class="line rv" style="--d:1.0s">投影这个分裂：</div>
           <div class="line rv" style="--d:1.4s">若投影的一侧消失 —— <span style="color:var(--struct)">NA_struct</span>。</div>
           <div class="line rv" style="--d:1.8s">若分支融合 —— <span style="color:var(--fuse)">NA_fuse</span>。</div>
           <div class="line rv" style="--d:2.2s">若拓扑背离 —— <span style="color:var(--topo)">NA_topo</span>。</div>
           <div class="spacer"></div>
-          <div class="line rv" style="--d:2.7s">没有鬼魅,没有遗漏:</div>
+          <div class="line rv" style="--d:2.7s">没有鬼魅，没有遗漏：</div>
           <div class="line rv" style="--d:3.1s">总数 = <span style="color:var(--mapped)">Mapped</span> + <span style="color:var(--struct)">NA_struct</span> + <span style="color:var(--fuse)">NA_fuse</span> + <span style="color:var(--topo)">NA_topo</span> + <span style="color:var(--residual)">residual_NA</span>。</div>
-          <div class="final rv" style="--d:3.8s">一本安静的账本,每一次缺失都有名字。</div>
+          <div class="final rv" style="--d:3.8s">一本安静的账本，每一次缺失都有名字。</div>
         </div>
       </div>
     </section>
@@ -505,7 +505,7 @@
         <svg class="bg-tree no-draw" id="bgTree2" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
         <div class="eyebrow rv">SplitAligner</div>
         <h1 class="title rv" style="--d:.08s; text-align:center; max-width:24ch">让分支身份变得可审计。</h1>
-        <p class="lede rv" style="--d:.2s; text-align:center; margin:0 auto; max-width:66ch">Wu J. (2026). <em>SplitAligner: a branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance.</em> 配套的坐标审计基准:确定性的 10 类群玩具树。</p>
+        <p class="lede rv" style="--d:.2s; text-align:center; margin:0 auto; max-width:66ch">Wu J. (2026). <em>SplitAligner: a branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance.</em> 配套的坐标审计基准：确定性的 10 类群玩具树。</p>
       </div>
     </section>
 
@@ -513,9 +513,9 @@
 
   <div class="controls">
     <div class="progress"><div class="fill" id="pfill"></div></div>
-    <button class="btn" id="prev" title="上一页 (←)" aria-label="上一个场景">‹</button>
-    <button class="btn play" id="play" title="播放 / 暂停 (space)" aria-label="播放 / 暂停">❚❚</button>
-    <button class="btn" id="next" title="下一页 (→)" aria-label="下一个场景">›</button>
+    <button class="btn" id="prev" title="上一页（←）" aria-label="上一个场景">‹</button>
+    <button class="btn play" id="play" title="播放 / 暂停（space）" aria-label="播放 / 暂停">❚❚</button>
+    <button class="btn" id="next" title="下一页（→）" aria-label="下一个场景">›</button>
     <div class="dots" id="dots" role="tablist" aria-label="场景"></div>
     <span class="hint">space · ← → · R 重新开始</span>
     <span class="scene-count" id="count">01 / 11</span>
@@ -739,7 +739,7 @@ function makeDeletion(regime, ids){
     document.getElementById(ids.fuse).textContent=nF;
     document.getElementById(ids.struct).textContent=nS;
     document.getElementById(ids.cap).innerHTML = s===0 ? "完整的树 —— 17 个冻结坐标全部被观测"
-      : `${rn} 步骤 ${s}:删除 <b>{ ${data.order.slice(0,s).join(", ")} }</b>`;
+      : `${rn} 步骤 ${s}：删除 <b>{ ${data.order.slice(0,s).join(", ")} }</b>`;
   }
   function apply(s){ if(s!==step){ step=s; render(s); } }
   function loop(ts){
