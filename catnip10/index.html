@@ -236,6 +236,8 @@
   .ax .axl{display:block; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.09em;
     text-transform:uppercase; color:var(--accent)}
   .ax b{display:block; color:var(--ink); font-size:15px; margin:3px 0 4px; line-height:1.3}
+  .ax .axt{display:block; font-family:var(--mono); font-size:11.5px; color:var(--faint);
+    margin:0 0 6px; line-height:1.45}
   .ax span:last-child{color:var(--muted); font-size:13.5px; line-height:1.5}
 
   /* Representation controls */
@@ -295,10 +297,10 @@
       <div class="eyebrow">Conformance benchmark · graph oracle</div>
       <h1>Catnip10</h1>
       <div class="tag">We may be small, but we see all.</div>
-      <p class="lead">A deterministic conformance benchmark for branch-wise workflows that file values on a <em>fixed or shared reference-branch axis</em>. Ten tips, seventeen frozen primitive coordinates, small enough to trace completely — and structured enough to test every declared coordinate claim.</p>
+      <p class="lead">A branch-associated value can be numerically correct and still be filed under the <em>wrong evolutionary branch</em>. Catnip10 is a ten-tip test tree — seventeen frozen coordinates, small enough to trace completely by hand — on which the right answer is known by construction, so a workflow's coordinate bookkeeping can be checked instead of trusted.</p>
       <div class="axes">
-        <div class="ax"><span class="axl">Axis A</span><b>Pruning-aware coordinate eligibility</b><span>After pruning and contraction, is a value independently eligible on the primitive coordinate it is filed under?</span></div>
-        <div class="ax"><span class="axl">Axis B</span><b>Representation-stable coordinate identity and availability</b><span>Does the same canonical unrooted split keep its identity and declared availability across equivalent serializations?</span></div>
+        <div class="ax"><span class="axl">Axis A</span><b>Is this value really about this branch?</b><span class="axt">pruning-aware coordinate eligibility</span><span>After pruning and contraction, is a value independently eligible on the primitive coordinate it is filed under?</span></div>
+        <div class="ax"><span class="axl">Axis B</span><b>Does the branch survive an equivalent rewrite of the tree?</b><span class="axt">representation-stable coordinate identity and availability</span><span>Does the same canonical unrooted split keep its identity and declared availability across equivalent serializations?</span></div>
       </div>
       <div class="btns">
         <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub repository ↗</a>
@@ -319,7 +321,7 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">01</span><h2>A number can be right while its coordinate is wrong</h2></div>
     <div class="prose">
-      <p>Comparative-genomics pipelines routinely place branch-associated values — rates, residuals, path lengths — into a matrix whose columns are branches of a reference tree. That only means something if a column label keeps denoting the same evolutionary object across every gene that contributes to it.</p>
+      <p>This applies to any workflow that files branch-associated values — rates, residuals, path lengths — on a <strong>fixed or shared reference-branch axis</strong>. Such a matrix only means something if a column label keeps denoting the same evolutionary object across every gene that contributes to it.</p>
       <p>Genes differ in taxon coverage, so each gene tree is a <strong>contraction</strong> of the reference tree. Removing a tip can leave an internal node with only two neighbours; standard tree reduction then suppresses that node and merges its two incident edges into one. The merged edge can carry the exact sum of its members' lengths — the arithmetic is perfect — but the two original branches are no longer separately observable in that gene.</p>
       <p>If a pipeline writes that merged value into a cell named after one of the two members, the number is numerically valid and the coordinate is not. Nothing crashes, no <code>NA</code> appears, and the error is invisible to every check that only asks whether the arithmetic is correct.</p>
     </div>

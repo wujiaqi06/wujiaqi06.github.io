@@ -177,9 +177,10 @@
   <div class="wrap">
     <div class="eyebrow">Tutorial</div>
     <h1>SplitAligner, end to end</h1>
-    <p class="sub">Turn a species tree and a set of gene trees into a <em>branch-coordinate matrix</em> in which each branch carries a numeric value or an explicit missingness state — structural, fusion-related, topology-induced, or residual. This walkthrough uses the bundled toy example, so you can reproduce every output on your own machine.</p>
+    <p class="sub">Turn a species tree and a set of gene trees into a <em>branch-coordinate matrix</em> in which every branch either carries a value or says exactly why it cannot. This walkthrough uses the bundled toy example, so you can reproduce every output on your own machine.</p>
     <div class="note">SplitAligner is a small, dependency-light <strong>Perl</strong> program. There is nothing to compile: clone the repository and run <code>SplitAligner.pl</code>. The commands below mirror the steps in <code>examples/run.sh</code>.</div>
     <ul class="toc">
+      <li><a href="#why">Why it matters</a></li>
       <li><a href="#idea">The idea</a></li>
       <li><a href="#install">1 · Install</a></li>
       <li><a href="#inputs">2 · Inputs</a></li>
@@ -194,6 +195,18 @@
   </div>
 </section>
 
+<section class="step" id="why">
+  <div class="wrap">
+    <div class="step-head"><span class="step-num">Why</span><h2>Why branch identity is a problem</h2></div>
+    <div class="prose">
+      <p>Most comparative-genomics questions are answered by comparing a number attached to a branch — a rate, a residual, a path length — across many genes. Did this lineage speed up? Did constraint relax here? The comparison only means something if that branch denotes the same evolutionary object in every gene that contributes to it.</p>
+      <p>In practice it often does not. Genes differ in which taxa they recover, and gene trees do not always agree with the species tree. When a taxon is missing, two adjacent branches of the reference tree can collapse into one. The merged branch has a perfectly correct length — the sum of its parts — but it is no longer either of the branches that formed it.</p>
+      <p>A pipeline that files that number under one of them produces a value that is numerically right and biologically misassigned. Nothing crashes, no <code>NA</code> appears, and no check that only verifies arithmetic will catch it. The practical consequence is that a gene can appear to evolve unusually fast or slow on a lineage for reasons that have nothing to do with evolution on that lineage — and without a record of which cells are affected, there is no way to tell those cases from real ones.</p>
+      <p>SplitAligner's response is to make branch identity explicit, and to give every way a branch can fail to be observable its own name. The <a href="SplitAligner_explainer.html">animated explainer</a> makes the same argument visually; the rest of this page is how to run it.</p>
+    </div>
+  </div>
+</section>
+
 <section class="step" id="idea">
   <div class="wrap">
     <div class="step-head"><span class="step-num">Idea</span><h2>A branch is the split it makes</h2></div>
@@ -202,37 +215,6 @@
       <div class="identity">σ<sub>g</sub>(b) = ( A<sub>b</sub> ∩ T<sub>g</sub>  |  B<sub>b</sub> ∩ T<sub>g</sub> )</div>
       <p>On the topology-congruent species-tree restriction, two non-deleted primitive branches map to the same reduced-tree edge exactly when their projected splits coincide. They do not become the same original branch: they become <strong>indistinguishable for that gene's taxon set</strong>, which is a <em>fusion</em>. If a projected side is empty, the branch instead has a <em>structural</em> absence. For an empirical free-topology gene tree, SplitAligner separately asks whether each independently observable projected split is recovered.</p>
 
-      <div class="note">
-        <p><strong>The display root is not the coordinate.</strong> SplitAligner's biological coordinate is the canonical unrooted split, not the displayed root position, internal-node number, traversal position, or child order. If two Newick representations encode the same weighted unrooted split object, changing only the display root or serialization does not change the underlying biological split identity.</p>
-        <p>The human-readable <code>B</code> aliases are serialization-local and may change between independently serialized species trees. When comparing independent representations, the canonical split key — not the <code>B</code> number alone — is the authoritative identity.</p>
-        <p>Rooting can still carry biological meaning in analyses that require direction or ancestry; it simply does not define SplitAligner's branch-coordinate identity.</p>
-      </div>
-      <div class="repfig">
-        <svg viewBox="0 0 660 150" role="img" aria-label="Two Newick renderings of the same unrooted four-taxon tree: one rooted on the internal edge, one rooted on the A branch. Both induce the same canonical split A,B versus C,D.">
-          <text class="rf-cap" x="6" y="14">Representation A · internal-edge root</text>
-          <g>
-            <path class="rf-e" d="M20 74 H62"/><path class="rf-e" d="M62 44 V104"/>
-            <path class="rf-e" d="M62 44 H96"/><path class="rf-e" d="M96 30 V58"/><path class="rf-e" d="M96 30 H130"/><path class="rf-e" d="M96 58 H130"/>
-            <path class="rf-e" d="M62 104 H96"/><path class="rf-e" d="M96 90 V118"/><path class="rf-e" d="M96 90 H130"/><path class="rf-e" d="M96 118 H130"/>
-            <circle class="rf-r" cx="20" cy="74" r="3.4"/>
-            <text class="rf-t" x="137" y="34">A</text><text class="rf-t" x="137" y="62">B</text>
-            <text class="rf-t" x="137" y="94">C</text><text class="rf-t" x="137" y="122">D</text>
-          </g>
-          <text class="rf-cap" x="264" y="14">Representation B · branch-A root</text>
-          <g>
-            <path class="rf-e" d="M264 74 H300"/><path class="rf-e" d="M300 30 V104"/><path class="rf-e" d="M300 30 H374"/>
-            <path class="rf-e" d="M300 104 H330"/><path class="rf-e" d="M330 62 V132"/><path class="rf-e" d="M330 62 H374"/>
-            <path class="rf-e" d="M330 132 H360"/><path class="rf-e" d="M360 118 V146"/><path class="rf-e" d="M360 118 H374"/><path class="rf-e" d="M360 146 H374"/>
-            <circle class="rf-r" cx="264" cy="74" r="3.4"/>
-            <text class="rf-t" x="381" y="34">A</text><text class="rf-t" x="381" y="66">B</text>
-            <text class="rf-t" x="381" y="122">C</text><text class="rf-t" x="381" y="150">D</text>
-          </g>
-          <path class="rf-a" d="M448 74 H482"/><path class="rf-a" d="M475 68 L482 74 L475 80"/>
-          <text class="rf-cap" x="496" y="58">same canonical split key</text>
-          <text class="rf-key" x="496" y="82">A,B | C,D</text>
-          <text class="rf-cap" x="496" y="104">B aliases may differ</text>
-        </svg>
-      </div>
       <p>The workflow has two modes: <code>matrix</code> builds the coordinate system and projects every gene onto it; <code>finalize</code> then classifies the resulting missingness where the paired evidence permits.</p>
     </div>
   </div>
@@ -324,6 +306,39 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
 A1BG   0.1809315089 NA   0.0047384154 0.0057110032 ...
 A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
     <div class="cap">free.matrix_with_fuse.txt (truncated)</div>
+    <div class="prose">
+      <div class="note">
+        <p><strong>The display root is not the coordinate.</strong> SplitAligner's biological coordinate is the canonical unrooted split, not the displayed root position, internal-node number, traversal position, or child order. If two Newick representations encode the same weighted unrooted split object, changing only the display root or serialization does not change the underlying biological split identity.</p>
+        <p>The human-readable <code>B</code> aliases are serialization-local and may change between independently serialized species trees. When comparing independent representations, the canonical split key — not the <code>B</code> number alone — is the authoritative identity.</p>
+        <p>Rooting can still carry biological meaning in analyses that require direction or ancestry; it simply does not define SplitAligner's branch-coordinate identity.</p>
+      </div>
+      <div class="repfig">
+        <svg viewBox="0 0 660 150" role="img" aria-label="Two Newick renderings of the same unrooted four-taxon tree: one rooted on the internal edge, one rooted on the A branch. Both induce the same canonical split A,B versus C,D.">
+          <text class="rf-cap" x="6" y="14">Representation A · internal-edge root</text>
+          <g>
+            <path class="rf-e" d="M20 74 H62"/><path class="rf-e" d="M62 44 V104"/>
+            <path class="rf-e" d="M62 44 H96"/><path class="rf-e" d="M96 30 V58"/><path class="rf-e" d="M96 30 H130"/><path class="rf-e" d="M96 58 H130"/>
+            <path class="rf-e" d="M62 104 H96"/><path class="rf-e" d="M96 90 V118"/><path class="rf-e" d="M96 90 H130"/><path class="rf-e" d="M96 118 H130"/>
+            <circle class="rf-r" cx="20" cy="74" r="3.4"/>
+            <text class="rf-t" x="137" y="34">A</text><text class="rf-t" x="137" y="62">B</text>
+            <text class="rf-t" x="137" y="94">C</text><text class="rf-t" x="137" y="122">D</text>
+          </g>
+          <text class="rf-cap" x="264" y="14">Representation B · branch-A root</text>
+          <g>
+            <path class="rf-e" d="M264 74 H300"/><path class="rf-e" d="M300 30 V104"/><path class="rf-e" d="M300 30 H374"/>
+            <path class="rf-e" d="M300 104 H330"/><path class="rf-e" d="M330 62 V132"/><path class="rf-e" d="M330 62 H374"/>
+            <path class="rf-e" d="M330 132 H360"/><path class="rf-e" d="M360 118 V146"/><path class="rf-e" d="M360 118 H374"/><path class="rf-e" d="M360 146 H374"/>
+            <circle class="rf-r" cx="264" cy="74" r="3.4"/>
+            <text class="rf-t" x="381" y="34">A</text><text class="rf-t" x="381" y="66">B</text>
+            <text class="rf-t" x="381" y="122">C</text><text class="rf-t" x="381" y="150">D</text>
+          </g>
+          <path class="rf-a" d="M448 74 H482"/><path class="rf-a" d="M475 68 L482 74 L475 80"/>
+          <text class="rf-cap" x="496" y="58">same canonical split key</text>
+          <text class="rf-key" x="496" y="82">A,B | C,D</text>
+          <text class="rf-cap" x="496" y="104">B aliases may differ</text>
+        </svg>
+      </div>
+    </div>
   </div>
 </section>
 
