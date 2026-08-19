@@ -170,9 +170,10 @@
   <div class="wrap">
     <div class="eyebrow">教程</div>
     <h1>SplitAligner：从头到尾走一遍</h1>
-    <p class="sub">把一棵物种树和一组基因树，变成一张<em>枝坐标矩阵</em>——每根枝要么携带数值，要么带有明确的缺失状态：结构性、融合相关、拓扑导致，或残余 NA。本教程使用随附的示例，你可以在自己的机器上复现每一份输出。</p>
+    <p class="sub">把一棵物种树和一组基因树，变成一张<em>枝坐标矩阵</em>——每根枝要么携带数值，要么明确说出它为什么不能。本教程使用随附的示例，你可以在自己的机器上复现每一份输出。</p>
     <div class="note">SplitAligner 是一个小巧、几乎无依赖的 <strong>Perl</strong> 程序。无需编译——克隆仓库、运行 <code>SplitAligner.pl</code> 即可。下面的命令对应 <code>examples/run.sh</code> 中的实际步骤。</div>
     <ul class="toc">
+      <li><a href="#why">为什么重要</a></li>
       <li><a href="#idea">核心思想</a></li>
       <li><a href="#install">1 · 安装</a></li>
       <li><a href="#inputs">2 · 输入</a></li>
@@ -187,6 +188,18 @@
   </div>
 </section>
 
+<section class="step" id="why">
+  <div class="wrap">
+    <div class="step-head"><span class="step-num">为什么</span><h2>分枝身份为什么是个问题</h2></div>
+    <div class="prose">
+      <p>比较基因组学的大多数问题，都是靠比较「挂在某根分枝上的一个数值」——速率、残差、路径长度——在许多基因之间的差异来回答的。这个系统的速率上升了吗？这里的约束放松了吗？只有当那根分枝在每一个参与比较的基因里都指同一个进化对象时，这种比较才有意义。</p>
+      <p>实际情况往往不是这样。不同基因回收到的类群不同，基因树也未必与物种树一致。当某个类群缺失时，参考树上相邻的两根分枝可能坍缩成一根。融合后那根分枝的长度完全正确——它是各组成部分之和——但它已经不再是形成它的任何一根分枝了。</p>
+      <p>把这个数值记在其中一根名下的流程，产生的是一个<strong>数值正确、而生物学归属错误</strong>的值。程序不会崩溃，不会出现 <code>NA</code>，任何只检查算术是否正确的检验都抓不到它。实际后果是：一个基因在某个系统上看起来异常快或异常慢，原因可能与那个系统上的进化毫无关系；而如果没有一份「哪些单元格受了影响」的记录，就无法把这类情况和真实情况区分开。</p>
+      <p>SplitAligner 的应对是把分枝身份显式化，并为分枝失去可观测性的每一种方式各起一个名字。<a href="SplitAligner_explainer_zh.html">动画讲解</a>用视觉方式讲同一个论证；本页余下部分讲的是怎么运行它。</p>
+    </div>
+  </div>
+</section>
+
 <section class="step" id="idea">
   <div class="wrap">
     <div class="step-head"><span class="step-num">思想</span><h2>一根枝，就是它所作的那个划分</h2></div>
@@ -195,36 +208,6 @@
       <div class="identity">σ<sub>g</sub>(b) = ( A<sub>b</sub> ∩ T<sub>g</sub>  |  B<sub>b</sub> ∩ T<sub>g</sub> )</div>
       <p>在与物种树限制拓扑一致的基准层中，两根未被删除的原始枝投影划分相同，当且仅当它们落到同一条约化枝上。这并不是说两根原始枝变成了同一根；而是它们在该基因的类群集合下<strong>无法再独立区分</strong>，形成<em>融合</em>。若投影后有一侧为空，则是<em>结构性</em>缺失。对于经验 free 拓扑基因树，SplitAligner 还会另行判断每个可独立观测的投影划分是否被找回。</p>
 
-      <div class="note">
-        <p><strong>显示根不是坐标。</strong>SplitAligner 的生物学坐标是规范化无根 split，而不是绘制出来的根位置、内部节点编号、遍历顺序或子节点顺序。若两个 Newick 表示编码的是同一个加权无根 split 对象，那么仅改变显示根或序列化方式，并不会改变底层的生物学 split 身份。</p>
-        <p>便于阅读的 <code>B</code> 别名是序列化局部的，在独立序列化的物种树之间可能不同。比较独立表示时，权威身份是规范化 split key，而不是 <code>B</code> 编号本身。</p>
-        <p>在需要方向或祖先关系的分析中，生根仍然可以承载生物学含义；它只是不定义 SplitAligner 的枝坐标身份。</p>
-      </div>      <div class="repfig">
-        <svg viewBox="0 0 660 150" role="img" aria-label="Two Newick renderings of the same unrooted four-taxon tree: one rooted on the internal edge, one rooted on the A branch. Both induce the same canonical split A,B versus C,D.">
-          <text class="rf-cap" x="6" y="14">表示 A — 在内部边上生根</text>
-          <g>
-            <path class="rf-e" d="M20 74 H62"/><path class="rf-e" d="M62 44 V104"/>
-            <path class="rf-e" d="M62 44 H96"/><path class="rf-e" d="M96 30 V58"/><path class="rf-e" d="M96 30 H130"/><path class="rf-e" d="M96 58 H130"/>
-            <path class="rf-e" d="M62 104 H96"/><path class="rf-e" d="M96 90 V118"/><path class="rf-e" d="M96 90 H130"/><path class="rf-e" d="M96 118 H130"/>
-            <circle class="rf-r" cx="20" cy="74" r="3.4"/>
-            <text class="rf-t" x="137" y="34">A</text><text class="rf-t" x="137" y="62">B</text>
-            <text class="rf-t" x="137" y="94">C</text><text class="rf-t" x="137" y="122">D</text>
-          </g>
-          <text class="rf-cap" x="250" y="14">表示 B — 在枝 A 上生根</text>
-          <g>
-            <path class="rf-e" d="M264 74 H300"/><path class="rf-e" d="M300 30 V104"/><path class="rf-e" d="M300 30 H374"/>
-            <path class="rf-e" d="M300 104 H330"/><path class="rf-e" d="M330 62 V132"/><path class="rf-e" d="M330 62 H374"/>
-            <path class="rf-e" d="M330 132 H360"/><path class="rf-e" d="M360 118 V146"/><path class="rf-e" d="M360 118 H374"/><path class="rf-e" d="M360 146 H374"/>
-            <circle class="rf-r" cx="264" cy="74" r="3.4"/>
-            <text class="rf-t" x="381" y="34">A</text><text class="rf-t" x="381" y="66">B</text>
-            <text class="rf-t" x="381" y="122">C</text><text class="rf-t" x="381" y="150">D</text>
-          </g>
-          <path class="rf-a" d="M448 74 H482"/><path class="rf-a" d="M475 68 L482 74 L475 80"/>
-          <text class="rf-cap" x="496" y="58">规范化 split key 相同</text>
-          <text class="rf-key" x="496" y="82">A,B | C,D</text>
-          <text class="rf-cap" x="496" y="104">B 别名可能不同</text>
-        </svg>
-      </div>
       <p>整个流程有两个模式：<code>matrix</code> 构建坐标系并把所有基因投影上去；<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>
@@ -316,6 +299,38 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
 A1BG   0.1809315089 NA   0.0047384154 0.0057110032 ...
 A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
     <div class="cap">free.matrix_with_fuse.txt（节选）</div>
+    <div class="prose">
+      <div class="note">
+        <p><strong>显示根不是坐标。</strong>SplitAligner 的生物学坐标是规范化无根 split，而不是绘制出来的根位置、内部节点编号、遍历顺序或子节点顺序。若两个 Newick 表示编码的是同一个加权无根 split 对象，那么仅改变显示根或序列化方式，并不会改变底层的生物学 split 身份。</p>
+        <p>便于阅读的 <code>B</code> 别名是序列化局部的，在独立序列化的物种树之间可能不同。比较独立表示时，权威身份是规范化 split key，而不是 <code>B</code> 编号本身。</p>
+        <p>在需要方向或祖先关系的分析中，生根仍然可以承载生物学含义；它只是不定义 SplitAligner 的枝坐标身份。</p>
+      </div>      <div class="repfig">
+        <svg viewBox="0 0 660 150" role="img" aria-label="Two Newick renderings of the same unrooted four-taxon tree: one rooted on the internal edge, one rooted on the A branch. Both induce the same canonical split A,B versus C,D.">
+          <text class="rf-cap" x="6" y="14">表示 A — 在内部边上生根</text>
+          <g>
+            <path class="rf-e" d="M20 74 H62"/><path class="rf-e" d="M62 44 V104"/>
+            <path class="rf-e" d="M62 44 H96"/><path class="rf-e" d="M96 30 V58"/><path class="rf-e" d="M96 30 H130"/><path class="rf-e" d="M96 58 H130"/>
+            <path class="rf-e" d="M62 104 H96"/><path class="rf-e" d="M96 90 V118"/><path class="rf-e" d="M96 90 H130"/><path class="rf-e" d="M96 118 H130"/>
+            <circle class="rf-r" cx="20" cy="74" r="3.4"/>
+            <text class="rf-t" x="137" y="34">A</text><text class="rf-t" x="137" y="62">B</text>
+            <text class="rf-t" x="137" y="94">C</text><text class="rf-t" x="137" y="122">D</text>
+          </g>
+          <text class="rf-cap" x="250" y="14">表示 B — 在枝 A 上生根</text>
+          <g>
+            <path class="rf-e" d="M264 74 H300"/><path class="rf-e" d="M300 30 V104"/><path class="rf-e" d="M300 30 H374"/>
+            <path class="rf-e" d="M300 104 H330"/><path class="rf-e" d="M330 62 V132"/><path class="rf-e" d="M330 62 H374"/>
+            <path class="rf-e" d="M330 132 H360"/><path class="rf-e" d="M360 118 V146"/><path class="rf-e" d="M360 118 H374"/><path class="rf-e" d="M360 146 H374"/>
+            <circle class="rf-r" cx="264" cy="74" r="3.4"/>
+            <text class="rf-t" x="381" y="34">A</text><text class="rf-t" x="381" y="66">B</text>
+            <text class="rf-t" x="381" y="122">C</text><text class="rf-t" x="381" y="150">D</text>
+          </g>
+          <path class="rf-a" d="M448 74 H482"/><path class="rf-a" d="M475 68 L482 74 L475 80"/>
+          <text class="rf-cap" x="496" y="58">规范化 split key 相同</text>
+          <text class="rf-key" x="496" y="82">A,B | C,D</text>
+          <text class="rf-cap" x="496" y="104">B 别名可能不同</text>
+        </svg>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -333,7 +348,7 @@ A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
     <div class="prose">
       <p>输出：</p>
       <ul>
-        <li><code>final.free.na_classified.txt</code> / <code>final.fix.na_classified.txt</code> —— 完成状态分类的矩阵；fix 侧缺少数值证据时会保留残余 <code>NA</code>;</li>
+        <li><code>final.free.na_classified.txt</code> / <code>final.fix.na_classified.txt</code> —— 完成状态分类的矩阵；fix 侧缺少数值证据时会保留残余 <code>NA</code>；</li>
         <li><code>&lt;input&gt;.na_fuse.txt</code> —— 融合救回的中间表；</li>
         <li><code>final.support_b.txt</code> 和 <code>species_tree.support_b.nwk</code> —— 枝级支持度（见第 7 步）。</li>
       </ul>
@@ -375,7 +390,7 @@ A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
   <div class="wrap">
     <div class="step-head"><span class="step-num">7</span><h2>枝级 Support</h2></div>
     <div class="prose">
-      <p>当你传入 <code>--species_tree</code>,<code>finalize</code> 会写出 <code>final.support_b.txt</code>：对骨架上的每根枝，给出它在共享基因上、free 树相对 fix 树保留了多少数值证据。</p>
+      <p>当你传入 <code>--species_tree</code>，<code>finalize</code> 会写出 <code>final.support_b.txt</code>：对骨架上的每根枝，给出它在共享基因上、free 树相对 fix 树保留了多少数值证据。</p>
     </div>
     <div class="code"><pre>branch_id  branch_type  n_shared_genes  n_fix_non_na  n_free_non_na  support_percent  discordance_percent
 B1         terminal     5               5             5              100.0000000000   0.0000000000

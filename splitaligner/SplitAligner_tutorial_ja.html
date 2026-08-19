@@ -170,9 +170,10 @@
   <div class="wrap">
     <div class="eyebrow">チュートリアル</div>
     <h1>SplitAligner を、はじめから終わりまで</h1>
-    <p class="sub">種の系統樹と遺伝子系統樹の集合を<em>枝座標行列</em>に変換する。各枝は数値、または明示的な欠測状態——構造的・融合関連・トポロジー由来・残余 NA——を持つ。本チュートリアルは同梱のトイ例を使うので、すべての出力を自分の環境で再現できる。</p>
+    <p class="sub">種の系統樹と遺伝子系統樹の集合を<em>枝座標行列</em>に変換する。各枝は数値を持つか、持てない理由を明示するかのいずれかである。本チュートリアルは同梱のトイ例を使うので、すべての出力を自分の環境で再現できる。</p>
     <div class="note">SplitAligner は小さく依存の少ない <strong>Perl</strong> プログラムである。コンパイルは不要——リポジトリをクローンして <code>SplitAligner.pl</code> を実行するだけ。以下のコマンドは <code>examples/run.sh</code> の処理手順に対応している。</div>
     <ul class="toc">
+      <li><a href="#why">なぜ重要か</a></li>
       <li><a href="#idea">考え方</a></li>
       <li><a href="#install">1 · インストール</a></li>
       <li><a href="#inputs">2 · 入力</a></li>
@@ -187,6 +188,18 @@
   </div>
 </section>
 
+<section class="step" id="why">
+  <div class="wrap">
+    <div class="step-head"><span class="step-num">なぜ</span><h2>枝の同一性が問題になる理由</h2></div>
+    <div class="prose">
+      <p>比較ゲノム解析の問いの多くは、枝に紐づいた数値——速度、残差、経路長——を多数の遺伝子にわたって比較することで答えられる。この系統で速度が上がったか。ここで制約が緩んだか。この比較が意味をもつのは、その枝が、寄与するすべての遺伝子において同一の進化的対象を指している場合に限られる。</p>
+      <p>実際にはそうなっていないことが多い。遺伝子ごとに回収される分類群は異なり、遺伝子系統樹は種の系統樹と必ずしも一致しない。ある分類群が欠けると、参照樹上で隣り合う二本の枝が一本に潰れることがある。融合した枝の長さは完全に正しい——構成枝の和である——が、それはもはや、それを形づくったどちらの枝でもない。</p>
+      <p>その数値を一方の名前で記入するワークフローは、数値としては正しく、生物学的には誤って割り当てられた値を生む。異常終了はせず、<code>NA</code> も現れず、算術の正しさだけを確かめる検査では捕まらない。実務上の帰結は、ある遺伝子がある系統で異常に速く、あるいは遅く進化しているように見えることが、その系統上の進化とは無関係な理由で起こりうるということである。そしてどのセルが影響を受けたかの記録がなければ、それを本物と見分ける手段はない。</p>
+      <p>SplitAligner の応答は、枝の同一性を明示的に扱い、枝が観測不能になりうるすべての様態にそれぞれ名前を与えることである。<a href="SplitAligner_explainer_ja.html">アニメーション解説</a>は同じ議論を視覚的に辿る。以降のページは、その実行方法である。</p>
+    </div>
+  </div>
+</section>
+
 <section class="step" id="idea">
   <div class="wrap">
     <div class="step-head"><span class="step-num">考え方</span><h2>枝とは、それが作るスプリットである</h2></div>
@@ -195,36 +208,6 @@
       <div class="identity">σ<sub>g</sub>(b) = ( A<sub>b</sub> ∩ T<sub>g</sub>  |  B<sub>b</sub> ∩ T<sub>g</sub> )</div>
       <p>種樹の制限木とトポロジーが一致する基準層では、削除されていない二本の原始枝の射影スプリットが一致することと、同じ簡約辺へ写ることは同値である。これは元の二枝が同じ枝になったという意味ではない。その遺伝子の分類群集合では二枝を<strong>独立に区別できなくなった</strong>、つまり<em>融合</em>したという意味である。射影後の片側が空なら、代わりに<em>構造的</em>欠測となる。経験的な free トポロジー遺伝子樹については、独立に観測可能な各射影スプリットが回収されたかを別に判定する。</p>
 
-      <div class="note">
-        <p><strong>表示上の根は座標ではない。</strong>SplitAligner の生物学的座標は正準無根スプリットであり、描画された根の位置、内部節点の番号、走査順序、子の順序ではない。二つの Newick 表現が同一の重み付き無根スプリット対象を符号化しているならば、表示上の根や直列化だけを変えても、基礎にある生物学的なスプリットの同一性は変わらない。</p>
-        <p>可読性のための <code>B</code> エイリアスは直列化に固有であり、独立に直列化された種樹の間では変わりうる。独立した表現どうしを比較する場合、権威ある同一性は <code>B</code> 番号そのものではなく正準スプリット鍵である。</p>
-        <p>根の位置は、方向や祖先関係を要する解析では依然として生物学的な意味をもちうる。それが SplitAligner の枝座標の同一性を定義しないというだけである。</p>
-      </div>      <div class="repfig">
-        <svg viewBox="0 0 660 150" role="img" aria-label="Two Newick renderings of the same unrooted four-taxon tree: one rooted on the internal edge, one rooted on the A branch. Both induce the same canonical split A,B versus C,D.">
-          <text class="rf-cap" x="6" y="14">表現 A — 内部辺で根を置く</text>
-          <g>
-            <path class="rf-e" d="M20 74 H62"/><path class="rf-e" d="M62 44 V104"/>
-            <path class="rf-e" d="M62 44 H96"/><path class="rf-e" d="M96 30 V58"/><path class="rf-e" d="M96 30 H130"/><path class="rf-e" d="M96 58 H130"/>
-            <path class="rf-e" d="M62 104 H96"/><path class="rf-e" d="M96 90 V118"/><path class="rf-e" d="M96 90 H130"/><path class="rf-e" d="M96 118 H130"/>
-            <circle class="rf-r" cx="20" cy="74" r="3.4"/>
-            <text class="rf-t" x="137" y="34">A</text><text class="rf-t" x="137" y="62">B</text>
-            <text class="rf-t" x="137" y="94">C</text><text class="rf-t" x="137" y="122">D</text>
-          </g>
-          <text class="rf-cap" x="250" y="14">表現 B — 枝 A で根を置く</text>
-          <g>
-            <path class="rf-e" d="M264 74 H300"/><path class="rf-e" d="M300 30 V104"/><path class="rf-e" d="M300 30 H374"/>
-            <path class="rf-e" d="M300 104 H330"/><path class="rf-e" d="M330 62 V132"/><path class="rf-e" d="M330 62 H374"/>
-            <path class="rf-e" d="M330 132 H360"/><path class="rf-e" d="M360 118 V146"/><path class="rf-e" d="M360 118 H374"/><path class="rf-e" d="M360 146 H374"/>
-            <circle class="rf-r" cx="264" cy="74" r="3.4"/>
-            <text class="rf-t" x="381" y="34">A</text><text class="rf-t" x="381" y="66">B</text>
-            <text class="rf-t" x="381" y="122">C</text><text class="rf-t" x="381" y="150">D</text>
-          </g>
-          <path class="rf-a" d="M448 74 H482"/><path class="rf-a" d="M475 68 L482 74 L475 80"/>
-          <text class="rf-cap" x="496" y="58">正準スプリット鍵は同一</text>
-          <text class="rf-key" x="496" y="82">A,B | C,D</text>
-          <text class="rf-cap" x="496" y="104">B エイリアスは異なりうる</text>
-        </svg>
-      </div>
       <p>ワークフローには二つのモードがある。<code>matrix</code> が座標系を構築し、全遺伝子をそこへ射影する。<code>finalize</code> が、対応する証拠に基づいて欠測状態を分類する。</p>
     </div>
   </div>
@@ -316,6 +299,38 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
 A1BG   0.1809315089 NA   0.0047384154 0.0057110032 ...
 A1CF   0.0376651404 0.0583312140 0.0032591533 ...</pre></div>
     <div class="cap">free.matrix_with_fuse.txt(一部抜粋)</div>
+    <div class="prose">
+      <div class="note">
+        <p><strong>表示上の根は座標ではない。</strong>SplitAligner の生物学的座標は正準無根スプリットであり、描画された根の位置、内部節点の番号、走査順序、子の順序ではない。二つの Newick 表現が同一の重み付き無根スプリット対象を符号化しているならば、表示上の根や直列化だけを変えても、基礎にある生物学的なスプリットの同一性は変わらない。</p>
+        <p>可読性のための <code>B</code> エイリアスは直列化に固有であり、独立に直列化された種樹の間では変わりうる。独立した表現どうしを比較する場合、権威ある同一性は <code>B</code> 番号そのものではなく正準スプリット鍵である。</p>
+        <p>根の位置は、方向や祖先関係を要する解析では依然として生物学的な意味をもちうる。それが SplitAligner の枝座標の同一性を定義しないというだけである。</p>
+      </div>      <div class="repfig">
+        <svg viewBox="0 0 660 150" role="img" aria-label="Two Newick renderings of the same unrooted four-taxon tree: one rooted on the internal edge, one rooted on the A branch. Both induce the same canonical split A,B versus C,D.">
+          <text class="rf-cap" x="6" y="14">表現 A — 内部辺で根を置く</text>
+          <g>
+            <path class="rf-e" d="M20 74 H62"/><path class="rf-e" d="M62 44 V104"/>
+            <path class="rf-e" d="M62 44 H96"/><path class="rf-e" d="M96 30 V58"/><path class="rf-e" d="M96 30 H130"/><path class="rf-e" d="M96 58 H130"/>
+            <path class="rf-e" d="M62 104 H96"/><path class="rf-e" d="M96 90 V118"/><path class="rf-e" d="M96 90 H130"/><path class="rf-e" d="M96 118 H130"/>
+            <circle class="rf-r" cx="20" cy="74" r="3.4"/>
+            <text class="rf-t" x="137" y="34">A</text><text class="rf-t" x="137" y="62">B</text>
+            <text class="rf-t" x="137" y="94">C</text><text class="rf-t" x="137" y="122">D</text>
+          </g>
+          <text class="rf-cap" x="250" y="14">表現 B — 枝 A で根を置く</text>
+          <g>
+            <path class="rf-e" d="M264 74 H300"/><path class="rf-e" d="M300 30 V104"/><path class="rf-e" d="M300 30 H374"/>
+            <path class="rf-e" d="M300 104 H330"/><path class="rf-e" d="M330 62 V132"/><path class="rf-e" d="M330 62 H374"/>
+            <path class="rf-e" d="M330 132 H360"/><path class="rf-e" d="M360 118 V146"/><path class="rf-e" d="M360 118 H374"/><path class="rf-e" d="M360 146 H374"/>
+            <circle class="rf-r" cx="264" cy="74" r="3.4"/>
+            <text class="rf-t" x="381" y="34">A</text><text class="rf-t" x="381" y="66">B</text>
+            <text class="rf-t" x="381" y="122">C</text><text class="rf-t" x="381" y="150">D</text>
+          </g>
+          <path class="rf-a" d="M448 74 H482"/><path class="rf-a" d="M475 68 L482 74 L475 80"/>
+          <text class="rf-cap" x="496" y="58">正準スプリット鍵は同一</text>
+          <text class="rf-key" x="496" y="82">A,B | C,D</text>
+          <text class="rf-cap" x="496" y="104">B エイリアスは異なりうる</text>
+        </svg>
+      </div>
+    </div>
   </div>
 </section>
 

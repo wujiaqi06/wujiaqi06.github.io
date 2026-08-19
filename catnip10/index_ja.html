@@ -236,6 +236,8 @@
   .ax .axl{display:block; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.09em;
     text-transform:uppercase; color:var(--accent)}
   .ax b{display:block; color:var(--ink); font-size:15px; margin:3px 0 4px; line-height:1.3}
+  .ax .axt{display:block; font-family:var(--mono); font-size:11.5px; color:var(--faint);
+    margin:0 0 6px; line-height:1.45}
   .ax span:last-child{color:var(--muted); font-size:13.5px; line-height:1.5}
 
   /* Representation controls */
@@ -295,10 +297,10 @@
       <div class="eyebrow">適合性ベンチマーク · グラフ理論的オラクル</div>
       <h1>Catnip10</h1>
       <div class="tag">小さくても、すべてを見通す。</div>
-      <p class="lead">固定・共有された<em>参照枝座標軸</em>の上に値を書き込む枝ベースのワークフローのための、決定論的な適合性ベンチマーク。10 分類群と 17 個の凍結された原始枝座標——完全に追跡できるほど小さく、宣言されたすべての座標主張を検証できるだけの構造をもつ。</p>
+      <p class="lead">枝に付随する値は、数値として正しいまま<em>誤った進化的枝</em>に書き込まれうる。Catnip10 は 10 分類群のテスト樹である——17 個の凍結座標、手で完全に追跡できる大きさ——そこでは正解が構成によって確定しているため、ワークフローの座標記帳は信頼するのではなく検証できる。</p>
       <div class="axes">
-        <div class="ax"><span class="axl">Axis A</span><b>剪定を考慮した座標適格性</b><span>剪定と収縮の後、その値は書き込まれた原始枝座標の値として独立に成立するか。</span></div>
-        <div class="ax"><span class="axl">Axis B</span><b>表現変化に対して安定な座標同一性と可用性</b><span>同一の正準無根スプリットは、数学的に等価な樹表現の間で同じ座標同一性と宣言された可用状態を保つか。</span></div>
+        <div class="ax"><span class="axl">Axis A</span><b>その値は本当にこの枝の値か。</b><span class="axt">剪定を考慮した座標適格性</span><span>剪定と収縮の後、その値は書き込まれた原始枝座標の値として独立に成立するか。</span></div>
+        <div class="ax"><span class="axl">Axis B</span><b>樹を等価に書き換えても枝は生き残るか。</b><span class="axt">表現変化に対して安定な座標同一性と可用性</span><span>同一の正準無根スプリットは、数学的に等価な樹表現の間で同じ座標同一性と宣言された可用状態を保つか。</span></div>
       </div>
       <div class="btns">
         <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub リポジトリ ↗</a>
@@ -319,7 +321,7 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">01</span><h2>数値が正しくても、座標が誤っていることがある</h2></div>
     <div class="prose">
-      <p>比較ゲノミクスのパイプラインは、枝に付随する値——進化速度、残差、経路長——を、参照樹の枝を列とする行列に日常的に格納する。しかしそれが意味をもつのは、列のラベルが、寄与するすべての遺伝子にわたって同じ進化的対象を指し続けている場合だけである。</p>
+      <p>これは、枝に付随する値——進化速度、残差、経路長——を<strong>固定・共有された参照枝座標軸</strong>の上に書き込むあらゆるワークフローに当てはまる。そうした行列が意味をもつのは、列のラベルが、寄与するすべての遺伝子にわたって同じ進化的対象を指し続けている場合だけである。</p>
       <p>遺伝子ごとに分類群のカバレッジは異なるため、各遺伝子系統樹は参照樹の<strong>収縮</strong>となる。分類群を一つ取り除くと、内部節点の次数が 2 になることがある。標準的な樹の簡約はその節点を抑約し、接続する 2 本の辺を 1 本に併合する。併合された辺は構成メンバーの長さの総和を正確に保持しうる——算術は完全である——が、元の 2 本の枝はその遺伝子ではもはや別々に観測できない。</p>
       <p>パイプラインがその併合値を、メンバーの一方の名前がついたセルに書き込むと、数値としては妥当でも座標としては妥当ではない。異常終了も起こらず、<code>NA</code> も現れず、算術の正しさだけを確認する検査からは完全に見えない。</p>
     </div>

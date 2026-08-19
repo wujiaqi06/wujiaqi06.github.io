@@ -236,6 +236,8 @@
   .ax .axl{display:block; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.09em;
     text-transform:uppercase; color:var(--accent)}
   .ax b{display:block; color:var(--ink); font-size:15px; margin:3px 0 4px; line-height:1.3}
+  .ax .axt{display:block; font-family:var(--mono); font-size:11.5px; color:var(--faint);
+    margin:0 0 6px; line-height:1.45}
   .ax span:last-child{color:var(--muted); font-size:13.5px; line-height:1.5}
 
   /* Representation controls */
@@ -295,10 +297,10 @@
       <div class="eyebrow">一致性基准 · 图论 oracle</div>
       <h1>Catnip10</h1>
       <div class="tag">我们虽小，但明察秋毫。</div>
-      <p class="lead">面向「把数值填写在固定或共享<em>参考枝坐标轴</em>上」的分枝级工作流的确定性一致性基准。10 个叶节点、17 条冻结的原始坐标——小到可以完整追踪，又足以检验每一项明确声明的坐标主张。</p>
+      <p class="lead">一个分枝级数值可以在数值上完全正确，却被记在<em>错误的演化分枝</em>名下。Catnip10 是一棵 10 叶的测试树——17 条冻结坐标，小到可以用手完整追踪——它的正确答案由构造确定，因此工作流的坐标记账可以被检验，而不必被信任。</p>
       <div class="axes">
-        <div class="ax"><span class="axl">Axis A</span><b>剪枝感知的坐标资格</b><span>剪枝与收缩之后，这个数值是否仍可作为其所填入原始坐标的独立取值？</span></div>
-        <div class="ax"><span class="axl">Axis B</span><b>表示变化下稳定的坐标身份与可用性</b><span>同一条规范化无根 split，在数学等价的树表示之间，是否保持相同的坐标身份和声明的可用状态？</span></div>
+        <div class="ax"><span class="axl">Axis A</span><b>这个数值真的是这根分枝的吗？</b><span class="axt">剪枝感知的坐标资格</span><span>剪枝与收缩之后，这个数值是否仍可作为其所填入原始坐标的独立取值？</span></div>
+        <div class="ax"><span class="axl">Axis B</span><b>把树等价地改写一遍，分枝还在吗？</b><span class="axt">表示变化下稳定的坐标身份与可用性</span><span>同一条规范化无根 split，在数学等价的树表示之间，是否保持相同的坐标身份和声明的可用状态？</span></div>
       </div>
       <div class="btns">
         <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
@@ -319,7 +321,7 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">01</span><h2>数值可以是对的，坐标却是错的</h2></div>
     <div class="prose">
-      <p>比较基因组学流程常把分枝级数值——演化速率、残差、路径长度——放进一个以参考树的分枝为列的矩阵。但这只有在一种前提下才有意义：一个列标签，在所有为它贡献数据的基因中，始终指向同一个演化对象。</p>
+      <p>这适用于任何把分枝级数值——演化速率、残差、路径长度——填写在<strong>固定或共享参考枝坐标轴</strong>上的工作流。这样一个矩阵只有在一种前提下才有意义：一个列标签，在所有为它贡献数据的基因中，始终指向同一个演化对象。</p>
       <p>各基因的类群覆盖不同，因此每棵基因树都是参考树的一次<strong>收缩</strong>。删掉一个叶节点，可能使某个内部节点只剩两个邻居；标准的树简约会抑制该节点，把与之相连的两条分枝合并成一条。合并后的分枝可以精确保留成员长度之和——算术毫无问题——但那两条原始分枝在这个基因里已经无法被分别观测。</p>
       <p>如果流程把这个合并值写进以其中一条成员命名的格子里，数值是有效的，坐标却不是。程序不会崩溃，不会出现 <code>NA</code>，而任何只检查算术是否正确的检验都看不见它。</p>
     </div>
