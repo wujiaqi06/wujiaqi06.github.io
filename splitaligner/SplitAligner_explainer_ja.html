@@ -260,7 +260,7 @@
         <div style="display:grid; gap:20px">
           <div class="eyebrow rv">ベンチマーク</div>
           <h2 class="headline rv" style="--d:.08s">系統樹を固定し、すべての枝に名前をつける。</h2>
-          <p class="lede rv" style="--d:.18s">あえて最小限にした 10 分類群の系統樹——R/APE によるランダムなトポロジー(<span class="mono">seed 42</span>)で、枝長は固定。進化速度シフトも不一致も推定誤差も<em>一切ない</em>。その無根の軸が <em>17 個の原始枝座標</em>を定める:末端枝 10 本 <span class="mono">t1–t10</span> と内部枝 7 本 <span class="mono">N_12–N_18</span>。</p>
+          <p class="lede rv" style="--d:.18s">あえて最小限にした 10 分類群の系統樹——R/APE によるランダムなトポロジー（<span class="mono">seed 42</span>）で、枝長は固定。進化速度シフトも不一致も推定誤差も<em>一切ない</em>。その無根の軸が <em>17 個の原始枝座標</em>を定める：末端枝 10 本 <span class="mono">t1–t10</span> と内部枝 7 本 <span class="mono">N_12–N_18</span>。</p>
           <p class="lede rv" style="--d:.26s">これが凍結された座標系だ。ここから変えるのは、遺伝子がどの分類群を含むか、それだけ。</p>
         </div>
       </div>
@@ -273,7 +273,7 @@
         <div style="display:grid; gap:18px">
           <div class="eyebrow rv">着想</div>
           <h2 class="headline rv" style="--d:.08s">枝とは、それが作る<em>スプリット</em>そのものだ。</h2>
-          <p class="lede rv" style="--d:.18s">枝 <span class="mono" style="color:var(--accent)">N_13</span> を切ると、系統樹は二つのグループに分かれる。この二分割(スプリット)こそが——描かれた位置でも根の取り方でもなく——枝の同一性<em>そのもの</em>だ。</p>
+          <p class="lede rv" style="--d:.18s">枝 <span class="mono" style="color:var(--accent)">N_13</span> を切ると、系統樹は二つのグループに分かれる。この二分割（スプリット）こそが——描かれた位置でも根の取り方でもなく——枝の同一性<em>そのもの</em>だ。</p>
           <div class="formula rv" style="--d:.26s">
             &sigma;(N_13) = ( <span style="color:var(--sideA)">t8, t7, t4, t9</span> &nbsp;|&nbsp; <span style="color:var(--sideB)">t1, t10, t5, t2, t3, t6</span> )<br>
             <span class="dim">二つの枝が「同じ」なのは、スプリットが一致するとき、かつそのときに限る</span>
@@ -326,9 +326,9 @@
               <div class="count struct"><div class="v" id="cStruct">0</div><div class="k">NA_struct</div></div>
             </div>
             <div class="legend-inline" style="margin-top:16px">
-              <span><span class="sw obs"></span>観測(数値)</span>
-              <span><span class="sw fuse"></span>NA_fuse(融合)</span>
-              <span><span class="sw struct"></span>NA_struct(消失)</span>
+              <span><span class="sw obs"></span>観測（数値）</span>
+              <span><span class="sw fuse"></span>NA_fuse（融合）</span>
+              <span><span class="sw struct"></span>NA_struct（消失）</span>
             </div>
             <p class="lede" style="font-size:13.5px; margin-top:16px">削除順 <span class="mono">t10, t1, t8, t7, t4, t9, t5</span> は、系統樹を根の側から剥がしていく。クレードごと崩れるため <span class="tok struct">NA_struct</span> が急増する。各座標は独立したグラフ理論的オラクルと照合される——でっち上げも、こっそりの欠落もない。ここには不一致がないので <span class="tok topo">NA_topo</span> = 0。</p>
           </div>
@@ -354,9 +354,9 @@
               <div class="count struct"><div class="v" id="cStructL">0</div><div class="k">NA_struct</div></div>
             </div>
             <div class="legend-inline" style="margin-top:16px">
-              <span><span class="sw obs"></span>観測(数値)</span>
-              <span><span class="sw fuse"></span>NA_fuse(融合)</span>
-              <span><span class="sw struct"></span>NA_struct(消失)</span>
+              <span><span class="sw obs"></span>観測（数値）</span>
+              <span><span class="sw fuse"></span>NA_fuse（融合）</span>
+              <span><span class="sw struct"></span>NA_struct（消失）</span>
             </div>
             <p class="lede" style="font-size:13.5px; margin-top:16px">削除順 <span class="mono">t8, t7, t4, t9, t5, t2, t3</span> は一つのクレードを狙い撃ちする。融合は一箇所に集中し、反対側は数値座標をずっと長く保つ。同じ凍結された軸でも、欠測の痕跡は異なる——そしてやはり <span class="tok topo">NA_topo</span> = 0。</p>
           </div>
@@ -381,16 +381,16 @@
             <span style="display:inline-block; width:7.2em"></span>= <span style="color:var(--struct)">NA_struct</span> &nbsp;&pi;<sub>g</sub>(b) = &perp;
           </div>
           <div class="proof">
-            <div class="step rv" style="--d:.16s">剪定後の樹 <b>&rho;<sub>Tg</sub>(S)</b> は一意——標準的な樹の制限操作(<span class="mono">ape::drop.tip</span>)であり、ラベルにもスプリットにも依存しない。</div>
-            <div class="step rv" style="--d:.24s">次数2の抑約は<b>辺の商</b>である:各枝はちょうど一本の簡約辺に落ちるか、削除される。ゆえに <b>&pi;<sub>g</sub></b> は well-defined。</div>
+            <div class="step rv" style="--d:.16s">剪定後の樹 <b>&rho;<sub>Tg</sub>(S)</b> は一意——標準的な樹の制限操作（<span class="mono">ape::drop.tip</span>）であり、ラベルにもスプリットにも依存しない。</div>
+            <div class="step rv" style="--d:.24s">次数2の抑約は<b>辺の商</b>である：各枝はちょうど一本の簡約辺に落ちるか、削除される。ゆえに <b>&pi;<sub>g</sub></b> は well-defined。</div>
             <div class="step rv" style="--d:.32s">|fiber| = 1、|fiber| &ge; 2、そして「削除」は<b>互いに排反かつ網羅的</b>——すなわち分割。status は |fiber| の関数だ。</div>
-            <div class="step rv" style="--d:.4s">|fiber| = 1 のとき、簡約辺の長さは <b>&ell;(b)</b> に等しい:観測<em>値</em>も一意だ。</div>
-            <div class="step rv" style="--d:.48s">どのファイバーも<b>連結した路(みち)</b>である——融合座標は路であって、ばらばらの集合ではない。<span class="qed">&#8718;</span></div>
+            <div class="step rv" style="--d:.4s">|fiber| = 1 のとき、簡約辺の長さは <b>&ell;(b)</b> に等しい：観測<em>値</em>も一意だ。</div>
+            <div class="step rv" style="--d:.48s">どのファイバーも<b>連結した路（みち）</b>である——融合座標は路であって、ばらばらの集合ではない。<span class="qed">&#8718;</span></div>
           </div>
           <div class="formula rv" style="--d:.2s; max-width:none; text-align:center">
             |B(S)| = <span style="color:var(--obs)">|observed|</span> + <span style="color:var(--fuse)">|NA_fuse|</span> + <span style="color:var(--struct)">|NA_struct|</span>
           </div>
-          <div class="cor-chip rv" style="--d:.56s"><span class="lbl">補題1 · スプリット = ファイバー</span><br>&sigma;<sub>g</sub>(b) = &sigma;<sub>g</sub>(b&prime;) &nbsp;&hArr;&nbsp; &pi;<sub>g</sub>(b) = &pi;<sub>g</sub>(b&prime;)。SplitAligner のスプリット射影は、グラフで定まる台帳を<b>忠実に計算する</b>——スプリット鍵はファイバーの正確な符号化であって、別個の定義ではない。</div>
+          <div class="cor-chip rv" style="--d:.56s"><span class="lbl">補題1 · スプリット = ファイバー</span><br>&sigma;<sub>g</sub>(b) = &sigma;<sub>g</sub>(b&prime;) &nbsp;&hArr;&nbsp; &pi;<sub>g</sub>(b) = &pi;<sub>g</sub>（b&prime;）。SplitAligner のスプリット射影は、グラフで定まる台帳を<b>忠実に計算する</b>——スプリット鍵はファイバーの正確な符号化であって、別個の定義ではない。</div>
           <p class="lede rv" style="--d:.28s; font-size:14px">どの status も<em>一意に定まる</em>——ただ一つの写像 &pi;<sub>g</sub> の関数だからだ。どの分類群が採られたかが決まれば、各セルの答えはただ一つ。<em>「すべての欠測に名前がある」——それは定理である。</em></p>
           <div class="cor-chip rv" style="--d:.6s"><span class="lbl">系2.5 · 真値層 vs 復元層</span><br>真値層は <b>(S, T<sub>g</sub>)</b> のみに依存し、遺伝子系統樹のトポロジーには一切依存しない。不一致が <span class="tok struct">NA_struct</span>&thinsp;/&thinsp;<span class="tok fuse">NA_fuse</span> を乱すことはなく、別層である復元層 <span class="tok topo">NA_topo</span> を開くだけだ。</div>
         </div>
@@ -430,7 +430,7 @@
               <div class="mini-note">枝 <em style="color:var(--accent); font-style:normal">b</em> = スプリット {t5,t2} → <span class="tok mapped">Mapped</span></div>
             </div>
             <div style="display:grid; gap:7px; justify-items:center; border-left:1px solid var(--line); padding-left:14px">
-              <div class="mini-cap" style="color:var(--topo)">遺伝子系統樹(不一致)</div>
+              <div class="mini-cap" style="color:var(--topo)">遺伝子系統樹（不一致）</div>
               <svg id="treeGe" class="no-draw" viewBox="0 0 210 165" role="img" aria-label="t5 と t2 がクレードを成さない不一致な遺伝子系統樹"></svg>
               <div class="mini-note" style="color:var(--topo)">{t5,t2} が消失 → <span class="tok topo">NA_topo</span></div>
             </div>
@@ -486,14 +486,14 @@
         <div class="eyebrow rv">手法の魂 — README より</div>
         <div class="poem">
           <div class="line rv" style="--d:.1s">固定された種の系統樹の背骨の上で、</div>
-          <div class="line rv" style="--d:.5s">私たちはただ一つを問う——枝 <em style="font-style:normal; color:var(--accent)">b</em> はなお成り立つか?</div>
+          <div class="line rv" style="--d:.5s">私たちはただ一つを問う——枝 <em style="font-style:normal; color:var(--accent)">b</em> はなお成り立つか？</div>
           <div class="spacer"></div>
-          <div class="line rv" style="--d:1.0s">スプリットを射影せよ:</div>
+          <div class="line rv" style="--d:1.0s">スプリットを射影せよ：</div>
           <div class="line rv" style="--d:1.4s">射影された片側が消えるなら — <span style="color:var(--struct)">NA_struct</span>。</div>
           <div class="line rv" style="--d:1.8s">枝が融合するなら — <span style="color:var(--fuse)">NA_fuse</span>。</div>
           <div class="line rv" style="--d:2.2s">トポロジーが背を向けるなら — <span style="color:var(--topo)">NA_topo</span>。</div>
           <div class="spacer"></div>
-          <div class="line rv" style="--d:2.7s">鬼もなく、漏れもなく:</div>
+          <div class="line rv" style="--d:2.7s">鬼もなく、漏れもなく：</div>
           <div class="line rv" style="--d:3.1s">総和 = <span style="color:var(--mapped)">Mapped</span> + <span style="color:var(--struct)">NA_struct</span> + <span style="color:var(--fuse)">NA_fuse</span> + <span style="color:var(--topo)">NA_topo</span> + <span style="color:var(--residual)">residual_NA</span>。</div>
           <div class="final rv" style="--d:3.8s">すべての欠測に名前がある、静かな台帳。</div>
         </div>
@@ -506,7 +506,7 @@
         <svg class="bg-tree no-draw" id="bgTree2" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
         <div class="eyebrow rv">SplitAligner</div>
         <h1 class="title rv" style="--d:.08s; text-align:center; max-width:24ch">枝の同一性を、監査可能に。</h1>
-        <p class="lede rv" style="--d:.2s; text-align:center; margin:0 auto; max-width:66ch">Wu J. (2026). <em>SplitAligner: a branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance.</em> 併設の座標監査ベンチマーク:決定論的な 10 分類群トイツリー。</p>
+        <p class="lede rv" style="--d:.2s; text-align:center; margin:0 auto; max-width:66ch">Wu J. (2026). <em>SplitAligner: a branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance.</em> 併設の座標監査ベンチマーク：決定論的な 10 分類群トイツリー。</p>
       </div>
     </section>
 
