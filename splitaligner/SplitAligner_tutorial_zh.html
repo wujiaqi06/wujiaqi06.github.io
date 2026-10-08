@@ -209,19 +209,35 @@
       <div class="identity">σ<sub>g</sub>(b) = ( A<sub>b</sub> ∩ T<sub>g</sub>  |  B<sub>b</sub> ∩ T<sub>g</sub> )</div>
       <p>在与物种树限制拓扑一致的基准层中，两根未被删除的原始枝投影划分相同，当且仅当它们落到同一条约化枝上。这并不是说两根原始枝变成了同一根；而是它们在该基因的类群集合下<strong>无法再独立区分</strong>，形成<em>融合</em>。若投影后有一侧为空，则是<em>结构性</em>缺失。对于经验 free 拓扑基因树，SplitAligner 还会另行判断每个可独立观测的投影划分是否被找回。</p>
 
-      <p><strong>SplitAligner 的算法是表示非依赖的。</strong>既然枝的身份就是它的划分，一棵树怎么写就无关紧要：比较之前，基因树的每一条枝都会先归约为规范化的<em>无根</em>划分。因此基因树可以有根或无根、二叉或多叉、子节点顺序任意；有根的输入一律按无根树处理，根处的两条半枝合并为一根枝。拓扑可以约束在物种树上（<strong>fix</strong>），也可以完全自由。实际使用只有两点要求：<strong>每棵基因树的类群必须是物种树类群的子集</strong>，名称完全一致；基因树应带枝长，因为枝长正是要填进矩阵的值。</p>
+      <p><strong>SplitAligner 的算法是表示非依赖的。</strong>既然枝的身份就是它的划分，一棵树怎么写就无关紧要：比较之前，基因树的每一条枝都会先归约为规范化的<em>无根</em>划分。因此基因树可以有根或无根、二叉或多叉、子节点顺序任意；有根的输入一律按无根树处理：二度根处的两条半枝合并为同一个划分；两者都是有限数值时枝长相加，否则该划分不带数值枝长。拓扑可以约束在物种树上（<strong>fix</strong>），也可以完全自由。实际使用只有两点要求：<strong>每棵基因树的类群必须是物种树类群的子集</strong>，名称完全一致；基因树应带枝长，因为枝长正是要填进矩阵的值。这一点已由自带示例上的序列化与输入变体回归测试验证：等价输入给出相同的矩阵，物种树不变时逐字节相同，物种树换一种写法时经 B 别名映射后逐格相同。</p>
 
-      <div class="code"><pre><span class="c"># 枝的身份只取决于类群集合，与根和子节点顺序无关</span>
+      <div class="code"><pre><span class="c"># 第一层 —— 覆盖层：只用 S 和 T_g，完全不看基因树</span>
 <span class="k">for</span> 每个基因 g:
-    T_g ← 基因树的类群                            <span class="c"># 必须 ⊆ 物种树类群</span>
-    G_g ← { canon(L | T_g ∖ L) : L = 某条枝下方的叶 }
-        <span class="c"># 无根划分；二度根的两条半枝得到同一个键</span>
-    <span class="k">for</span> 每根物种树枝 b:
-        σ ← canon(A_b ∩ T_g | B_b ∩ T_g)          <span class="c"># 投影</span>
-        state(g, b) ← S  <span class="k">if</span> σ 有一侧为空
-                    ← F  <span class="k">if</span> σ ∈ G_g 且另有枝也投影到 σ
-                    ← D  <span class="k">if</span> σ ∈ G_g、唯一、且可独立观测
-                    ← U  否则                     <span class="c"># 已投影，但未找回</span></pre></div>
+    T_g ← S 与基因树共有的类群                           <span class="c"># 步骤 1</span>
+    <span class="k">for</span> 每根物种树枝 b:                                 <span class="c"># 步骤 2–3</span>
+        σ_g(b) ← canon(A_b ∩ T_g | B_b ∩ T_g)             <span class="c"># 投影</span>
+        <span class="k">if</span> σ_g(b) 有一侧为空:
+            state(g,b) ← NA_struct                        <span class="c"># 没有投影身份</span>
+        <span class="k">else if</span> b 是内部枝且 σ_g(b) 有一侧只剩一个类群:
+            端点塌缩：只做融合记账，
+            不是可独立观测的原始枝
+    <span class="k">for</span> 每个保留下来的投影划分:                           <span class="c"># 步骤 4</span>
+        <span class="k">if</span> 存在 b' ≠ b 使 σ_g(b) = σ_g(b'):
+            state(g,b) ← NA_fuse                          <span class="c"># 融合组；共享的信号可能</span>
+                                                          <span class="c"># 落在复合坐标 b|b' 上</span>
+            <span class="c"># 实现：状态账本只在复合划分真的在 G_g 中被找回时才记为融合（F）；</span>
+            <span class="c"># 否则该格进入第二层，最终成为 residual NA</span>
+    其余 (g,b) 为决定性的：身份已定，值尚未知
+
+<span class="c"># 第二层 —— 基因树层：只有决定性的格子才去看基因树</span>
+    Σ(G_g) ← G_g 的规范无根划分                           <span class="c"># 步骤 5</span>
+    <span class="k">for</span> 每个决定性的 (g,b):
+        <span class="k">if</span> σ_g(b) ∈ Σ(G_g):  Mapped —— 记录枝长
+        <span class="k">else</span>:                generic NA                   <span class="c"># 原因尚未命名</span>
+
+<span class="c"># 第三层 —— finalize：用配对的 fixed/free 证据给剩下的 NA 命名</span>
+    free 侧的 generic NA 只有在 fixed 侧原始坐标带有数值证据时
+    才成为 NA_topo；否则为 residual NA</pre></div>
       <p>整个流程有两个模式：<code>matrix</code> 构建坐标系并把所有基因投影上去；<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>

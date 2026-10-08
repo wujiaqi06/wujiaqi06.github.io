@@ -209,19 +209,36 @@
       <div class="identity">σ<sub>g</sub>(b) = ( A<sub>b</sub> ∩ T<sub>g</sub>  |  B<sub>b</sub> ∩ T<sub>g</sub> )</div>
       <p>種樹の制限木とトポロジーが一致する基準層では、削除されていない二本の原始枝の射影スプリットが一致することと、同じ簡約辺へ写ることは同値である。これは元の二枝が同じ枝になったという意味ではない。その遺伝子の分類群集合では二枝を<strong>独立に区別できなくなった</strong>、つまり<em>融合</em>したという意味である。射影後の片側が空なら、代わりに<em>構造的</em>欠測となる。経験的な free トポロジー遺伝子樹については、独立に観測可能な各射影スプリットが回収されたかを別に判定する。</p>
 
-      <p><strong>SplitAligner のアルゴリズムは表現に依存しない。</strong>枝の同一性はスプリットそのものにあるので、樹がどう書かれているかは問題にならない。比較の前に、遺伝子系統樹のすべての枝は正準化された<em>無根</em>スプリットへ還元される。したがって遺伝子系統樹は有根でも無根でも、二分岐でも多分岐でも、子ノードの順序も任意でよい。有根の入力は無根樹として扱われ、根にある二本の半枝は一本の枝にまとめられる。トポロジーは種樹に拘束されていても（<strong>fix</strong>）完全に自由でもよい。実用上の要件は二つ。<strong>各遺伝子系統樹の分類群が種樹の分類群の部分集合であること</strong>（名前は完全一致）、そして遺伝子系統樹に枝長があること。枝長こそが行列に記入される値だからである。</p>
+      <p><strong>SplitAligner のアルゴリズムは表現に依存しない。</strong>枝の同一性はスプリットそのものにあるので、樹がどう書かれているかは問題にならない。比較の前に、遺伝子系統樹のすべての枝は正準化された<em>無根</em>スプリットへ還元される。したがって遺伝子系統樹は有根でも無根でも、二分岐でも多分岐でも、子ノードの順序も任意でよい。有根の入力は無根樹として扱われる。次数 2 の根にある二本の半枝は一つのスプリットにまとめられ、両方が有限の数値なら枝長は合算され、そうでなければそのスプリットは数値の枝長を持たない。トポロジーは種樹に拘束されていても（<strong>fix</strong>）完全に自由でもよい。実用上の要件は二つ。<strong>各遺伝子系統樹の分類群が種樹の分類群の部分集合であること</strong>（名前は完全一致）、そして遺伝子系統樹に枝長があること。枝長こそが行列に記入される値だからである。この点は同梱例に対する直列化・入力変体の回帰テストで検証済みである。等価な入力は同一の行列を与え、種樹が同じならバイト単位で、種樹の書き方を変えた場合は B エイリアスを対応付けたうえでセル単位で一致する。</p>
 
-      <div class="code"><pre><span class="c"># 枝の同一性は分類群集合のみで決まり、根や子ノードの順序には依らない</span>
+      <div class="code"><pre><span class="c"># 第 1 段階 — カバレッジ層：S と T_g だけを使い、遺伝子樹は見ない</span>
 <span class="k">for</span> 各遺伝子 g:
-    T_g ← 遺伝子樹の分類群                        <span class="c"># 種樹の分類群の ⊆ であること</span>
-    G_g ← { canon(L | T_g ∖ L) : L = ある枝の下にある葉 }
-        <span class="c"># 無根スプリット；次数 2 の根の二本の半枝は同じキーになる</span>
-    <span class="k">for</span> 各種樹の枝 b:
-        σ ← canon(A_b ∩ T_g | B_b ∩ T_g)          <span class="c"># 射影</span>
-        state(g, b) ← S  <span class="k">if</span> σ の片側が空
-                    ← F  <span class="k">if</span> σ ∈ G_g かつ別の枝も σ に射影される
-                    ← D  <span class="k">if</span> σ ∈ G_g、一意、かつ独立に観測可能
-                    ← U  それ以外                 <span class="c"># 射影されたが回収されず</span></pre></div>
+    T_g ← S と遺伝子樹に共通する分類群                     <span class="c"># ステップ 1</span>
+    <span class="k">for</span> 各種樹の枝 b:                                   <span class="c"># ステップ 2–3</span>
+        σ_g(b) ← canon(A_b ∩ T_g | B_b ∩ T_g)             <span class="c"># 射影</span>
+        <span class="k">if</span> σ_g(b) の片側が空:
+            state(g,b) ← NA_struct                        <span class="c"># 射影された同一性がない</span>
+        <span class="k">else if</span> b が内部枝で σ_g(b) の片側が分類群 1 つ:
+            端点崩壊：融合の記帳用に保持し、
+            独立に観測可能な原始枝とはしない
+    <span class="k">for</span> 保持された各射影スプリット:                         <span class="c"># ステップ 4</span>
+        <span class="k">if</span> ある b' ≠ b について σ_g(b) = σ_g(b'):
+            state(g,b) ← NA_fuse                          <span class="c"># 融合群；共有されたシグナルは</span>
+                                                          <span class="c"># 複合座標 b|b' 上にあり得る</span>
+            <span class="c"># 実装：状態サイドカーが融合（F）を記録するのは複合スプリットが</span>
+            <span class="c"># G_g 内で回収された場合のみ。そうでなければ第 2 段階へ進み、</span>
+            <span class="c"># 最終的に residual NA となる</span>
+    残りの (g,b) は決定的：同一性は確定、値は未知
+
+<span class="c"># 第 2 段階 — 遺伝子樹層：決定的なペアだけが遺伝子樹を参照する</span>
+    Σ(G_g) ← G_g の正準無根スプリット                       <span class="c"># ステップ 5</span>
+    <span class="k">for</span> 各決定的な (g,b):
+        <span class="k">if</span> σ_g(b) ∈ Σ(G_g):  Mapped — 枝長を記録
+        <span class="k">else</span>:                generic NA                   <span class="c"># 原因はまだ名付けない</span>
+
+<span class="c"># 第 3 段階 — finalize：対になった fixed/free の証拠で残りの NA に名を付ける</span>
+    free 側の generic NA は、fixed 側の原始座標が数値の証拠を持つ場合にのみ
+    NA_topo となり、そうでなければ residual NA</pre></div>
       <p>ワークフローには二つのモードがある。<code>matrix</code> が座標系を構築し、全遺伝子をそこへ射影する。<code>finalize</code> が、対応する証拠に基づいて欠測状態を分類する。</p>
     </div>
   </div>
