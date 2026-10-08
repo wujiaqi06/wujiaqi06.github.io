@@ -259,6 +259,7 @@ GeneB((A:0.2,C:0.1):0.1,(B:0.1,D:0.2):0.1):0.1;</pre></div>
       </ul>
       <p>Comparing the two is what later separates <em>coverage-driven</em> absence from <em>discordance-driven</em> absence.</p>
     </div>
+    <div class="note"><strong>Tree representation does not matter.</strong> SplitAligner's split algorithm is representation-independent: before anything is compared, every edge of a gene tree is converted into a canonical <em>unrooted</em> split, a bipartition of the taxa present in that gene. So a gene tree may be rooted or unrooted, binary or multifurcating, written in any child order, with or without branch lengths or internal-node labels; its topology may be constrained to the species tree (<strong>fix</strong>) or completely free, and it may take any shape. A rooted tree is simply treated as unrooted: the two half-edges at a degree-2 root become one split, and their lengths are summed when both are numeric. The one hard requirement is that <strong>the taxa of each gene tree must be a subset of the species-tree taxa</strong>, with names matching exactly and no duplicates. Plain Newick only: quoted labels and <code>[...]</code> comments are rejected.</div>
   </div>
 </section>
 
