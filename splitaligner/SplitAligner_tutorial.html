@@ -218,6 +218,17 @@
 
       <p><strong>SplitAligner's algorithm is representation-independent.</strong> Because identity lives in the split, nothing about how a tree is written matters: every edge of a gene tree is reduced to a canonical <em>unrooted</em> split before any comparison, so a gene tree may be rooted or unrooted, binary or multifurcating, in any child order, with or without branch lengths or internal-node labels. Its topology may be constrained to the species tree (<strong>fix</strong>) or completely free, and it may take any shape. Rooted input is simply treated as unrooted: the two half-edges at a degree-2 root become one split, and their lengths are summed when both are numeric. The input tree format is otherwise unconstrained. The one hard requirement is that <strong>the taxa of each gene tree must be a subset of the species-tree taxa</strong>, with names matching exactly and no duplicates.</p>
 
+      <div class="code"><pre><span class="c"># identity never consults the root, child order, or branch lengths</span>
+<span class="k">for</span> each gene g:
+    T_g ← taxa of the gene tree                  <span class="c"># must be ⊆ species-tree taxa</span>
+    G_g ← { canon(L | T_g ∖ L) : L = tips below an edge }
+        <span class="c"># unrooted splits; a degree-2 root's two half-edges give one key</span>
+    <span class="k">for</span> each species-tree branch b:
+        σ ← canon(A_b ∩ T_g | B_b ∩ T_g)          <span class="c"># projection</span>
+        state(g, b) ← S  <span class="k">if</span> one side of σ is empty
+                    ← F  <span class="k">if</span> σ ∈ G_g and another branch also projects to σ
+                    ← D  <span class="k">if</span> σ ∈ G_g, unique, and independently observable
+                    ← U  otherwise               <span class="c"># projected, not recovered</span></pre></div>
       <p>The workflow has two modes: <code>matrix</code> builds the coordinate system and projects every gene onto it; <code>finalize</code> then classifies the resulting missingness where the paired evidence permits.</p>
     </div>
   </div>

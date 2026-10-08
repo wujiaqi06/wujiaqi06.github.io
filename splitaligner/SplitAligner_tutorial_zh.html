@@ -211,6 +211,17 @@
 
       <p><strong>SplitAligner 的算法是表示非依赖的。</strong>既然枝的身份就是它的划分，一棵树怎么写就无关紧要：比较之前，基因树的每一条枝都会先归约为规范化的<em>无根</em>划分，因此基因树可以有根或无根、二叉或多叉、子节点顺序任意、有无枝长和内节点标签均可。拓扑可以约束在物种树上（<strong>fix</strong>），也可以完全自由，任何形状都行。有根的输入一律按无根树处理：二度根处的两条半枝合并为同一个划分，两者都是数值时枝长相加。除此之外，输入树的格式完全自由。唯一的硬性要求是<strong>每棵基因树的类群必须是物种树类群的子集</strong>，名称完全一致且不重复。</p>
 
+      <div class="code"><pre><span class="c"># 全程不看根、不看子节点顺序、不看枝长</span>
+<span class="k">for</span> 每个基因 g:
+    T_g ← 基因树的类群                            <span class="c"># 必须 ⊆ 物种树类群</span>
+    G_g ← { canon(L | T_g ∖ L) : L = 某条枝下方的叶 }
+        <span class="c"># 无根划分；二度根的两条半枝得到同一个键</span>
+    <span class="k">for</span> 每根物种树枝 b:
+        σ ← canon(A_b ∩ T_g | B_b ∩ T_g)          <span class="c"># 投影</span>
+        state(g, b) ← S  <span class="k">if</span> σ 有一侧为空
+                    ← F  <span class="k">if</span> σ ∈ G_g 且另有枝也投影到 σ
+                    ← D  <span class="k">if</span> σ ∈ G_g、唯一、且可独立观测
+                    ← U  否则                     <span class="c"># 已投影，但未找回</span></pre></div>
       <p>整个流程有两个模式：<code>matrix</code> 构建坐标系并把所有基因投影上去；<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>
