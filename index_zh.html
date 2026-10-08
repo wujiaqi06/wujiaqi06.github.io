@@ -284,7 +284,7 @@
 
       <div class="focus">
         <h3>当前重点 — SplitAligner</h3>
-        <p>一个为「类群缺失、基因树冲突」情形设计的分支身份坐标系统。它通过投影到物种树上的分裂（split）来定义分支身份，并把「分支缺失」拆分为几类明确、可审计的情况；配套一个确定性的图论 oracle 基准（Catnip10）和一个开发中的 R 参考实现。分支坐标由规范化的无根 split 定义，不依赖显示用的根位置或节点的排列顺序，因此同一棵加权无根树的各种等价表示，都会保留相同的生物学分支身份。</p>
+        <p>一个为「类群缺失、基因树冲突」情形设计的分支身份坐标系统。它通过投影到物种树上的分裂（split）来定义分支身份，并把「分支缺失」拆分为几类明确、可审计的情况；配套一个确定性的图论 oracle 基准（Catnip10）和一个带 C++ 核心的 R 实现（SplitAlignerR）。分支坐标由规范化的无根 split 定义，不依赖显示用的根位置或节点的排列顺序，因此同一棵加权无根树的各种等价表示，都会保留相同的生物学分支身份。</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="splitaligner/SplitAligner_explainer_zh.html" target="_blank" rel="noopener">动画讲解 ↗</a>
           <a href="splitaligner/SplitAligner_tutorial_zh.html" target="_blank" rel="noopener">教程 ↗</a>
@@ -338,10 +338,11 @@
 
         <div class="sw">
           <h3>SplitAlignerR</h3>
-          <div class="meta"><span class="pill lang">R</span><span class="pill">GPL-3</span><span class="pill">开发中</span></div>
-          <p>SplitAligner 的 R 参考实现分支。当前的种子版本把 Catnip10 图论 oracle 基准打包为可审计、带完整文档的包数据，并附带校验函数；面向实际数据的分裂映射引擎正在开发中。</p>
+          <div class="meta"><span class="pill lang">R / C++17</span><span class="pill">GPL-3</span><span class="pill">v0.1.0 · 通过 Pro RECERT 认证</span></div>
+          <p>SplitAligner 的 R 接口与独立基准分支。v0.1.0 包含一个生产级的 C++17 graph-first 映射器（严格的有限范围枝长校验、显式的结构性/拓扑性状态、复合坐标溯源）；一个独立的 fixed/free 配对 finalize 层，把字面 NA 保留为 residual NA；以及一个纯 R 的节点-边 oracle，可独立重算整个 Catnip10 基准（272 个格子、19 个融合事件）。不可变的 v0.1.0 版本已通过独立的 Pro RECERT 审核；默认分支为发布后的开发线。</p>
           <div class="links">
             <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">GitHub ↗</a>
+            <a href="https://wujiaqi06.github.io/SplitAlignerR/" target="_blank" rel="noopener">文档 ↗</a>
           </div>
         </div>
 

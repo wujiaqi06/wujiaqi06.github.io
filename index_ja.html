@@ -284,7 +284,7 @@
 
       <div class="focus">
         <h3>現在の焦点 — SplitAligner</h3>
-        <p>分類群の欠損や遺伝子系統樹の不一致がある状況で系統ゲノミクスを行うための、枝同一性の座標系です。種樹のスプリットを射影することで枝の同一性を定義し、枝の「欠測」を明示的で監査可能なカテゴリに分解します。決定論的なグラフ理論的オラクル・ベンチマーク（Catnip10）と、開発中の R リファレンス実装が付属します。枝座標は表示上の根の位置や節点の並び順ではなく、正準化された無根スプリットによって定義されるため、同じ重み付き無根樹を表す等価な表現のあいだで、生物学的な枝の同一性が保たれます。</p>
+        <p>分類群の欠損や遺伝子系統樹の不一致がある状況で系統ゲノミクスを行うための、枝同一性の座標系です。種樹のスプリットを射影することで枝の同一性を定義し、枝の「欠測」を明示的で監査可能なカテゴリに分解します。決定論的なグラフ理論的オラクル・ベンチマーク（Catnip10）と、C++ コアを備えた R 実装（SplitAlignerR）が付属します。枝座標は表示上の根の位置や節点の並び順ではなく、正準化された無根スプリットによって定義されるため、同じ重み付き無根樹を表す等価な表現のあいだで、生物学的な枝の同一性が保たれます。</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="splitaligner/SplitAligner_explainer_ja.html" target="_blank" rel="noopener">アニメーション解説 ↗</a>
           <a href="splitaligner/SplitAligner_tutorial_ja.html" target="_blank" rel="noopener">チュートリアル ↗</a>
@@ -338,10 +338,11 @@
 
         <div class="sw">
           <h3>SplitAlignerR</h3>
-          <div class="meta"><span class="pill lang">R</span><span class="pill">GPL-3</span><span class="pill">開発中</span></div>
-          <p>SplitAligner の R リファレンス実装です。現在のシード版では、Catnip10 のグラフ理論的オラクル・ベンチマークを、監査可能でドキュメント付きのパッケージデータと検証用ヘルパーとして同梱しています。実データ向けのスプリット写像エンジンは開発中です。</p>
+          <div class="meta"><span class="pill lang">R / C++17</span><span class="pill">GPL-3</span><span class="pill">v0.1.0 · Pro RECERT 認証済み</span></div>
+          <p>SplitAligner の R インターフェースおよび独立ベンチマーク・トラックです。v0.1.0 には、厳密な有限範囲の枝長検証、明示的な構造的／トポロジー的状態、複合座標の来歴を備えた本番用 C++17 graph-first マッパー、字面どおりの NA を residual NA として保持する独立した fixed/free 対の finalize 層、そして Catnip10 ベンチマーク全体（272 セル、19 の融合イベント）を独立に再計算する純 R のノード・エッジ・オラクルが含まれます。不変の v0.1.0 リリースは独立した Pro RECERT を通過済みで、デフォルトブランチはリリース後の開発ラインです。</p>
           <div class="links">
             <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">GitHub ↗</a>
+            <a href="https://wujiaqi06.github.io/SplitAlignerR/" target="_blank" rel="noopener">ドキュメント ↗</a>
           </div>
         </div>
 

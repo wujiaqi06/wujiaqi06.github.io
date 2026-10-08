@@ -284,7 +284,7 @@
 
       <div class="focus">
         <h3>Current focus — SplitAligner</h3>
-        <p>A branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance. It defines branch identity through projected species-tree splits and decomposes branch absence into explicit, auditable categories, with a deterministic graph-oracle benchmark (Catnip10) and an R reference implementation in progress. Its branch coordinates are defined by canonical unrooted splits rather than display-root or positional node identities, so equivalent representations of the same weighted unrooted tree preserve the same biological branch identities.</p>
+        <p>A branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance. It defines branch identity through projected species-tree splits and decomposes branch absence into explicit, auditable categories, with a deterministic graph-oracle benchmark (Catnip10) and an R implementation with a C++ core (SplitAlignerR). Its branch coordinates are defined by canonical unrooted splits rather than display-root or positional node identities, so equivalent representations of the same weighted unrooted tree preserve the same biological branch identities.</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="splitaligner/SplitAligner_explainer.html" target="_blank" rel="noopener">Animated explainer ↗</a>
           <a href="splitaligner/SplitAligner_tutorial.html" target="_blank" rel="noopener">Tutorial ↗</a>
@@ -338,10 +338,11 @@
 
         <div class="sw">
           <h3>SplitAlignerR</h3>
-          <div class="meta"><span class="pill lang">R</span><span class="pill">GPL-3</span><span class="pill">in development</span></div>
-          <p>The R reference-implementation track for SplitAligner. The current seed release ships the Catnip10 graph-oracle benchmark as audit-ready, documented package data with validation helpers; the empirical split-mapping engine is in active development.</p>
+          <div class="meta"><span class="pill lang">R / C++17</span><span class="pill">GPL-3</span><span class="pill">v0.1.0 · Pro RECERT certified</span></div>
+          <p>The R interface and independent benchmark track for SplitAligner. v0.1.0 ships a production C++17 graph-first mapper with strict finite-range branch-length validation, explicit structural and topological states, and composite-coordinate provenance; a separate paired fixed/free finalization layer that keeps literal NA as residual NA; and a pure R node-edge oracle that independently recomputes the whole Catnip10 benchmark (272 cells, 19 fusion events). The immutable v0.1.0 release passed independent Pro RECERT; the default branch is the post-release development line.</p>
           <div class="links">
             <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">GitHub ↗</a>
+            <a href="https://wujiaqi06.github.io/SplitAlignerR/" target="_blank" rel="noopener">Documentation ↗</a>
           </div>
         </div>
 
