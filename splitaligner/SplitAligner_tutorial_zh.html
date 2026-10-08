@@ -213,31 +213,31 @@
 
       <div class="code"><pre><span class="c"># 第一层 —— 覆盖层：只用 S 和 T_g，完全不看基因树</span>
 <span class="k">for</span> 每个基因 g:
-    T_g ← S 与基因树共有的类群                           <span class="c"># 步骤 1</span>
-    <span class="k">for</span> 每根物种树枝 b:                                 <span class="c"># 步骤 2–3</span>
-        σ_g(b) ← canon(A_b ∩ T_g | B_b ∩ T_g)             <span class="c"># 投影</span>
+    T_g ← 基因树的类群（S 的子集）                               <span class="c"># 步骤 1</span>
+    <span class="k">for</span> 每根物种树枝 b:                                     <span class="c"># 步骤 2–3</span>
+        σ_g(b) ← canon(A_b ∩ T_g | B_b ∩ T_g)                 <span class="c"># 投影</span>
         <span class="k">if</span> σ_g(b) 有一侧为空:
-            state(g,b) ← NA_struct                        <span class="c"># 没有投影身份</span>
-        <span class="k">else if</span> b 是内部枝且 σ_g(b) 有一侧只剩一个类群:
-            端点塌缩：只做融合记账，
-            不是可独立观测的原始枝
-    <span class="k">for</span> 每个保留下来的投影划分:                           <span class="c"># 步骤 4</span>
-        <span class="k">if</span> 存在 b' ≠ b 使 σ_g(b) = σ_g(b'):
-            state(g,b) ← NA_fuse                          <span class="c"># 融合组；共享的信号可能</span>
-                                                          <span class="c"># 落在复合坐标 b|b' 上</span>
-            <span class="c"># 实现：状态账本只在复合划分真的在 G_g 中被找回时才记为融合（F）；</span>
-            <span class="c"># 否则该格进入第二层，最终成为 residual NA</span>
-    其余 (g,b) 为决定性的：身份已定，值尚未知
+            state(g,b) ← NA_struct                            <span class="c"># 没有投影身份</span>
+        <span class="k">else if</span> b 是内部枝且 σ_g(b) 有一侧只剩一个类群 x:
+            端点塌缩：σ_g(b) 与 x 的终端枝划分相同，
+            所以 b 只做融合记账，永远不作为独立枝
+    把保留下来的枝按 σ_g(b) 分组                                <span class="c"># 步骤 4</span>
+        成员 ≥ 2 的组是融合组：成员在 T_g 上无法区分，
+        共用一个复合坐标 b|b'
+    此时每个保留的 (g,b) 身份已定，值尚未知
 
-<span class="c"># 第二层 —— 基因树层：只有决定性的格子才去看基因树</span>
-    Σ(G_g) ← G_g 的规范无根划分                           <span class="c"># 步骤 5</span>
-    <span class="k">for</span> 每个决定性的 (g,b):
-        <span class="k">if</span> σ_g(b) ∈ Σ(G_g):  Mapped —— 记录枝长
-        <span class="k">else</span>:                generic NA                   <span class="c"># 原因尚未命名</span>
+<span class="c"># 第二层 —— 基因树层：每个保留的投影划分查一次基因树</span>
+    Σ(G_g) ← G_g 的规范无根划分                               <span class="c"># 步骤 5</span>
+    <span class="k">for</span> 每个保留的投影划分 σ 及其分组:
+        <span class="k">if</span> σ ∉ Σ(G_g):            所有成员记 generic NA        <span class="c"># 原因尚未命名</span>
+        <span class="k">else if</span> 组内成员 ≥ 2:
+                                所有成员记 NA_fuse              <span class="c"># 枝长记在 b|b' 上</span>
+        <span class="k">else</span>:                   Mapped —— 记录枝长
 
 <span class="c"># 第三层 —— finalize：用配对的 fixed/free 证据给剩下的 NA 命名</span>
-    free 侧的 generic NA 只有在 fixed 侧原始坐标带有数值证据时
-    才成为 NA_topo；否则为 residual NA</pre></div>
+    NA_fuse 只在复合坐标 b|b' 带有数值枝长时成立
+    free 侧的 generic NA 只有在 fixed 侧原始坐标为 Mapped 且带数值时
+    才成为 NA_topo；否则保持为 residual NA</pre></div>
       <p>整个流程有两个模式：<code>matrix</code> 构建坐标系并把所有基因投影上去；<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>

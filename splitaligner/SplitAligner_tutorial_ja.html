@@ -213,32 +213,31 @@
 
       <div class="code"><pre><span class="c"># 第 1 段階 — カバレッジ層：S と T_g だけを使い、遺伝子樹は見ない</span>
 <span class="k">for</span> 各遺伝子 g:
-    T_g ← S と遺伝子樹に共通する分類群                     <span class="c"># ステップ 1</span>
-    <span class="k">for</span> 各種樹の枝 b:                                   <span class="c"># ステップ 2–3</span>
-        σ_g(b) ← canon(A_b ∩ T_g | B_b ∩ T_g)             <span class="c"># 射影</span>
+    T_g ← 遺伝子樹の分類群（S の部分集合）                       <span class="c"># ステップ 1</span>
+    <span class="k">for</span> 各種樹の枝 b:                                       <span class="c"># ステップ 2–3</span>
+        σ_g(b) ← canon(A_b ∩ T_g | B_b ∩ T_g)                 <span class="c"># 射影</span>
         <span class="k">if</span> σ_g(b) の片側が空:
-            state(g,b) ← NA_struct                        <span class="c"># 射影された同一性がない</span>
-        <span class="k">else if</span> b が内部枝で σ_g(b) の片側が分類群 1 つ:
-            端点崩壊：融合の記帳用に保持し、
-            独立に観測可能な原始枝とはしない
-    <span class="k">for</span> 保持された各射影スプリット:                         <span class="c"># ステップ 4</span>
-        <span class="k">if</span> ある b' ≠ b について σ_g(b) = σ_g(b'):
-            state(g,b) ← NA_fuse                          <span class="c"># 融合群；共有されたシグナルは</span>
-                                                          <span class="c"># 複合座標 b|b' 上にあり得る</span>
-            <span class="c"># 実装：状態サイドカーが融合（F）を記録するのは複合スプリットが</span>
-            <span class="c"># G_g 内で回収された場合のみ。そうでなければ第 2 段階へ進み、</span>
-            <span class="c"># 最終的に residual NA となる</span>
-    残りの (g,b) は決定的：同一性は確定、値は未知
+            state(g,b) ← NA_struct                            <span class="c"># 射影された同一性がない</span>
+        <span class="k">else if</span> b が内部枝で σ_g(b) の片側が分類群 x ただ 1 つ:
+            端点崩壊：σ_g(b) は x の終端枝のスプリットと一致するため、
+            b は融合の記帳用にのみ保持され、独立した枝にはならない
+    保持された枝を σ_g(b) でグループ化する                       <span class="c"># ステップ 4</span>
+        要素が 2 つ以上のグループは融合群：要素は T_g 上で区別できず、
+        1 つの複合座標 b|b' を共有する
+    保持された各 (g,b) の同一性はここで確定し、値はまだ未知
 
-<span class="c"># 第 2 段階 — 遺伝子樹層：決定的なペアだけが遺伝子樹を参照する</span>
-    Σ(G_g) ← G_g の正準無根スプリット                       <span class="c"># ステップ 5</span>
-    <span class="k">for</span> 各決定的な (g,b):
-        <span class="k">if</span> σ_g(b) ∈ Σ(G_g):  Mapped — 枝長を記録
-        <span class="k">else</span>:                generic NA                   <span class="c"># 原因はまだ名付けない</span>
+<span class="c"># 第 2 段階 — 遺伝子樹層：保持された各射影スプリットが遺伝子樹を一度だけ参照する</span>
+    Σ(G_g) ← G_g の正準無根スプリット                           <span class="c"># ステップ 5</span>
+    <span class="k">for</span> 保持された各射影スプリット σ とそのグループ:
+        <span class="k">if</span> σ ∉ Σ(G_g):            全要素を generic NA に        <span class="c"># 原因はまだ名付けない</span>
+        <span class="k">else if</span> グループの要素が 2 つ以上:
+                                全要素を NA_fuse に              <span class="c"># 枝長は b|b' に記入</span>
+        <span class="k">else</span>:                   Mapped — 枝長を記録
 
 <span class="c"># 第 3 段階 — finalize：対になった fixed/free の証拠で残りの NA に名を付ける</span>
-    free 側の generic NA は、fixed 側の原始座標が数値の証拠を持つ場合にのみ
-    NA_topo となり、そうでなければ residual NA</pre></div>
+    NA_fuse は複合座標 b|b' が数値の枝長を持つ場合にのみ成立する
+    free 側の generic NA は、fixed 側の原始座標が Mapped かつ数値を持つ場合にのみ
+    NA_topo となり、そうでなければ residual NA のまま</pre></div>
       <p>ワークフローには二つのモードがある。<code>matrix</code> が座標系を構築し、全遺伝子をそこへ射影する。<code>finalize</code> が、対応する証拠に基づいて欠測状態を分類する。</p>
     </div>
   </div>

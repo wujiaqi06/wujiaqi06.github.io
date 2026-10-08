@@ -220,32 +220,31 @@
 
       <div class="code"><pre><span class="c"># Stage 1 — coverage level: uses only S and T_g, never the gene tree</span>
 <span class="k">for</span> each gene g:
-    T_g ← taxa shared by S and the gene tree              <span class="c"># Step 1</span>
-    <span class="k">for</span> each species-tree branch b:                       <span class="c"># Steps 2–3</span>
-        σ_g(b) ← canon(A_b ∩ T_g | B_b ∩ T_g)             <span class="c"># projection</span>
+    T_g ← taxa of the gene tree (a subset of S)               <span class="c"># Step 1</span>
+    <span class="k">for</span> each species-tree branch b:                           <span class="c"># Steps 2–3</span>
+        σ_g(b) ← canon(A_b ∩ T_g | B_b ∩ T_g)                 <span class="c"># projection</span>
         <span class="k">if</span> one side of σ_g(b) is empty:
-            state(g,b) ← NA_struct                        <span class="c"># no projected identity</span>
-        <span class="k">else if</span> b is internal and one side of σ_g(b) is a single taxon:
-            endpoint-collapsed: kept for fusion bookkeeping,
-            not an independently observable primitive branch
-    <span class="k">for</span> each retained projected split:                    <span class="c"># Step 4</span>
-        <span class="k">if</span> σ_g(b) = σ_g(b') for some b' ≠ b:
-            state(g,b) ← NA_fuse                          <span class="c"># fusion group; the shared signal</span>
-                                                          <span class="c"># may live on a composite coordinate b|b'</span>
-            <span class="c"># implementation: the state sidecar records the fusion (F) only when</span>
-            <span class="c"># the composite split is recovered in G_g; otherwise the pair falls</span>
-            <span class="c"># through to Stage 2 and ends as residual NA</span>
-    remaining (g,b) are decisive: identity settled, value still unknown
+            state(g,b) ← NA_struct                            <span class="c"># no projected identity</span>
+        <span class="k">else if</span> b is internal and one side of σ_g(b) is a single taxon x:
+            endpoint-collapsed: σ_g(b) coincides with the terminal branch of x,
+            so b is kept for fusion bookkeeping, never as an independent branch
+    group the retained branches by σ_g(b)                     <span class="c"># Step 4</span>
+        a group with ≥ 2 members is a fusion group: its members are
+        indistinguishable on T_g and share one composite coordinate b|b'
+    every retained (g,b) now has a settled identity; its value is still unknown
 
-<span class="c"># Stage 2 — gene-tree level: only decisive pairs consult the gene tree</span>
-    Σ(G_g) ← canonical unrooted splits of G_g             <span class="c"># Step 5</span>
-    <span class="k">for</span> each decisive (g,b):
-        <span class="k">if</span> σ_g(b) ∈ Σ(G_g):  Mapped — branch length recorded
-        <span class="k">else</span>:                generic NA                   <span class="c"># cause not yet named</span>
+<span class="c"># Stage 2 — gene-tree level: each retained projected split consults the gene tree once</span>
+    Σ(G_g) ← canonical unrooted splits of G_g                 <span class="c"># Step 5</span>
+    <span class="k">for</span> each retained projected split σ and its group:
+        <span class="k">if</span> σ ∉ Σ(G_g):            generic NA for every member   <span class="c"># cause not yet named</span>
+        <span class="k">else if</span> the group has ≥ 2 members:
+                                NA_fuse for every member      <span class="c"># the length is filed on b|b'</span>
+        <span class="k">else</span>:                   Mapped — branch length recorded
 
 <span class="c"># Stage 3 — finalize: paired fixed/free evidence names the remaining NAs</span>
-    a free-side generic NA becomes NA_topo only when the fixed-side
-    primitive coordinate carries numeric evidence; otherwise residual NA</pre></div>
+    NA_fuse stands only if the composite coordinate b|b' carries a numeric length
+    a free-side generic NA becomes NA_topo only when the fixed-side primitive
+    coordinate is Mapped with a numeric length; otherwise it stays residual NA</pre></div>
       <p>The workflow has two modes: <code>matrix</code> builds the coordinate system and projects every gene onto it; <code>finalize</code> then classifies the resulting missingness where the paired evidence permits.</p>
     </div>
   </div>
