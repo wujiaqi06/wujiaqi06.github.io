@@ -218,7 +218,9 @@
 
       <p><strong>SplitAligner's algorithm is representation-independent.</strong> Because identity lives in the split, how a tree is written does not matter: every edge of a gene tree is reduced to a canonical <em>unrooted</em> split before any comparison. A gene tree may therefore be rooted or unrooted, binary or multifurcating, and written in any child order; rooted input is simply treated as unrooted: the two half-edges at a degree-2 root become one split; their lengths are summed when both are finite numeric values, and otherwise the split carries no numeric length. Its topology may be constrained to the species tree (<strong>fix</strong>) or completely free. Two practical requirements remain: <strong>the taxa of each gene tree must be a subset of the species-tree taxa</strong>, with names matching exactly, and the gene trees should carry branch lengths, since those are the values that get filed into the matrix. This is verified by a serialization- and input-variant regression battery on the bundled example: equivalent inputs give identical matrices, byte for byte when the species tree is unchanged and cell for cell after mapping the B aliases when it is re-serialized.</p>
 
-      <div class="code"><pre><span class="c"># Stage 1 — coverage level: uses only S and T_g, never the gene tree</span>
+      <div class="code"><pre><span class="c"># Split-based branch-mapping algorithm</span>
+
+<span class="c"># Stage 1 — coverage level: uses only S and T_g, never the gene tree</span>
 <span class="k">for</span> each gene g:
     T_g ← taxa of the gene tree (a subset of S)               <span class="c"># Step 1</span>
     <span class="k">for</span> each species-tree branch b:                           <span class="c"># Steps 2–3</span>

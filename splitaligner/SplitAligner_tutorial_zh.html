@@ -211,7 +211,9 @@
 
       <p><strong>SplitAligner 的算法是表示非依赖的。</strong>既然枝的身份就是它的划分，一棵树怎么写就无关紧要：比较之前，基因树的每一条枝都会先归约为规范化的<em>无根</em>划分。因此基因树可以有根或无根、二叉或多叉、子节点顺序任意；有根的输入一律按无根树处理：二度根处的两条半枝合并为同一个划分；两者都是有限数值时枝长相加，否则该划分不带数值枝长。拓扑可以约束在物种树上（<strong>fix</strong>），也可以完全自由。实际使用只有两点要求：<strong>每棵基因树的类群必须是物种树类群的子集</strong>，名称完全一致；基因树应带枝长，因为枝长正是要填进矩阵的值。这一点已由自带示例上的序列化与输入变体回归测试验证：等价输入给出相同的矩阵，物种树不变时逐字节相同，物种树换一种写法时经 B 别名映射后逐格相同。</p>
 
-      <div class="code"><pre><span class="c"># 第一层 —— 覆盖层：只用 S 和 T_g，完全不看基因树</span>
+      <div class="code"><pre><span class="c"># Split-based branch-mapping algorithm</span>
+
+<span class="c"># 第一层 —— 覆盖层：只用 S 和 T_g，完全不看基因树</span>
 <span class="k">for</span> 每个基因 g:
     T_g ← 基因树的类群（S 的子集）                               <span class="c"># 步骤 1</span>
     <span class="k">for</span> 每根物种树枝 b:                                     <span class="c"># 步骤 2–3</span>
