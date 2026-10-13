@@ -168,13 +168,10 @@
   .vd p{margin:0; color:var(--muted); font-size:15px; line-height:1.55}
 
   /* Code block */
-  :root{--code-bg:#12201c; --code-ink:#e8f0ec; --code-faint:#8fb0a6}
-  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){--code-bg:#0b1512; --code-ink:#dce7e2; --code-faint:#6f8f86} }
-  :root[data-theme="dark"]{--code-bg:#0b1512; --code-ink:#dce7e2; --code-faint:#6f8f86}
-  pre{background:var(--code-bg); border:1px solid color-mix(in srgb,#000 12%, var(--code-bg)); border-radius:12px; padding:16px 18px;
-    overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.6; color:var(--code-ink); margin:20px 0 0}
-  pre code{background:none; border:none; padding:0; font-size:inherit; color:inherit}
-  .cm{color:var(--code-faint)}
+  pre{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+    overflow-x:auto; font-family:var(--mono); font-size:13.5px; line-height:1.6; color:var(--ink); margin:20px 0 0}
+  pre code{background:none; border:none; padding:0; font-size:inherit}
+  .cm{color:var(--faint)}
 
   /* Link rows */
   .linkrow{display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px; margin-top:18px}
