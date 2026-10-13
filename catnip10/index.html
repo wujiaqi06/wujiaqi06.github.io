@@ -442,6 +442,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">An equivalent algorithm exists. For pruning without gene-tree discordance, the <strong>Split-based branch-mapping algorithm</strong> derives the same primitive states by projecting species-tree splits instead of contracting the graph: see <a href="../splitaligner/SplitAligner_tutorial.html#idea">the SplitAligner tutorial ↗</a>.</p>
 
     <div class="note">
       <p><strong>No circular oracle.</strong> Canonical split keys are computed only after graph reduction and are used to identify and align surviving reduced edges; they do not derive pruning state. Primitive-coordinate state comes solely from graph deletion, contraction, and propagated original-edge membership.</p>

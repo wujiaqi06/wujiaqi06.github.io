@@ -422,6 +422,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">还有一个等价算法。在只有类群删减、没有基因树不一致的情形下，<strong>Split-based branch-mapping algorithm</strong> 不收缩树图，而是通过投影物种树划分得到相同的原始坐标状态：见 <a href="../splitaligner/SplitAligner_tutorial_zh.html#idea">SplitAligner 教程 ↗</a>。</p>
 
     <div class="note">
       <p><strong>不循环的 oracle。</strong>规范化 split key 只在图简约<em>之后</em>计算，用于识别并对齐存活的简约边；它不产生剪枝状态。原始坐标状态完全来自图的删除、收缩，以及被传播的原始边成员归属。</p>

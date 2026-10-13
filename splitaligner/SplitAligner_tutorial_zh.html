@@ -240,6 +240,7 @@
     NA_fuse 只在复合坐标 b|b' 带有数值枝长时成立
     free 侧的 generic NA 只有在 fixed 侧原始坐标为 Mapped 且带数值时
     才成为 NA_topo；否则保持为 residual NA</pre></div>
+      <div class="cap" style="font-family:var(--sans); font-size:13px; line-height:1.55; max-width:78ch">还有一个等价算法。在只有类群删减、没有基因树不一致的情形下，<strong>Contraction-based oracle</strong> 不用划分，而是通过收缩删减后的树图得到相同的枝状态：见 <a href="../catnip10/index_zh.html#oracle">Catnip10 主页 ↗</a>。</div>
       <p>整个流程有两个模式：<code>matrix</code> 构建坐标系并把所有基因投影上去；<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>
