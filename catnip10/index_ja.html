@@ -389,7 +389,7 @@
 
     <div class="prose"><p>原始枝の同一性と枝長は別々に伝播する。メンバー集合は和集合で、枝長は加算によって更新される。原始枝座標の状態は、最終的なメンバー集合だけから導かれる。</p></div>
 
-<pre><code><span class="cm"># Contraction-based oracle</span>
+<pre><code><span class="cm"># Graph algorithm</span>
 
 Input:
   weighted unrooted tree G = (V,E)
@@ -422,7 +422,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
-    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">等価なアルゴリズムがもう一つある。分類群の剪定のみで遺伝子樹の不一致がない場合、<strong>Split-based branch-mapping algorithm</strong> はグラフを縮約する代わりに種樹スプリットを射影することで、同じ原始座標の状態を導く：<a href="../splitaligner/SplitAligner_tutorial_ja.html#idea">SplitAligner チュートリアル ↗</a>を参照。</p>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">等価なアルゴリズムがもう一つある。無根樹において、分類群の剪定のみで遺伝子樹の不一致がない場合、<strong>Split algorithm</strong> はグラフを縮約する代わりに種樹スプリットを射影することで、同じ原始座標の状態を導く：<a href="../splitaligner/SplitAligner_tutorial_ja.html#idea">SplitAligner チュートリアル ↗</a>を参照。</p>
 
     <div class="note">
       <p><strong>循環しないオラクル。</strong>正準スプリット鍵はグラフ簡約の後にのみ計算され、生き残った簡約辺を同定・整列するために用いられる。剪定状態を導くものではない。原始枝座標の状態は、グラフの削除・収縮と、伝播された元の辺の帰属だけから決まる。</p>
