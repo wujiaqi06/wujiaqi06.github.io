@@ -278,7 +278,7 @@
     <span class="nav-name"><a href="../index_ja.html">Jiaqi Wu</a></span>
     <nav class="nav-links">
       <a href="../index_ja.html#software">ソフトウェア</a>
-      <a href="#oracle">オラクル</a>
+      <a href="#oracle">Graph algorithm</a>
       <a href="#axis-a">軸 A</a>
       <a href="#axis-b">軸 B</a>
       <a href="#dispositions">判定</a>
@@ -305,7 +305,7 @@
       </div>
       <div class="btns">
         <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub リポジトリ ↗</a>
-        <a class="btn" href="#oracle">オラクルの仕組み</a>
+        <a class="btn" href="#oracle">Graph algorithm の仕組み</a>
         <a class="btn" href="#case-study">ケーススタディ</a>
         <a class="btn" href="#explore">操作してみる</a>
       </div>
@@ -374,9 +374,9 @@
 <!-- 02 -->
 <section class="block" id="oracle">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">02</span><h2>グラフ理論的オラクル（graph oracle）：来歴を保持するグラフ収縮</h2></div>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Graph-theoretic branch-identity algorithm</h2></div>
     <div class="prose">
-      <p>グラフ理論的オラクル（graph oracle）は、グラフの削除・収縮と原始枝の帰属伝播によってベンチマークの真値を直接構成する小さなグラフアルゴリズムである。したがって Catnip10 の真値対象は、被監査ワークフローの出力から推定されたものではなく、確定的かつ厳密で、セル単位で検証できる。オラクルが被監査ワークフローの出力を読むことは一切ない。</p>
+      <p>Graph-theoretic branch-identity algorithm は樹そのものの上で働く。欠けた分類群を取り除くにつれて各原始枝を追跡し、どれが残り、どれが消え、どれが融合するかを記録し、融合した枝ごとにそれがどの原始枝を含むかを正確に記録する。有根樹にも無根樹にも適用できる。これは SplitAligner の互いに独立した二つの枝同一性アルゴリズムの一つである。答えを構成的に計算するため、Catnip10 はこれをオラクルとして用いる。ベンチマークの真値対象は推定ではなく、確定的かつ厳密で、セル単位で検証でき、オラクルが被監査ワークフローの出力を読むことは一切ない。</p>
     </div>
 
     <ol class="algo">
@@ -422,7 +422,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
-    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">等価なアルゴリズムがもう一つある。無根樹において、分類群の剪定のみで遺伝子樹の不一致がない場合、<strong>Split-based branch-identity algorithm</strong> はグラフを縮約する代わりに種樹スプリットを射影することで、同じ原始座標の状態を導く：<a href="../splitaligner/SplitAligner_tutorial_ja.html#idea">SplitAligner チュートリアル ↗</a>を参照。</p>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch"><strong>Split-based branch-identity algorithm</strong> は同じ構造的な問い、すなわち無根の枝同一性に、グラフを縮約せず各枝の両側の分類群を比較することで答える。この共通の課題では二つの独立したアルゴリズムは必ず一致し、互いの検証に用いられる：<a href="../splitaligner/SplitAligner_tutorial_ja.html#idea">SplitAligner チュートリアル ↗</a>を参照。</p>
 
     <div class="note">
       <p><strong>循環しないオラクル。</strong>正準スプリット鍵はグラフ簡約の後にのみ計算され、生き残った簡約辺を同定・整列するために用いられる。剪定状態を導くものではない。原始枝座標の状態は、グラフの削除・収縮と、伝播された元の辺の帰属だけから決まる。</p>

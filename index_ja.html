@@ -285,7 +285,7 @@
       <p style="margin:28px 0 14px; font-weight:600; color:var(--ink)">互いに独立した二つの枝同一性アルゴリズムと、制御された分類群削除ベンチマーク。</p>
       <div class="focus">
         <h3>現在の焦点 — SplitAligner</h3>
-        <p>分類群の欠損や遺伝子系統樹の不一致がある状況で系統ゲノミクスを行うための、枝同一性の座標系です。種樹のスプリットを射影することで枝の同一性を定義し、枝の「欠測」を明示的で監査可能なカテゴリに分解します。決定論的なグラフ理論的オラクル・ベンチマーク（Catnip10）と、C++ コアを備えた R 実装（SplitAlignerR）が付属します。枝座標は表示上の根の位置や節点の並び順ではなく、正準化された無根スプリットによって定義されるため、同じ重み付き無根樹を表す等価な表現のあいだで、生物学的な枝の同一性が保たれます。</p>
+        <p>分類群の欠損や遺伝子系統樹の不一致がある状況で系統ゲノミクスを行うための、枝同一性の座標系です。種樹のスプリットを射影することで枝の同一性を定義し、枝の「欠測」を明示的で監査可能なカテゴリに分解します。互いに独立した二つの枝同一性アルゴリズム、制御された分類群削除ベンチマーク（Catnip10）、C++ コアを備えた R 実装（SplitAlignerR）が付属します。枝座標は表示上の根の位置や節点の並び順ではなく、正準化された無根スプリットによって定義されるため、同じ重み付き無根樹を表す等価な表現のあいだで、生物学的な枝の同一性が保たれます。</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="splitaligner/SplitAligner_explainer_ja.html" target="_blank" rel="noopener">アニメーション解説 ↗</a>
           <a href="splitaligner/SplitAligner_tutorial_ja.html" target="_blank" rel="noopener">チュートリアル ↗</a>
@@ -296,10 +296,10 @@
       </div>
       <div class="focus" style="margin-top:16px">
         <h3>現在の焦点 — Catnip10</h3>
-        <p>固定または共有の参照枝座標軸に値を書き込む枝単位のワークフローを対象とした、制御された分類群削除ベンチマーク（controlled taxon-deletion benchmark）であり、決定論的な 10 分類群の適合性テストです。独立したグラフ理論的オラクル（graph oracle）が真値を与え、ワークフローは 2 つの軸——剪定を考慮した座標の適格性と、表現の違いに対して安定な座標の同一性・可用性——で採点されます。SplitAligner が座標を構築し、Catnip10 がそれを検証します。</p>
+        <p>固定または共有の参照枝座標軸に値を書き込む枝単位のワークフローを対象とした、制御された分類群削除ベンチマーク（controlled taxon-deletion benchmark）であり、決定論的な 10 分類群の適合性テストです。被検ワークフローとは独立に実行される Graph-theoretic branch-identity algorithm が真値を与え、ワークフローは 2 つの軸——剪定を考慮した座標の適格性と、表現の違いに対して安定な座標の同一性・可用性——で採点されます。SplitAligner が座標を構築し、Catnip10 がそれを検証します。</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="catnip10/index_ja.html">概要とオラクルの操作 ↗</a>
-          <a href="catnip10/index_ja.html#oracle">グラフ理論的オラクルの仕組み ↗</a>
+          <a href="catnip10/index_ja.html#oracle">Graph algorithm の仕組み ↗</a>
           <a href="catnip10/index_ja.html#case-study">匿名ケーススタディ ↗</a>
           <a href="https://doi.org/10.64898/2026.07.22.740066" target="_blank" rel="noopener">真理値表プレプリント ↗</a>
           <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">Catnip10 リポジトリ ↗</a>
@@ -330,7 +330,7 @@
         <div class="sw">
           <h3>Catnip10</h3>
           <div class="meta"><span class="pill lang">Python / R</span><span class="pill">MIT</span><span class="pill">適合性ベンチマーク</span></div>
-          <p>固定または共有の参照枝座標軸に値を書き込む枝単位のワークフローを対象とした、制御された分類群削除ベンチマーク（controlled taxon-deletion benchmark）であり、決定論的な 10 分類群の適合性テスト。独立したグラフ収縮オラクルが真値を与え、剪定を考慮した座標の適格性と、表現の違いに対して安定な座標の同一性の 2 軸で採点します。SplitAligner の検証エコシステムの中で開発しました。</p>
+          <p>固定または共有の参照枝座標軸に値を書き込む枝単位のワークフローを対象とした、制御された分類群削除ベンチマーク（controlled taxon-deletion benchmark）であり、決定論的な 10 分類群の適合性テスト。被検ワークフローとは独立に実行される Graph-theoretic branch-identity algorithm が真値を与え、剪定を考慮した座標の適格性と、表現の違いに対して安定な座標の同一性の 2 軸で採点します。SplitAligner の検証エコシステムの中で開発しました。</p>
           <div class="links">
             <a href="catnip10/index_ja.html">概要とオラクルの操作 ↗</a>
             <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub ↗</a>

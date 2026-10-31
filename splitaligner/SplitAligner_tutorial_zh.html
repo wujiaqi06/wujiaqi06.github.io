@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315736a'/%3E%3Cpath d='M5 16h6M11 9v14M11 9h8M11 23h8M19 6v6M19 6h6M19 12h6M19 20v6M19 20h6M19 26h6' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>SplitAligner — 教程</title>
-<meta name="description" content="SplitAligner 实操教程：安装、运行示例、生成枝坐标矩阵、读懂缺失状态与枝级 Support，并互动探索 Catnip10 图论 oracle。">
+<meta name="description" content="SplitAligner 实操教程：安装、运行示例、生成枝坐标矩阵、读懂缺失状态与枝级 Support，并互动探索 Catnip10 benchmark。">
 <link rel="stylesheet" href="catnip10_game.css">
 <script src="catnip10_game_data.js" defer></script>
 <script src="catnip10_game.js" defer></script>
@@ -240,7 +240,7 @@
     NA_fuse 只在复合坐标 b|b' 带有数值枝长时成立
     free 侧的 generic NA 只有在 fixed 侧原始坐标为 Mapped 且带数值时
     才成为 NA_topo；否则保持为 residual NA</pre></div>
-      <div class="cap" style="font-family:var(--sans); font-size:13px; line-height:1.55; max-width:78ch">还有一个等价算法。在无根树上、只有类群删减而没有基因树不一致的情形下，<strong>Graph-theoretic branch-identity algorithm</strong> 不用划分，而是通过收缩删减后的树图得到相同的枝状态：见 <a href="../catnip10/index_zh.html#oracle">Catnip10 主页 ↗</a>。</div>
+      <div class="cap" style="font-family:var(--sans); font-size:13px; line-height:1.55; max-width:78ch"><strong>Graph-theoretic branch-identity algorithm</strong> 回答的是同一个结构问题——无根枝身份——但它不用划分，而是在删减后的树收缩时追踪每一根原始枝。在这个共同任务上，两个相互独立的算法必然一致，并用来互相检验：见 <a href="../catnip10/index_zh.html#oracle">Catnip10 主页 ↗</a>。</div>
       <p>整个流程有两个模式：<code>matrix</code> 构建坐标系并把所有基因投影上去；<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>
@@ -451,7 +451,7 @@ B3         terminal     5               4             4              100.0000000
         <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener"><div class="t">SplitAligner(GitHub) ↗</div><div class="d">源码、示例与 preprint 数据，以及 docs/ 规范。</div></a>
         <a href="https://doi.org/10.64898/2026.07.22.740066" target="_blank" rel="noopener"><div class="t">真值表预印本（bioRxiv） ↗</div><div class="d">跨基因枝身份的唯一图论真值表——SplitAligner 背后的理论。</div></a>
         <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener"><div class="t">SplitAlignerR ↗</div><div class="d">R 接口：C++17 graph-first 映射器、fixed/free 配对 finalize，以及独立的纯 R Catnip10 oracle（v0.1.0，通过 Pro RECERT 认证）。</div></a>
-        <a href="../catnip10/index_zh.html"><div class="t">Catnip10 ↗</div><div class="d">确定性一致性基准：概览、交互式图论 oracle 与案例研究。</div></a>
+        <a href="../catnip10/index_zh.html"><div class="t">Catnip10 ↗</div><div class="d">受控类群删除基准：概览、Graph-theoretic branch-identity algorithm、交互式探索与案例研究。</div></a>
       </div>
     </div>
   </div>

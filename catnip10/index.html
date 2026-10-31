@@ -278,7 +278,7 @@
     <span class="nav-name"><a href="../index.html">Jiaqi Wu</a></span>
     <nav class="nav-links">
       <a href="../index.html#software">Software</a>
-      <a href="#oracle">Oracle</a>
+      <a href="#oracle">Graph algorithm</a>
       <a href="#axis-a">Axis A</a>
       <a href="#axis-b">Axis B</a>
       <a href="#dispositions">Dispositions</a>
@@ -305,7 +305,7 @@
       </div>
       <div class="btns">
         <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub repository ↗</a>
-        <a class="btn" href="#oracle">How the oracle works</a>
+        <a class="btn" href="#oracle">How the graph algorithm works</a>
         <a class="btn" href="#case-study">Case study</a>
         <a class="btn" href="#explore">Try it interactively</a>
       </div>
@@ -394,9 +394,9 @@
 <!-- 02 THE ORACLE -->
 <section class="block" id="oracle">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">02</span><h2>The oracle: graph contraction with bookkeeping</h2></div>
+    <div class="sec-head"><span class="sec-num">02</span><h2>The Graph-theoretic branch-identity algorithm</h2></div>
     <div class="prose">
-      <p>The oracle is deliberately not a phylogenetic method. It is a small graph algorithm that computes the answer by construction, so the benchmark's truth object is exact and inspectable rather than estimated. It never looks at the audited workflow's output.</p>
+      <p>The Graph-theoretic branch-identity algorithm works on the tree itself: as the missing taxa are removed, it follows each original branch, recording which ones survive, which disappear, and which merge, and for every merged branch exactly which original branches it contains, in rooted and unrooted trees alike. It is one of SplitAligner's two independent branch-identity algorithms. Because it computes the answer by construction, Catnip10 uses it as its oracle: the benchmark's truth object is exact and inspectable rather than estimated, and the oracle never looks at the audited workflow's output.</p>
     </div>
 
     <ol class="algo">
@@ -442,7 +442,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
-    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">An equivalent algorithm exists. On unrooted trees, for pruning without gene-tree discordance, the <strong>Split-based branch-identity algorithm</strong> derives the same primitive states by projecting species-tree splits instead of contracting the graph: see <a href="../splitaligner/SplitAligner_tutorial.html#idea">the SplitAligner tutorial ↗</a>.</p>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">The <strong>Split-based branch-identity algorithm</strong> answers the same structural question, unrooted branch identity, without contracting the graph: it compares the taxa on the two sides of each branch. On that shared task the two independent algorithms must agree, and each is used to check the other: see <a href="../splitaligner/SplitAligner_tutorial.html#idea">the SplitAligner tutorial ↗</a>.</p>
 
     <div class="note">
       <p><strong>No circular oracle.</strong> Canonical split keys are computed only after graph reduction and are used to identify and align surviving reduced edges; they do not derive pruning state. Primitive-coordinate state comes solely from graph deletion, contraction, and propagated original-edge membership.</p>

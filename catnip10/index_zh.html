@@ -278,7 +278,7 @@
     <span class="nav-name"><a href="../index_zh.html">Jiaqi Wu</a></span>
     <nav class="nav-links">
       <a href="../index_zh.html#software">软件</a>
-      <a href="#oracle">Oracle</a>
+      <a href="#oracle">Graph algorithm</a>
       <a href="#axis-a">轴 A</a>
       <a href="#axis-b">轴 B</a>
       <a href="#dispositions">判定</a>
@@ -305,7 +305,7 @@
       </div>
       <div class="btns">
         <a class="btn primary" href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
-        <a class="btn" href="#oracle">oracle 如何工作</a>
+        <a class="btn" href="#oracle">Graph algorithm 如何工作</a>
         <a class="btn" href="#case-study">案例研究</a>
         <a class="btn" href="#explore">动手试试</a>
       </div>
@@ -374,9 +374,9 @@
 <!-- 02 -->
 <section class="block" id="oracle">
   <div class="wrap">
-    <div class="sec-head"><span class="sec-num">02</span><h2>图论 oracle（graph oracle）：带成员溯源的图收缩</h2></div>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Graph-theoretic branch-identity algorithm</h2></div>
     <div class="prose">
-      <p>图论 oracle（graph oracle）是一个通过图删除、收缩和原始分枝成员归属传播，直接构造基准真值的小型图算法。因此，Catnip10 的真值对象是确定、精确且可逐格核验的，而不是从被审计工作流的输出中估计出来的。oracle 从不读取被审计工作流的输出。</p>
+      <p>Graph-theoretic branch-identity algorithm 直接在树上工作：随着缺失类群被逐个删除，它追踪每一根原始枝，记录哪些保留、哪些消失、哪些融合，并为每一根融合枝记下它究竟包含哪些原始枝；有根树和无根树都适用。它是 SplitAligner 两个相互独立的枝身份算法之一。由于它按构造直接算出答案，Catnip10 用它作为 oracle：基准的真值对象是确定、精确且可逐格核验的，而不是估计出来的；oracle 从不读取被审计工作流的输出。</p>
     </div>
 
     <ol class="algo">
@@ -422,7 +422,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
-    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">还有一个等价算法。在无根树上、只有类群删减而没有基因树不一致的情形下，<strong>Split-based branch-identity algorithm</strong> 不收缩树图，而是通过投影物种树划分得到相同的原始坐标状态：见 <a href="../splitaligner/SplitAligner_tutorial_zh.html#idea">SplitAligner 教程 ↗</a>。</p>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch"><strong>Split-based branch-identity algorithm</strong> 回答的是同一个结构问题——无根枝身份——但它不收缩树图，而是比较每根枝两侧的类群。在这个共同任务上，两个相互独立的算法必然一致，并用来互相检验：见 <a href="../splitaligner/SplitAligner_tutorial_zh.html#idea">SplitAligner 教程 ↗</a>。</p>
 
     <div class="note">
       <p><strong>不循环的 oracle。</strong>规范化 split key 只在图简约<em>之后</em>计算，用于识别并对齐存活的简约边；它不产生剪枝状态。原始坐标状态完全来自图的删除、收缩，以及被传播的原始边成员归属。</p>
