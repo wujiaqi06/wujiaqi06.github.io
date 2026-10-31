@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315736a'/%3E%3Cpath d='M5 16h6M11 9v14M11 9h8M11 23h8M19 6v6M19 6h6M19 12h6M19 20v6M19 20h6M19 26h6' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<title>Catnip10 — 确定性枝坐标一致性基准</title>
+<title>Catnip10: a controlled taxon-deletion benchmark</title>
 <meta name="description" content="Catnip10 是面向「使用固定或共享参考枝坐标轴」的分枝级工作流的确定性 10 叶一致性基准。它以独立的图论 oracle（graph oracle）为真值对象，检验剪枝感知的坐标资格，以及表示变化下稳定的坐标身份与可用性。">
 <link rel="stylesheet" href="../splitaligner/catnip10_game.css">
 <script src="../splitaligner/catnip10_game_data.js" defer></script>
@@ -295,7 +295,7 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow">一致性基准 · 图论 oracle</div>
+      <div class="eyebrow">受控类群删除基准 · 图论 oracle</div>
       <h1>Catnip10</h1>
       <div class="tag">我们虽小，但明察秋毫。</div>
       <p class="lead">一个分枝级数值可以在数值上完全正确，却被记在<em>错误的演化分枝</em>名下。Catnip10 是一棵 10 叶的测试树——17 条冻结坐标，小到可以用手完整追踪——它的正确答案由构造确定，因此工作流的坐标记账可以被检验，而不必被信任。</p>
@@ -312,7 +312,7 @@
     </div>
     <figure class="badge-card" style="margin:0">
       <img src="catnip10_mascot.jpg" alt="Catnip10 吉祥物：一棵手持放大镜与审计记录板的卡通玩具树，标注了 t1 到 t10 十个叶节点，其中 t10 标为 DISPLAY ROOT。">
-      <figcaption class="badge-cap">项目吉祥物 · 10 叶一致性基准</figcaption>
+      <figcaption class="badge-cap">项目吉祥物 · Catnip10 benchmark</figcaption>
     </figure>
   </div>
 </section>
@@ -389,7 +389,7 @@
 
     <div class="prose"><p>原始分枝身份与枝长分别传播：成员集合取并集，枝长相加。原始坐标状态只由最终的成员集合推导。</p></div>
 
-<pre><code><span class="cm"># Graph algorithm</span>
+<pre><code><span class="cm"># Graph-theoretic branch-identity algorithm</span>
 
 Input:
   weighted unrooted tree G = (V,E)
@@ -422,7 +422,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
-    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">还有一个等价算法。在无根树上、只有类群删减而没有基因树不一致的情形下，<strong>Split algorithm</strong> 不收缩树图，而是通过投影物种树划分得到相同的原始坐标状态：见 <a href="../splitaligner/SplitAligner_tutorial_zh.html#idea">SplitAligner 教程 ↗</a>。</p>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">还有一个等价算法。在无根树上、只有类群删减而没有基因树不一致的情形下，<strong>Split-based branch-identity algorithm</strong> 不收缩树图，而是通过投影物种树划分得到相同的原始坐标状态：见 <a href="../splitaligner/SplitAligner_tutorial_zh.html#idea">SplitAligner 教程 ↗</a>。</p>
 
     <div class="note">
       <p><strong>不循环的 oracle。</strong>规范化 split key 只在图简约<em>之后</em>计算，用于识别并对齐存活的简约边；它不产生剪枝状态。原始坐标状态完全来自图的删除、收缩，以及被传播的原始边成员归属。</p>
@@ -1764,7 +1764,7 @@ python3 -m unittest discover -s tests -v
 <footer>
   <div class="wrap">
     <span>© <span id="yr"></span> Jiaqi Wu（呉佳齊）· 广岛大学</span>
-    <span>Catnip10 · 确定性枝坐标一致性基准</span>
+    <span>Catnip10: a controlled taxon-deletion benchmark</span>
   </div>
 </footer>
 

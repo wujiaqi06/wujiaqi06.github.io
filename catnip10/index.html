@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315736a'/%3E%3Cpath d='M5 16h6M11 9v14M11 9h8M11 23h8M19 6v6M19 6h6M19 12h6M19 20v6M19 20h6M19 26h6' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<title>Catnip10 — deterministic branch-coordinate conformance benchmark</title>
+<title>Catnip10: a controlled taxon-deletion benchmark</title>
 <meta name="description" content="Catnip10 is a deterministic 10-tip conformance benchmark for branch-wise workflows that use a fixed or shared reference-branch axis. It tests pruning-aware coordinate eligibility and representation-stable coordinate identity and availability against an independent graph-contraction oracle.">
 <link rel="stylesheet" href="../splitaligner/catnip10_game.css">
 <script src="../splitaligner/catnip10_game_data.js" defer></script>
@@ -295,7 +295,7 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow">Conformance benchmark · graph oracle</div>
+      <div class="eyebrow">Controlled taxon-deletion benchmark · graph oracle</div>
       <h1>Catnip10</h1>
       <div class="tag">We may be small, but we see all.</div>
       <p class="lead">A branch-associated value can be numerically correct and still be filed under the <em>wrong evolutionary branch</em>. Catnip10 is a ten-tip test tree — seventeen frozen coordinates, small enough to trace completely by hand — on which the right answer is known by construction, so a workflow's coordinate bookkeeping can be checked instead of trusted.</p>
@@ -312,7 +312,7 @@
     </div>
     <figure class="badge-card" style="margin:0">
       <img src="catnip10_mascot.jpg" alt="The Catnip10 badge: a cartoon toy tree holding a magnifying glass and an audit clipboard, with ten labelled tips t1 to t10, and t10 annotated as DISPLAY ROOT. Project mascot, not an authoritative benchmark topology.">
-      <figcaption class="badge-cap">project mascot · 10-tip conformance benchmark</figcaption>
+      <figcaption class="badge-cap">project mascot · Catnip10 benchmark</figcaption>
     </figure>
   </div>
 </section>
@@ -409,7 +409,7 @@
 
     <div class="prose"><p>Primitive identity and branch length are propagated separately: membership by set union and length by addition. Primitive-coordinate state is derived only from the final membership sets.</p></div>
 
-<pre><code><span class="cm"># Graph algorithm</span>
+<pre><code><span class="cm"># Graph-theoretic branch-identity algorithm</span>
 
 Input:
   weighted unrooted tree G = (V,E)
@@ -442,7 +442,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
-    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">An equivalent algorithm exists. On unrooted trees, for pruning without gene-tree discordance, the <strong>Split algorithm</strong> derives the same primitive states by projecting species-tree splits instead of contracting the graph: see <a href="../splitaligner/SplitAligner_tutorial.html#idea">the SplitAligner tutorial ↗</a>.</p>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">An equivalent algorithm exists. On unrooted trees, for pruning without gene-tree discordance, the <strong>Split-based branch-identity algorithm</strong> derives the same primitive states by projecting species-tree splits instead of contracting the graph: see <a href="../splitaligner/SplitAligner_tutorial.html#idea">the SplitAligner tutorial ↗</a>.</p>
 
     <div class="note">
       <p><strong>No circular oracle.</strong> Canonical split keys are computed only after graph reduction and are used to identify and align surviving reduced edges; they do not derive pruning state. Primitive-coordinate state comes solely from graph deletion, contraction, and propagated original-edge membership.</p>
@@ -1813,7 +1813,7 @@ python3 -m unittest discover -s tests -v
 <footer>
   <div class="wrap">
     <span>© <span id="yr"></span> Jiaqi Wu (呉佳齊) · Hiroshima University</span>
-    <span>Catnip10 · deterministic branch-coordinate conformance benchmark</span>
+    <span>Catnip10: a controlled taxon-deletion benchmark</span>
   </div>
 </footer>
 

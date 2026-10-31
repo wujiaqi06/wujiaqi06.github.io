@@ -282,6 +282,7 @@
         </div>
       </div>
 
+      <p style="margin:28px 0 14px; font-weight:600; color:var(--ink)">Two independent branch-identity algorithms and a controlled taxon-deletion benchmark.</p>
       <div class="focus">
         <h3>Current focus — SplitAligner</h3>
         <p>A branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance. It defines branch identity through projected species-tree splits and decomposes branch absence into explicit, auditable categories, with a deterministic graph-oracle benchmark (Catnip10) and an R implementation with a C++ core (SplitAlignerR). Its branch coordinates are defined by canonical unrooted splits rather than display-root or positional node identities, so equivalent representations of the same weighted unrooted tree preserve the same biological branch identities.</p>
@@ -295,7 +296,7 @@
       </div>
       <div class="focus" style="margin-top:16px">
         <h3>Current focus — Catnip10</h3>
-        <p>A deterministic 10-tip conformance benchmark for branch-wise workflows that file values on a fixed or shared reference-branch axis. An independent graph oracle supplies the truth object, and a workflow is scored on two axes: pruning-aware coordinate eligibility, and representation-stable coordinate identity and availability. SplitAligner builds coordinates; Catnip10 tests them.</p>
+        <p>A controlled taxon-deletion benchmark: a deterministic 10-tip conformance test for branch-wise workflows that file values on a fixed or shared reference-branch axis. An independent graph oracle supplies the truth object, and a workflow is scored on two axes: pruning-aware coordinate eligibility, and representation-stable coordinate identity and availability. SplitAligner builds coordinates; Catnip10 tests them.</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="catnip10/index.html">Overview &amp; interactive oracle ↗</a>
           <a href="catnip10/index.html#oracle">How the graph oracle works ↗</a>
@@ -329,7 +330,7 @@
         <div class="sw">
           <h3>Catnip10</h3>
           <div class="meta"><span class="pill lang">Python / R</span><span class="pill">MIT</span><span class="pill">conformance benchmark</span></div>
-          <p>A deterministic ten-tip conformance benchmark for branch-wise workflows that file values on a fixed or shared reference-branch axis. An independent graph-contraction oracle supplies the truth object, and workflows are scored on two axes: pruning-aware coordinate eligibility, and representation-stable coordinate identity. Developed within the SplitAligner validation ecosystem.</p>
+          <p>A controlled taxon-deletion benchmark: a deterministic ten-tip conformance test for branch-wise workflows that file values on a fixed or shared reference-branch axis. An independent graph-contraction oracle supplies the truth object, and workflows are scored on two axes: pruning-aware coordinate eligibility, and representation-stable coordinate identity. Developed within the SplitAligner validation ecosystem.</p>
           <div class="links">
             <a href="catnip10/index.html">Overview &amp; interactive oracle ↗</a>
             <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub ↗</a>

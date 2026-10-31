@@ -211,7 +211,7 @@
 
       <p><strong>SplitAligner 的算法是表示非依赖的。</strong>既然枝的身份就是它的划分，一棵树怎么写就无关紧要：比较之前，基因树的每一条枝都会先归约为规范化的<em>无根</em>划分。因此基因树可以有根或无根、二叉或多叉、子节点顺序任意；有根的输入一律按无根树处理：二度根处的两条半枝合并为同一个划分；两者都是有限数值时枝长相加，否则该划分不带数值枝长。拓扑可以约束在物种树上（<strong>fix</strong>），也可以完全自由。实际使用只有两点要求：<strong>每棵基因树的类群必须是物种树类群的子集</strong>，名称完全一致；基因树应带枝长，因为枝长正是要填进矩阵的值。这一点已由自带示例上的序列化与输入变体回归测试验证：等价输入给出相同的矩阵，物种树不变时逐字节相同，物种树换一种写法时经 B 别名映射后逐格相同。</p>
 
-      <div class="code"><pre><span class="c"># Split algorithm</span>
+      <div class="code"><pre><span class="c"># Split-based branch-identity algorithm</span>
 
 <span class="c"># 第一层 —— 覆盖层：只用 S 和 T_g，完全不看基因树</span>
 <span class="k">for</span> 每个基因 g:
@@ -240,7 +240,7 @@
     NA_fuse 只在复合坐标 b|b' 带有数值枝长时成立
     free 侧的 generic NA 只有在 fixed 侧原始坐标为 Mapped 且带数值时
     才成为 NA_topo；否则保持为 residual NA</pre></div>
-      <div class="cap" style="font-family:var(--sans); font-size:13px; line-height:1.55; max-width:78ch">还有一个等价算法。在无根树上、只有类群删减而没有基因树不一致的情形下，<strong>Graph algorithm</strong> 不用划分，而是通过收缩删减后的树图得到相同的枝状态：见 <a href="../catnip10/index_zh.html#oracle">Catnip10 主页 ↗</a>。</div>
+      <div class="cap" style="font-family:var(--sans); font-size:13px; line-height:1.55; max-width:78ch">还有一个等价算法。在无根树上、只有类群删减而没有基因树不一致的情形下，<strong>Graph-theoretic branch-identity algorithm</strong> 不用划分，而是通过收缩删减后的树图得到相同的枝状态：见 <a href="../catnip10/index_zh.html#oracle">Catnip10 主页 ↗</a>。</div>
       <p>整个流程有两个模式：<code>matrix</code> 构建坐标系并把所有基因投影上去；<code>finalize</code> 再根据成对证据区分缺失状态。</p>
     </div>
   </div>

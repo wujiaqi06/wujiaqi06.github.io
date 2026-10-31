@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315736a'/%3E%3Cpath d='M5 16h6M11 9v14M11 9h8M11 23h8M19 6v6M19 6h6M19 12h6M19 20v6M19 20h6M19 26h6' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
-<title>Catnip10 — 決定論的な枝座標適合性ベンチマーク</title>
+<title>Catnip10: a controlled taxon-deletion benchmark</title>
 <meta name="description" content="Catnip10 は、固定・共有された参照枝座標軸を用いる枝ベースのワークフローのための決定論的な 10 分類群適合性ベンチマークである。独立したグラフ理論的オラクル(graph oracle)を真値対象として、剪定を考慮した座標適格性と、表現変化に対して安定な座標同一性・可用性を検証する。">
 <link rel="stylesheet" href="../splitaligner/catnip10_game.css">
 <script src="../splitaligner/catnip10_game_data.js" defer></script>
@@ -295,7 +295,7 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow">適合性ベンチマーク · グラフ理論的オラクル</div>
+      <div class="eyebrow">制御された分類群削除ベンチマーク · グラフ理論的オラクル</div>
       <h1>Catnip10</h1>
       <div class="tag">小さくても、すべてを見通す。</div>
       <p class="lead">枝に付随する値は、数値として正しいまま<em>誤った進化的枝</em>に書き込まれうる。Catnip10 は 10 分類群のテスト樹である——17 個の凍結座標、手で完全に追跡できる大きさ——そこでは正解が構成によって確定しているため、ワークフローの座標記帳は信頼するのではなく検証できる。</p>
@@ -312,7 +312,7 @@
     </div>
     <figure class="badge-card" style="margin:0">
       <img src="catnip10_mascot.jpg" alt="Catnip10 のマスコット:虫めがねと監査用クリップボードを持つトイツリーのイラスト。t1 から t10 までの分類群が並び、t10 には DISPLAY ROOT と注記されている。プロジェクトのマスコットであり、権威あるベンチマークトポロジーではない。">
-      <figcaption class="badge-cap">プロジェクトマスコット · 10 分類群の適合性ベンチマーク</figcaption>
+      <figcaption class="badge-cap">プロジェクトマスコット · Catnip10 benchmark</figcaption>
     </figure>
   </div>
 </section>
@@ -389,7 +389,7 @@
 
     <div class="prose"><p>原始枝の同一性と枝長は別々に伝播する。メンバー集合は和集合で、枝長は加算によって更新される。原始枝座標の状態は、最終的なメンバー集合だけから導かれる。</p></div>
 
-<pre><code><span class="cm"># Graph algorithm</span>
+<pre><code><span class="cm"># Graph-theoretic branch-identity algorithm</span>
 
 Input:
   weighted unrooted tree G = (V,E)
@@ -422,7 +422,7 @@ For each primitive coordinate b:
   else:
       NA_STRUCT
 </code></pre>
-    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">等価なアルゴリズムがもう一つある。無根樹において、分類群の剪定のみで遺伝子樹の不一致がない場合、<strong>Split algorithm</strong> はグラフを縮約する代わりに種樹スプリットを射影することで、同じ原始座標の状態を導く：<a href="../splitaligner/SplitAligner_tutorial_ja.html#idea">SplitAligner チュートリアル ↗</a>を参照。</p>
+    <p class="fine" style="font-size:13px; margin:10px 0 20px; max-width:80ch">等価なアルゴリズムがもう一つある。無根樹において、分類群の剪定のみで遺伝子樹の不一致がない場合、<strong>Split-based branch-identity algorithm</strong> はグラフを縮約する代わりに種樹スプリットを射影することで、同じ原始座標の状態を導く：<a href="../splitaligner/SplitAligner_tutorial_ja.html#idea">SplitAligner チュートリアル ↗</a>を参照。</p>
 
     <div class="note">
       <p><strong>循環しないオラクル。</strong>正準スプリット鍵はグラフ簡約の後にのみ計算され、生き残った簡約辺を同定・整列するために用いられる。剪定状態を導くものではない。原始枝座標の状態は、グラフの削除・収縮と、伝播された元の辺の帰属だけから決まる。</p>
@@ -1764,7 +1764,7 @@ python3 -m unittest discover -s tests -v
 <footer>
   <div class="wrap">
     <span>© <span id="yr"></span> Jiaqi Wu（呉佳齊）· 広島大学</span>
-    <span>Catnip10 · 決定論的な枝座標適合性ベンチマーク</span>
+    <span>Catnip10: a controlled taxon-deletion benchmark</span>
   </div>
 </footer>
 

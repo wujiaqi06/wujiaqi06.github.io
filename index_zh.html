@@ -282,6 +282,7 @@
         </div>
       </div>
 
+      <p style="margin:28px 0 14px; font-weight:600; color:var(--ink)">两个相互独立的枝身份算法，以及一个受控类群删除基准。</p>
       <div class="focus">
         <h3>当前重点 — SplitAligner</h3>
         <p>一个为「类群缺失、基因树冲突」情形设计的分支身份坐标系统。它通过投影到物种树上的分裂（split）来定义分支身份，并把「分支缺失」拆分为几类明确、可审计的情况；配套一个确定性的图论 oracle 基准（Catnip10）和一个带 C++ 核心的 R 实现（SplitAlignerR）。分支坐标由规范化的无根 split 定义，不依赖显示用的根位置或节点的排列顺序，因此同一棵加权无根树的各种等价表示，都会保留相同的生物学分支身份。</p>
@@ -295,7 +296,7 @@
       </div>
       <div class="focus" style="margin-top:16px">
         <h3>当前重点 — Catnip10</h3>
-        <p>一个确定性的 10 叶一致性基准，面向那些把数值记录在固定或共享参考分支坐标轴上的分支级工作流。由独立的图论 oracle 提供真值对象，并从两个维度对工作流打分：一是坐标资格是否正确考虑了剪枝，二是坐标的身份与可用性在树的不同表示之间是否稳定。SplitAligner 负责构建坐标，Catnip10 负责检验坐标。</p>
+        <p>一个受控类群删除基准（controlled taxon-deletion benchmark）：确定性的 10 叶一致性测试，面向那些把数值记录在固定或共享参考分支坐标轴上的分支级工作流。由独立的图论 oracle 提供真值对象，并从两个维度对工作流打分：一是坐标资格是否正确考虑了剪枝，二是坐标的身份与可用性在树的不同表示之间是否稳定。SplitAligner 负责构建坐标，Catnip10 负责检验坐标。</p>
         <div class="sw links" style="display:flex; gap:16px; flex-wrap:wrap; font-size:14.5px">
           <a href="catnip10/index_zh.html">概览与交互式 oracle ↗</a>
           <a href="catnip10/index_zh.html#oracle">图论 oracle 如何工作 ↗</a>
@@ -329,7 +330,7 @@
         <div class="sw">
           <h3>Catnip10</h3>
           <div class="meta"><span class="pill lang">Python / R</span><span class="pill">MIT</span><span class="pill">一致性基准</span></div>
-          <p>一个确定性的 10 叶一致性基准，面向把数值记录在固定或共享参考分支坐标轴上的分支级工作流。由独立的图收缩 oracle 提供真值对象，从两个维度打分：坐标资格是否正确考虑了剪枝，以及坐标身份在树的不同表示之间是否稳定。在 SplitAligner 的验证体系中开发。</p>
+          <p>一个受控类群删除基准（controlled taxon-deletion benchmark）：确定性的 10 叶一致性测试，面向把数值记录在固定或共享参考分支坐标轴上的分支级工作流。由独立的图收缩 oracle 提供真值对象，从两个维度打分：坐标资格是否正确考虑了剪枝，以及坐标身份在树的不同表示之间是否稳定。在 SplitAligner 的验证体系中开发。</p>
           <div class="links">
             <a href="catnip10/index_zh.html">概览与交互式 oracle ↗</a>
             <a href="https://github.com/wujiaqi06/Catnip10" target="_blank" rel="noopener">GitHub ↗</a>
