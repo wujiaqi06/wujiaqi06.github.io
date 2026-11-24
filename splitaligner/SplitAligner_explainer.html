@@ -14,7 +14,7 @@
     --struct:#e0555f;                  /* NA_struct — red, matches Fig S1 */
     --fuse:#5b8dd6;                    /* NA_fuse  — blue, matches Fig S1 */
     --topo:#e6a93a;                    /* NA_topo  — amber (also brand accent) */
-    --residual:#596a75;                /* residual_NA */
+    --residual:#596a75;                /* generic, unnamed NA */
     --accent:#e6a93a;
     --sideA:#3fb488; --sideB:#c79a3f;
     --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
@@ -180,7 +180,7 @@
   .cell{aspect-ratio:1; border-radius:2px; background:var(--ink3); opacity:0; transform:scale(.4)}
   .scene.is-active .matrix .cell{opacity:1; transform:none; transition:opacity .5s ease, transform .5s ease}
   .cell.mapped{background:var(--mapped)} .cell.struct{background:var(--struct)}
-  .cell.fuse{background:var(--fuse)} .cell.topo{background:var(--topo)} .cell.res{background:var(--residual)}
+  .cell.fuse{background:var(--fuse)} .cell.topo{background:var(--topo)}
   .equation{font-family:var(--mono); font-size:clamp(13px,1.4vw,17px); line-height:2; letter-spacing:.01em}
   .equation .op{color:var(--faint)}
   .legend{display:grid; gap:9px; margin-top:4px}
@@ -419,7 +419,7 @@
           </div>
           <div class="fate topo rv" style="--d:.34s">
             <div class="cap"><span class="name" style="color:var(--topo)">NA_topo</span><span class="swatch" style="background:var(--topo)"></span></div>
-            <div class="why">Coverage is fine, but the gene tree topology <b>disagrees</b> — the split simply isn&rsquo;t there. <b>Discordance.</b></div>
+            <div class="why">The branch survives taxon removal on its own, but its split is <b>absent from the gene tree</b>. <b>Not recovered.</b></div>
           </div>
         </div>
         <div class="split-cols rv" style="--d:.42s; gap:28px; align-items:stretch">
@@ -438,9 +438,9 @@
           <div style="display:grid; gap:14px; align-content:center">
             <div class="topo-call">
               <div class="h">NA_topo — the headline case</div>
-              <div class="b">Same taxa, same coverage — but the gene tree groups them differently, so the split simply isn&rsquo;t there. In the 302-mammal data this is <b style="color:var(--paper)">76.7%</b> of all non-mapped entries.</div>
+              <div class="b">The branch is still separately observable for this gene&rsquo;s taxa, but the gene tree does not contain its split. In the 302-mammal data this is <b style="color:var(--paper)">88.6%</b> of missing entries on internal reference branches.</div>
             </div>
-            <p class="lede" style="font-size:13px">The 10-tip benchmark removes discordance by design, isolating <span class="tok struct">NA_struct</span> and <span class="tok fuse">NA_fuse</span> cleanly. Real gene trees open the fourth column, <span class="tok topo">NA_topo</span>; a fifth, <span class="tok res">residual_NA</span>, stays honest when the fixed side offers no numeric evidence to promote.</p>
+            <p class="lede" style="font-size:13px">The 10-tip benchmark removes discordance by design, isolating <span class="tok struct">NA_struct</span> and <span class="tok fuse">NA_fuse</span> cleanly. Real gene trees open the fourth column, <span class="tok topo">NA_topo</span>. It records that the split is absent, not why: biological discordance, estimation error, or an unresolved relationship. A fused group is tested as a whole: when its split is absent, the group is recorded as <span class="mono" style="color:var(--paper)">NA_fuse_topo</span> and its members stay <span class="tok fuse">NA_fuse</span>.</p>
           </div>
         </div>
       </div>
@@ -460,21 +460,20 @@
               <span class="op">+</span> <span style="color:var(--struct)">NA_struct</span>
               <span class="op">+</span> <span style="color:var(--fuse)">NA_fuse</span><br>
               <span class="op" style="margin-left:2.6em">+</span> <span style="color:var(--topo)">NA_topo</span>
-              <span class="op">+</span> <span style="color:var(--residual)">residual_NA</span>
             </div>
             <div class="legend rv" style="--d:.2s">
               <div class="row"><span class="swatch" style="background:var(--mapped)"></span> Mapped <span class="n">1,219,182</span></div>
               <div class="row"><span class="swatch" style="background:var(--topo)"></span> NA_topo <span class="n">113,656</span></div>
-              <div class="row"><span class="swatch" style="background:var(--fuse)"></span> NA_fuse <span class="n">21,913</span></div>
+              <div class="row"><span class="swatch" style="background:var(--fuse)"></span> NA_fuse <span class="n">22,320</span></div>
               <div class="row"><span class="swatch" style="background:var(--struct)"></span> NA_struct <span class="n">12,117</span></div>
-              <div class="row"><span class="swatch" style="background:var(--residual)"></span> residual_NA <span class="n">407</span></div>
               <div class="row" style="border-top:1px solid var(--line); padding-top:8px; color:var(--paper)">Total cells |&#x1D48A;| <span class="n">1,367,275</span></div>
             </div>
+            <div class="rv" style="--d:.26s; font-size:12.5px; color:var(--muted); line-height:1.5; max-width:72ch">A fused group is tested once, as a whole: 202 groups are not recovered (<span class="mono" style="color:var(--paper)">NA_fuse_topo</span>). Their 407 member cells stay <span style="color:var(--fuse)">NA_fuse</span> and are already counted above. Unmatched reference splits = NA_topo + NA_fuse_topo = 113,656 + 202 = 113,858.</div>
             <div class="rv" style="--d:.3s; font-size:13px; color:var(--faint); font-family:var(--mono)">2,275 single-copy genes &times; 302 placental mammals · free-topology</div>
           </div>
           <div class="rv" style="--d:.16s; justify-self:center; display:grid; gap:16px; justify-items:center">
             <div class="matrix" id="matrix" aria-label="gene by branch matrix, colored by cell state"></div>
-            <div class="stat" style="text-align:center"><div class="big">76.7%</div><div class="lab" style="margin:6px auto 0">of all non-mapped entries are topology-induced — not missing coverage</div></div>
+            <div class="stat" style="text-align:center"><div class="big">88.6%</div><div class="lab" style="margin:6px auto 0">of missing entries on internal reference branches are NA_topo — topological nonrecovery, not taxon loss</div></div>
           </div>
         </div>
       </div>
@@ -494,7 +493,7 @@
           <div class="line rv" style="--d:2.2s">if topology turns away — <span style="color:var(--topo)">NA_topo</span>.</div>
           <div class="spacer"></div>
           <div class="line rv" style="--d:2.7s">No ghosts, no leaks:</div>
-          <div class="line rv" style="--d:3.1s">Total = <span style="color:var(--mapped)">Mapped</span> + <span style="color:var(--struct)">NA_struct</span> + <span style="color:var(--fuse)">NA_fuse</span> + <span style="color:var(--topo)">NA_topo</span> + <span style="color:var(--residual)">residual_NA</span>.</div>
+          <div class="line rv" style="--d:3.1s">Total = <span style="color:var(--mapped)">Mapped</span> + <span style="color:var(--struct)">NA_struct</span> + <span style="color:var(--fuse)">NA_fuse</span> + <span style="color:var(--topo)">NA_topo</span>.</div>
           <div class="final rv" style="--d:3.8s">A quiet ledger, where every absence has a name.</div>
         </div>
       </div>
@@ -506,7 +505,7 @@
         <svg class="bg-tree no-draw" id="bgTree2" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
         <div class="eyebrow rv">SplitAligner</div>
         <h1 class="title rv" style="--d:.08s; text-align:center; max-width:22ch">Branch identity, made auditable.</h1>
-        <p class="lede rv" style="--d:.2s; text-align:center; margin:0 auto; max-width:66ch">Wu J. (2026). <em>SplitAligner: a branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance.</em> Companion coordinate-audit benchmark: the deterministic 10-tip toy tree.</p>
+        <p class="lede rv" style="--d:.2s; text-align:center; margin:0 auto; max-width:66ch">Wu J. (2026). <em>SplitAligner: a branch-identity coordinate system for phylogenomics under missing taxa and gene-tree discordance.</em> Companion benchmark: Catnip10: a controlled taxon-deletion benchmark.</p>
       </div>
     </section>
 
@@ -669,7 +668,7 @@ drawTree(document.getElementById("treePremise"), toyTree(), {internalLabels:true
 /* Scene 6: matrix fill (real free-topology proportions) */
 (function(){
   const cols=18, rows=12, total=cols*rows;
-  const frac={mapped:0.892, topo:0.083, fuse:0.016, struct:0.0089, res:0.0003};
+  const frac={mapped:0.892, topo:0.083, fuse:0.016, struct:0.0089};
   const bag=[];
   Object.entries(frac).forEach(([k,v])=>{const n=Math.round(v*total); for(let i=0;i<n;i++)bag.push(k);});
   while(bag.length<total)bag.push("mapped"); bag.length=total;
