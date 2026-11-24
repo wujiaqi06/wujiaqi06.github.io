@@ -417,7 +417,7 @@ A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
       <p>The categories partition the axis — they add up to the whole ledger:</p>
       <div class="identity">|C| = Mapped + NA_fuse + NA_struct + NA_topo</div>
       <div class="identity">Unmatched reference splits = NA_topo + NA_fuse_topo</div>
-      <p>The first identity counts cells; the second counts reference splits absent from the gene trees. In the 302-mammal data: 1,367,275 = 1,219,182 + 22,320 + 12,117 + 113,656, and 113,858 = 113,656 + 202. If a recovered branch has no usable length in the input tree, its length cell is a plain <code>NA</code>; the branch still counts as Mapped.</p>
+      <p>The first identity counts cells; the second counts reference splits absent from the gene trees. In the 302-mammal data: 1,367,275 = 1,219,182 + 22,320 + 12,117 + 113,656, and 113,858 = 113,656 + 202.</p>
       <p>Once <code>NA</code> is split into <em>why</em>, downstream rate or selection analyses can handle, filter, and audit the states explicitly instead of treating every absence as the same opaque value.</p>
     </div>
   </div>
@@ -454,7 +454,7 @@ B3         terminal     5               4             4              100.0000000
         <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener"><div class="t">SplitAligner preprint (bioRxiv) ↗</div><div class="d">The method and the 302-mammal analysis.</div></a>
         <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener"><div class="t">SplitAligner on GitHub ↗</div><div class="d">Source, the toy and preprint examples, and the docs/ specification.</div></a>
         <a href="https://doi.org/10.64898/2026.07.22.740066" target="_blank" rel="noopener"><div class="t">Truth-table preprint (bioRxiv) ↗</div><div class="d">A unique graph-theoretic truth table for cross-gene branch identity — the theory behind SplitAligner.</div></a>
-        <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener"><div class="t">SplitAlignerR ↗</div><div class="d">The R interface: a C++17 graph-first mapper, paired fixed/free finalization, and an independent pure-R Catnip10 oracle (v0.1.0, Pro RECERT certified).</div></a>
+        <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener"><div class="t">SplitAlignerR ↗</div><div class="d">The R interface: the split-based SplitAlignerFast C++ core by default, graph-based truth tables for rooted and unrooted trees, and an independent pure-R Catnip10 oracle (development version 0.1.0.9015).</div></a>
         <a href="../catnip10/index.html"><div class="t">Catnip10 ↗</div><div class="d">A controlled taxon-deletion benchmark: overview, the Graph-theoretic branch-identity algorithm, an interactive explorer, and a case study.</div></a>
       </div>
     </div>

@@ -409,7 +409,7 @@ A1BG   0.1809315089 NA_struct  0.0047384154 ...</pre></div>
       <p>这些类别对坐标轴构成一个划分——加起来就是整本台账：</p>
       <div class="identity">|C| = Mapped + NA_fuse + NA_struct + NA_topo</div>
       <div class="identity">未匹配的参考划分 = NA_topo + NA_fuse_topo</div>
-      <p>第一个等式数的是单元格，第二个数的是基因树中缺席的参考划分。在 302 种哺乳动物数据中：1,367,275 = 1,219,182 + 22,320 + 12,117 + 113,656；113,858 = 113,656 + 202。若一根被找回的枝在输入树里没有可用的枝长，它的枝长格是普通的 <code>NA</code>，但该枝仍算 Mapped。</p>
+      <p>第一个等式数的是单元格，第二个数的是基因树中缺席的参考划分。在 302 种哺乳动物数据中：1,367,275 = 1,219,182 + 22,320 + 12,117 + 113,656；113,858 = 113,656 + 202。</p>
       <p>一旦 <code>NA</code> 按<em>原因</em>拆开，下游的速率或选择分析就能明确地处理、过滤和审计各类状态，而不是把所有缺失都压成同一个不透明的值。</p>
     </div>
   </div>
@@ -446,7 +446,7 @@ B3         terminal     5               4             4              100.0000000
         <a href="https://doi.org/10.64898/2026.02.24.707838" target="_blank" rel="noopener"><div class="t">SplitAligner 预印本（bioRxiv） ↗</div><div class="d">方法以及 302 种哺乳类的分析。</div></a>
         <a href="https://github.com/wujiaqi06/SplitAligner" target="_blank" rel="noopener"><div class="t">SplitAligner(GitHub) ↗</div><div class="d">源码、示例与 preprint 数据，以及 docs/ 规范。</div></a>
         <a href="https://doi.org/10.64898/2026.07.22.740066" target="_blank" rel="noopener"><div class="t">真值表预印本（bioRxiv） ↗</div><div class="d">跨基因枝身份的唯一图论真值表——SplitAligner 背后的理论。</div></a>
-        <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener"><div class="t">SplitAlignerR ↗</div><div class="d">R 接口：C++17 graph-first 映射器、fixed/free 配对 finalize，以及独立的纯 R Catnip10 oracle（v0.1.0，通过 Pro RECERT 认证）。</div></a>
+        <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener"><div class="t">SplitAlignerR ↗</div><div class="d">R 接口：默认使用基于划分的 SplitAlignerFast C++ 内核，另有有根与无根树的图论真值表，以及独立的纯 R Catnip10 oracle（开发版 0.1.0.9015）。</div></a>
         <a href="../catnip10/index_zh.html"><div class="t">Catnip10 ↗</div><div class="d">受控类群删除基准：概览、Graph-theoretic branch-identity algorithm、交互式探索与案例研究。</div></a>
       </div>
     </div>

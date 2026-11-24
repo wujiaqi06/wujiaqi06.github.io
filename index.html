@@ -340,7 +340,7 @@
         <div class="sw">
           <h3>SplitAlignerR</h3>
           <div class="meta"><span class="pill lang">R / C++17</span><span class="pill">GPL-3</span><span class="pill">v0.1.0 · Pro RECERT certified</span></div>
-          <p>The R interface and independent benchmark track for SplitAligner. v0.1.0 ships a production C++17 graph-first mapper with strict finite-range branch-length validation, explicit structural and topological states, and composite-coordinate provenance; a separate paired fixed/free finalization layer that keeps literal NA as residual NA; and a pure R node-edge oracle that independently recomputes the whole Catnip10 benchmark (272 cells, 19 fusion events). The immutable v0.1.0 release passed independent Pro RECERT; the default branch is the post-release development line.</p>
+          <p>The R interface and independent benchmark track for SplitAligner. The current development version (0.1.0.9015) uses the split-based SplitAlignerFast C++17 core by default (<code>align_branches()</code>), for both free and fixed gene trees. It also provides graph-based truth tables for rooted and unrooted reference trees, an independent graph path for fixed-topology gene trees (<code>align_fixed_topology()</code>), and a pure R implementation that independently recomputes the whole Catnip10 benchmark (272 cells, 19 fusion events). The immutable v0.1.0 release passed independent Pro RECERT; the development version is not covered by that certification.</p>
           <div class="links">
             <a href="https://github.com/wujiaqi06/SplitAlignerR" target="_blank" rel="noopener">GitHub ↗</a>
             <a href="https://wujiaqi06.github.io/SplitAlignerR/" target="_blank" rel="noopener">Documentation ↗</a>
